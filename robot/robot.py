@@ -2,9 +2,10 @@
 
 import wpilib
 import wpilib.drive
+from commandbased import CommandBasedRobot
+wpilib.SmartDashboard.fi
 
-
-class MyRobot(wpilib.TimedRobot):
+class Robot(CommandBasedRobot):
     """Main robot class"""
 
     def robotInit(self):
@@ -36,7 +37,9 @@ class MyRobot(wpilib.TimedRobot):
 
     def autonomousPeriodic(self):
         if self.timer.get() < 2.0:
-            self.drive.arcadeDrive(-1.0, -0.3)
+            self.drive.arcadeDrive(1.0, -0.3)
+        elif self.timer.get() < 4.0:
+            self.drive.arcadeDrive(1.0, 0.9)
         else:
             self.drive.arcadeDrive(0, 0)
 
@@ -60,4 +63,4 @@ class MyRobot(wpilib.TimedRobot):
 
 
 if __name__ == "__main__":
-    wpilib.run(MyRobot)
+    wpilib.run(Robot)
