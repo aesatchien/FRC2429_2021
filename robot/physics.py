@@ -9,11 +9,18 @@
 # of your robot code without too much extra effort.
 #
 
-import hal.simulation
-
 from pyfrc.physics.core import PhysicsInterface
 from pyfrc.physics import motor_cfgs, tankmodel
 from pyfrc.physics.units import units
+import wpilib
+version = wpilib.__version__[0:4]
+print(f'*** Version is {version} ***')
+if version == '2020':
+    import hal.simulation as simlib # 2020
+elif version == '2021':
+    import wpilib.simulation as simlib #2021
+
+
 
 
 class PhysicsEngine:
@@ -27,18 +34,21 @@ class PhysicsEngine:
 
         self.physics_controller = physics_controller
 
-        # Motors
-        self.l_motor = hal.simulation.PWMSim(1)
-        self.r_motor = hal.simulation.PWMSim(2)
-
-        self.dio1 = hal.simulation.DIOSim(1)
-        self.dio2 = hal.simulation.DIOSim(2)
-        self.ain2 = hal.simulation.AnalogInSim(2)
-
-        self.motor = hal.simulation.PWMSim(4)
+        # Making the transition from 2020 to 2021 libraries
+        self.dio1 = simlib.DIOSim(1)
+        self.dio2 = simlib.DIOSim(2)
+        self.motor = simlib.PWMSim(4)
+        self.l_motor = simlib.PWMSim(1)
+        self.r_motor = simlib.PWMSim(2)
 
         # Gyro
-        self.gyro = hal.simulation.AnalogGyroSim(1)
+        self.gyro = simlib.AnalogGyroSim(1)
+        if version == '2021':
+            self.ain2 = simlib.AnalogInputSim(2)
+        elif version == '2020':
+            self.ain2 = simlib.AnalogInSim(2)
+
+
 
         self.position = 0
 

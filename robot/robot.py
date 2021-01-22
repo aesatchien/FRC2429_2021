@@ -3,13 +3,18 @@
 import wpilib
 import wpilib.drive
 from commandbased import CommandBasedRobot
-wpilib.SmartDashboard.fi
+
 
 class Robot(CommandBasedRobot):
     """Main robot class"""
 
     def robotInit(self):
         """Robot-wide initialization code should go here"""
+
+        if self.isReal():
+            print('*** Robot is real ***')
+        else:
+            print('*** Robot is not real.  Running simulation ***')
 
         self.lstick = wpilib.Joystick(0)
         self.rstick = wpilib.Joystick(1)
