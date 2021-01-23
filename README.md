@@ -1,9 +1,9 @@
 # FRC2429_2021
 
-Stripped-down version of the 2020 Python code for our robot.  This is a work in progress (Jan-March 2021) designed to integrate the robot simulation of autonomous and pathweaver with jupyter notebooks testing our code.   Maintined by CJH.
+Stripped-down version of the 2020 Python code for our robot.  This is a work in progress (Jan-March 2021) designed to integrate the robot simulation of autonomous and pathweaver with jupyter notebooks testing our code. 
 
 Clone the git and install on your own machine:
-Use "git clone https://github.com/aesatchien/FRC2429_2020.git" from the git bash shell to download.
+Use "git clone https://github.com/aesatchien/FRC2429_2021.git" from the git bash (or any git aware) shell to download.
 If you don't have git and you just want to look at the code, you can download the repository from the links on the right.
 
 Notes on how to install python and the necessary accessories that will get all of this running:
