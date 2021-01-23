@@ -12,15 +12,15 @@
 from pyfrc.physics.core import PhysicsInterface
 from pyfrc.physics import motor_cfgs, tankmodel
 from pyfrc.physics.units import units
-import wpilib
+import wpilib.geometry as geo
+
+import wpilib # need some other way of checking version w/o importing unneeded stuff
 version = wpilib.__version__[0:4]
 print(f'*** Version is {version} ***')
 if version == '2020':
     import hal.simulation as simlib # 2020
 elif version == '2021':
     import wpilib.simulation as simlib #2021
-
-
 
 
 class PhysicsEngine:
@@ -48,9 +48,17 @@ class PhysicsEngine:
         elif version == '2020':
             self.ain2 = simlib.AnalogInSim(2)
 
-
-
         self.position = 0
+
+        # cjh keep us on the field - still need to figure out the corner case and mecanum case (may need to flip y?)
+        field_size = 'competition'
+        if field_size == 'competition':
+            self.x_limit, self.y_limit = 15.97, 8.21  # meters for a 52.4x26.9' field
+        else: # at home autonomous challenge for 2021
+            self.x_limit, self.y_limit = 9.144, 9.144 / 2  # meters for a 30x15' field
+
+
+
 
         # Change these parameters to fit your robot!
         bumper_width = 3.25 * units.inch
@@ -85,6 +93,22 @@ class PhysicsEngine:
         transform = self.drivetrain.calculate(l_motor, r_motor, tm_diff)
         pose = self.physics_controller.move_robot(transform)
 
+        if pose.translation().x < 0 or pose.translation().x > self.x_limit:
+            curr_x = transform.translation().x
+            curr_y = transform.translation().y
+            new_transform = geo.Transform2d(geo.Translation2d(-curr_x, curr_y), transform.rotation())
+            self.physics_controller.move_robot(new_transform)
+
+        if pose.translation().y < 0 or pose.translation().y > self.y_limit:
+            curr_x = transform.translation().x
+            curr_y = transform.translation().y
+            new_transform = geo.Transform2d(geo.Translation2d(-curr_x, curr_y), transform.rotation())
+            self.physics_controller.move_robot(new_transform)
+
+
+
+
+# -----------  DELETE THIS STUFF AFTER EXPLAINING -------------------
         # Update the gyro simulation
         # -> FRC gyros are positive clockwise, but the returned pose is positive
         #    counter-clockwise
@@ -98,7 +122,7 @@ class PhysicsEngine:
             switch1 = True
             switch2 = False
 
-        elif self.position > 10:
+        elif self.position > 5:
             switch1 = False
             switch2 = True
 
