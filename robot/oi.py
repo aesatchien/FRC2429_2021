@@ -1,7 +1,17 @@
 # OI compatible with robotpy 2020
 import wpilib
 from wpilib import SmartDashboard, SendableChooser
-from wpilib.command import JoystickButton
+from wpilib.command import JoystickButton, POVButton
+from triggers.dpad import Dpad
+from triggers.axis_button import AxisButton
+
+# commands to bind
+from commands.dpad_drive import DpadDrive
+from commands.autonomous_rotate import AutonomousRotate
+from commands.autonomous_drive import AutonomousDrive
+from commands.autonomous_ramsete import AutonomousRamsete
+from commands.autonomous_group import AutonomousGroup
+from commands.autonomous_drive_pid import AutonomousDrivePID
 
 class OI(object):
     """
@@ -16,11 +26,28 @@ class OI(object):
 
         self.initialize_joystics()
 
+        self.drive_fwd_command =  AutonomousDrive(self.robot, setpoint=2, timeout=3)
+        self.rotate_command = AutonomousRotate(self.robot, setpoint=45, timeout=3, source='dashboard')
+        self.autonomous_test_command = AutonomousGroup(self.robot)
+        self.autonomous_test_ramsete_command = AutonomousRamsete(self.robot)
+
         self.assign_buttons()
+
+        # dummy setpoints to speed up testing from the dashboard
+        SmartDashboard.putNumber('distance', 2.0)
+        SmartDashboard.putNumber('angle', 60)
+
 
     def assign_buttons(self):
         """Assign commands to buttons here"""
-        pass
+        # *** NOTE - THESE CAN FAIL IN COMPETITION IF YOU ARE RELYING ON A BUTTON TO BE HELD DOWN! ***
+        self.dpad.whenPressed(DpadDrive(self.robot, button=self.dpad))
+
+        self.buttonA.whenPressed(self.drive_fwd_command)
+        self.buttonB.whenPressed( AutonomousRotate(self.robot, setpoint=60, timeout=4, source='dashboard'))
+        self.buttonX.whenPressed( AutonomousRotate(self.robot, setpoint=-60, timeout=4, source='dashboard'))
+        self.buttonY.whenPressed(AutonomousDrivePID(self.robot, setpoint=2, timeout=3, source='dashboard'))
+        self.buttonStart.whenPressed(AutonomousGroup(self.robot))
 
     def initialize_joystics(self):
         """
@@ -37,6 +64,7 @@ class OI(object):
         self.buttonRB = JoystickButton(self.stick, 6)
         self.buttonBack = JoystickButton(self.stick, 7)
         self.buttonStart = JoystickButton(self.stick, 8)
+        self.dpad = Dpad(self.stick)
 
         # add/change bindings if we are using more than one joystick
         if self.competition_mode:
@@ -49,3 +77,9 @@ class OI(object):
             self.co_buttonRB = JoystickButton(self.co_stick, 6)
             self.co_buttonBack = JoystickButton(self.co_stick, 7)
             self.co_buttonStart = JoystickButton(self.co_stick, 8)
+            self.co_povButtonUp = POVButton(self.co_stick, 0)
+            self.co_povButtonDown = POVButton(self.co_stick, 180)
+            self.co_povButtonRight = POVButton(self.co_stick, 90)
+            self.co_povButtonLeft = POVButton(self.co_stick, 270)
+            self.co_axisButtonLT = AxisButton(self.co_stick, 2)
+            self.co_axisButtonRT = AxisButton(self.co_stick, 3)

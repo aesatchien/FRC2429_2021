@@ -1,11 +1,18 @@
 #!/usr/bin/env python3
+# Stripped-down version of 2020's Infinite Recharge robot for 2021's simulation and pathweaving
 
 import wpilib
+from wpilib import Timer
 from commandbased import CommandBasedRobot
 from wpilib.command import Scheduler
+from commands.autonomous_ramsete import AutonomousRamsete
+from commands.autonomous_drive import AutonomousDrive
+from commands.autonomous_rotate import AutonomousRotate
 
 # 2429-specific imports - need to import every subsystem you instantiate
-from subsystems.drivetrain_demo import DriveTrainDemo
+from subsystems.drivetrain_sim import DriveTrainSim
+from subsystems.drivetrain import DriveTrain
+# ToDo: make a real drivetrain
 from oi import OI
 
 class Robot(CommandBasedRobot):
@@ -15,61 +22,63 @@ class Robot(CommandBasedRobot):
         """Robot-wide initialization code should go here"""
         super().__init__()
 
-        self.drivetrain = DriveTrainDemo(self)
+        if self.isReal():  # use the real drive train
+            self.drivetrain = DriveTrain(self)
+        else:  # use the simulated drive train
+            self.drivetrain = DriveTrainSim(self)
+
+        #self.drivetrain = DriveTrainSim(self)  # delete this later, the if statement messes up the IDE searches
+
+        # oi MUST be created after all other subsystems since it uses them
         self.oi = OI(self)
 
-        if self.isReal():
-            print('*** Robot is real ***')
-        else:
-            print('*** Robot is not real.  Running simulation ***')
-
-        # Position gets automatically updated as robot moves
-        self.gyro = wpilib.AnalogGyro(1)
-        self.limit1 = wpilib.DigitalInput(1)
-        self.limit2 = wpilib.DigitalInput(2)
-        self.motor = wpilib.Jaguar(4)
-
-        self.position = wpilib.AnalogInput(2)
-
-        self.timer = wpilib.Timer()
+        self.enabled_time = 0  # something is especially weird with the sim about this needing to be initialized in robotInit
 
     def autonomousInit(self):
         """Called when autonomous mode is enabled"""
-
-        self.timer.reset()
-        self.timer.start()
+        self.enabled_time = Timer.getFPGATimestamp()
+        #self.autonomousCommand = AutonomousRamsete(self)
+        self.autonomousCommand = AutonomousDrive(self, setpoint=2)
+        #self.autonomousCommand = AutonomousRotate(self, setpoint=60)
+        self.autonomousCommand.start()
 
     def autonomousPeriodic(self):
         Scheduler.getInstance().run()
-        if self.timer.get() < 2.0:
+
+
+        '''        elapsed_time = Timer.getFPGATimestamp() - self.enabled_time
+        if elapsed_time < 2.0:
             self.drivetrain.drive.arcadeDrive(1.0, -0.3)
-        elif self.timer.get() < 4.0:
+        elif elapsed_time < 4.0:
             self.drivetrain.drive.arcadeDrive(1.0, 0.9)
         else:
-            self.drivetrain.drive.arcadeDrive(0, 0)
+            self.drivetrain.drive.arcadeDrive(0, 0)'''
 
     def TeleopInit(self):
         """Called when teleop mode is enabled"""
-        self.timer.reset()
-        self.timer.start()
-        print(f'Enabling teleop at time = {round(self.timer.get(),1)}')
+        self.enabled_time = Timer.getFPGATimestamp()
 
     def teleopPeriodic(self):
         Scheduler.getInstance().run()
 
-        # Move a motor with a Joystick
-        y = -self.oi.stick.getRawAxis(5)
+    def testPeriodic(self):
+        """This function is called periodically during test mode."""
+        #wpilib.LiveWindow.run()
+        pass
 
-        # stop movement backwards when 1 is on
-        if self.limit1.get():
-            y = max(0, y)
+    def disabledInit(self):
+        self.reset()
 
-        # stop movement forwards when 2 is on
-        if self.limit2.get():
-            y = min(0, y)
+    def disabledPeriodic(self):
+        """This function is called periodically while disabled."""
+        self.log()
 
-        self.motor.set(y)
+    def log(self):
+        # worried about too much comm during the match
+        pass
 
+    def reset(self):
+        pass
 
 if __name__ == "__main__":
     wpilib.run(Robot)

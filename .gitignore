@@ -1,5 +1,7 @@
 # CJH pycharm gitignore
 
+/robot/guis
+
 #pycharm directory
 .idea/
 #jupyter stuff
