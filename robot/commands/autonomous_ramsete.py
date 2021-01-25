@@ -9,7 +9,8 @@ from wpilib import Timer, SmartDashboard
 import subsystems.drive_constants as drive_constants
 
 class AutonomousRamsete(Command):
-    """Attempting to translate the Ramsete command from commands V2 into a V1 version since robotpy doesn't have this command yet"""
+    """Attempting to translate the Ramsete command from commands V2 into a V1 version since robotpy doesn't have this command yet
+    this does not work yet - it just sits there and quivers.  Have to go through piece by piece """
     def __init__(self, robot, timeout=10):
         Command.__init__(self, name='autonomous_ramsete')
         self.robot = robot

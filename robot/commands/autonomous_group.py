@@ -11,7 +11,18 @@ class AutonomousGroup(CommandGroup):
 
     def __init__(self, robot, timeout=None):
         CommandGroup.__init__(self, name='AutonomousGroup')
+        # slalom
+        self.addSequential(AutonomousDrive(robot, setpoint=1, timeout=6))
+        self.addSequential(AutonomousRotate(robot, setpoint=-85, timeout=5))
+        self.addSequential(AutonomousDrive(robot, setpoint=1.5, timeout=6))
+        self.addSequential(AutonomousRotate(robot, setpoint=85, timeout=5))
         self.addSequential(AutonomousDrive(robot, setpoint=2, timeout=6))
-        self.addSequential(AutonomousRotate(robot, setpoint=45, timeout=5, source=None))
-        self.addSequential(AutonomousDrive(robot, setpoint=2, timeout=6))
+        self.addSequential(AutonomousRotate(robot, setpoint=85, timeout=5))
+        self.addSequential(AutonomousDrive(robot, setpoint=1.5, timeout=6))
+        self.addSequential(AutonomousRotate(robot, setpoint=-85, timeout=5))
+        self.addSequential(AutonomousDrive(robot, setpoint=1.5, timeout=6))
+        self.addSequential(AutonomousRotate(robot, setpoint=-85, timeout=5))
+        self.addSequential(AutonomousDrive(robot, setpoint=1.5, timeout=6))
+        self.addSequential(AutonomousRotate(robot, setpoint=-85, timeout=5))
+
 

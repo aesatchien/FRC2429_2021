@@ -68,7 +68,7 @@ class PhysicsEngine:
         # --------  INITIALIZE FIELD SETTINGS  ---------------
 
         # keep us on the field - set x,y limits for driving
-        field_size = 'competition'
+        field_size = 'home'
         if field_size == 'competition':
             self.x_limit, self.y_limit = 15.97, 8.21  # meters for a 52.4x26.9' field
         else: # at home autonomous challenge for 2021
