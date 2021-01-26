@@ -106,7 +106,7 @@ class AutonomousRamsete(Command):
     def end(self, message='Ended'):
         """Called once after isFinished returns true"""
         end_time = round(Timer.getFPGATimestamp() - self.robot.enabled_time, 1)
-        print("\n" + f"** {message} {self.getName()} at {end_time} s after {round(end_time-self.start_time,1)} s **")
+        print(f"** {message} {self.getName()} at {end_time} s after {round(end_time-self.start_time,1)} s **")
         SmartDashboard.putString("alert", f"** Ended {self.getName()} at {end_time} s after {round(end_time-self.start_time,1)} s **")
         self.robot.drivetrain.stop()
 

@@ -44,11 +44,10 @@ class DpadDrive(Command):
         """Make this return true when this Command no longer needs to run execute()"""
         return not self.button.get()
 
-    def end(self):
+    def end(self, message='Ended'):
         """Called once after isFinished returns true"""
         self.robot.drivetrain.stop()
-        print("\n" + f"** Ended {self.getName()} at {round(Timer.getFPGATimestamp() - self.robot.enabled_time, 1)} s **")
+        print(f"** {message} {self.getName()} at {round(Timer.getFPGATimestamp() - self.robot.enabled_time, 1)} s **")
     def interrupted(self):
         """Called when another command which requires one or more of the same subsystems is scheduled to run."""
-        self.robot.drivetrain.stop()
-        print("\n" + f"** Interrupted {self.getName()} at {round(Timer.getFPGATimestamp() - self.robot.enabled_time, 1)} s **")
+        self.end(message='Interrupted')

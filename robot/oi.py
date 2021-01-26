@@ -8,10 +8,11 @@ from triggers.axis_button import AxisButton
 # commands to bind
 from commands.dpad_drive import DpadDrive
 from commands.autonomous_rotate import AutonomousRotate
-from commands.autonomous_drive import AutonomousDrive
+from commands.autonomous_drive_timed import AutonomousDriveTimed
 from commands.autonomous_ramsete import AutonomousRamsete
 from commands.autonomous_group import AutonomousGroup
 from commands.autonomous_drive_pid import AutonomousDrivePID
+
 
 class OI(object):
     """
@@ -25,29 +26,21 @@ class OI(object):
         self.competition_mode = False
 
         self.initialize_joystics()
-
-        self.drive_fwd_command =  AutonomousDrive(self.robot, setpoint=2, timeout=3)
-        self.rotate_command = AutonomousRotate(self.robot, setpoint=45, timeout=3, source='dashboard')
-        self.autonomous_test_command = AutonomousGroup(self.robot)
-        self.autonomous_test_ramsete_command = AutonomousRamsete(self.robot)
-
         self.assign_buttons()
 
-        # dummy setpoints to speed up testing from the dashboard
-        SmartDashboard.putNumber('distance', 2.0)
-        SmartDashboard.putNumber('angle', 60)
-
+        self.initialize_dashboard()
 
     def assign_buttons(self):
         """Assign commands to buttons here"""
         # *** NOTE - THESE CAN FAIL IN COMPETITION IF YOU ARE RELYING ON A BUTTON TO BE HELD DOWN! ***
         self.dpad.whenPressed(DpadDrive(self.robot, button=self.dpad))
 
-        self.buttonA.whenPressed( AutonomousDrive(self.robot, setpoint=2, timeout=3))
-        self.buttonB.whenPressed( AutonomousRotate(self.robot, setpoint=60, timeout=4, source='dashboard'))
-        self.buttonX.whenPressed( AutonomousRotate(self.robot, setpoint=-60, timeout=4, source=None))
-        self.buttonY.whenPressed( AutonomousDrivePID(self.robot, setpoint=2, timeout=3, source='dashboard'))
-        self.buttonStart.whenPressed( AutonomousGroup(self.robot))
+        # also bound to asdfg on the 2021 keyboard
+        self.buttonA.whenPressed( AutonomousDriveTimed(self.robot, setpoint=2, timeout=3) )
+        self.buttonB.whenPressed( AutonomousRotate(self.robot, setpoint=60, timeout=4, source='dashboard') )
+        self.buttonX.whenPressed( AutonomousRotate(self.robot, setpoint=-60, timeout=4, source=None) )
+        self.buttonY.whenPressed( AutonomousDrivePID(self.robot, setpoint=2, timeout=3, source='dashboard') )
+        self.buttonStart.whenPressed( AutonomousGroup(self.robot) )
 
     def initialize_joystics(self):
         """
@@ -83,3 +76,24 @@ class OI(object):
             self.co_povButtonLeft = POVButton(self.co_stick, 270)
             self.co_axisButtonLT = AxisButton(self.co_stick, 2)
             self.co_axisButtonRT = AxisButton(self.co_stick, 3)
+
+    def initialize_dashboard(self):
+        # dummy setpoints to speed up testing from the dashboard
+
+        SmartDashboard.putNumber('distance', 2.0)
+        SmartDashboard.putNumber('angle', 60)
+
+        self.drive_fwd_command =  AutonomousDriveTimed(self.robot, setpoint=2, timeout=3)
+        self.rotate_command = AutonomousRotate(self.robot, setpoint=45, timeout=3, source='dashboard')
+        self.autonomous_test_command = AutonomousGroup(self.robot)
+        self.autonomous_test_ramsete_command = AutonomousRamsete(self.robot)
+
+        # set up the dashboard chooser for the autonomous options
+        self.routine_chooser = SendableChooser()
+        routes = ['Slalom', 'Barrel Roll', 'Bounce']
+        for ix, position in enumerate(routes):
+            if ix == 0:
+                self.routine_chooser.setDefaultOption(position, position)
+            else:
+                self.routine_chooser.addOption(position, position)
+        wpilib.SmartDashboard.putData('Autonomous Routine', self.routine_chooser)

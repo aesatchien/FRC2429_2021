@@ -61,10 +61,6 @@ class PhysicsEngine:
         self.r_encoder.setDistancePerPulse(drive_constants.encoder_distance_per_pulse_m)
 
 
-        # NavX (SPI interface) - no idea why the "4" is there, just using it as given
-        self.navx = simlib.SimDeviceSim("navX-Sensor[4]")
-        self.navx_yaw = self.navx.getDouble("Yaw")
-
         # --------  INITIALIZE FIELD SETTINGS  ---------------
 
         # keep us on the field - set x,y limits for driving
@@ -82,6 +78,7 @@ class PhysicsEngine:
         initial_position_transform = geo.Transform2d(initial_pose, final_pose)
         self.physics_controller.move_robot(initial_position_transform)
 
+        # --------  INITIALIZE ROBOT MODEL  ---------------
         # Change these parameters to fit your robot!
         bumper_width = 3.25 * units.inch
 
@@ -112,8 +109,9 @@ class PhysicsEngine:
         l_motor = self.l_motor.getSpeed()
         r_motor = self.r_motor.getSpeed()
 
+        # get a new location based on motor movement
         transform = self.drivetrain.calculate(l_motor, r_motor, tm_diff)
-        pose = self.physics_controller.move_robot(transform) # includes inertia
+        pose = self.physics_controller.move_robot(transform)  # includes inertia
 
         # keep us on the simulated field - reverse the transform if we try to go out of bounds
         if (pose.translation().x < 0 or pose.translation().x > self.x_limit or
@@ -126,6 +124,10 @@ class PhysicsEngine:
         # Update encoders - need use the pose so it updates properly for coasting to a stop
         self.l_distance += l_motor * 3.0*tm_diff
         self.r_distance += -r_motor * 3.0*tm_diff
+        if l_motor==0 and r_motor==0:  # update encoders even when coasting
+            coast_distance = pose.translation().x - self.x
+            self.l_distance += coast_distance
+            self.r_distance += coast_distance
 
         if version == '2021':
             self.l_encoder.setDistance(self.l_distance)
@@ -137,7 +139,6 @@ class PhysicsEngine:
         else:
             self.l_encoder.setCount(int(self.l_distance / drive_constants.encoder_distance_per_pulse_m))
             self.r_encoder.setCount(int(self.r_distance / drive_constants.encoder_distance_per_pulse_m))
-
 
         self.x, self.y = pose.translation().x, pose.translation().y
         # Update the navx gyro simulation
