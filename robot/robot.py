@@ -6,8 +6,7 @@ from wpilib import Timer
 from commandbased import CommandBasedRobot
 from wpilib.command import Scheduler
 from commands.autonomous_ramsete import AutonomousRamsete
-from commands.autonomous_drive import AutonomousDrive
-from commands.autonomous_rotate import AutonomousRotate
+from commands.autonomous_group import AutonomousGroup
 
 # 2429-specific imports - need to import every subsystem you instantiate
 from subsystems.drivetrain_sim import DriveTrainSim
@@ -37,9 +36,7 @@ class Robot(CommandBasedRobot):
     def autonomousInit(self):
         """Called when autonomous mode is enabled"""
         self.enabled_time = Timer.getFPGATimestamp()
-        #self.autonomousCommand = AutonomousRamsete(self)
-        self.autonomousCommand = AutonomousDrive(self, setpoint=2)
-        #self.autonomousCommand = AutonomousRotate(self, setpoint=60)
+        self.autonomousCommand = AutonomousGroup(self)
         self.autonomousCommand.start()
 
     def autonomousPeriodic(self):

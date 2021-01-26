@@ -43,11 +43,11 @@ class OI(object):
         # *** NOTE - THESE CAN FAIL IN COMPETITION IF YOU ARE RELYING ON A BUTTON TO BE HELD DOWN! ***
         self.dpad.whenPressed(DpadDrive(self.robot, button=self.dpad))
 
-        self.buttonA.whenPressed(self.drive_fwd_command)
+        self.buttonA.whenPressed( AutonomousDrive(self.robot, setpoint=2, timeout=3))
         self.buttonB.whenPressed( AutonomousRotate(self.robot, setpoint=60, timeout=4, source='dashboard'))
-        self.buttonX.whenPressed( AutonomousRotate(self.robot, setpoint=-60, timeout=4, source='dashboard'))
-        self.buttonY.whenPressed(AutonomousDrivePID(self.robot, setpoint=2, timeout=3, source='dashboard'))
-        self.buttonStart.whenPressed(AutonomousGroup(self.robot))
+        self.buttonX.whenPressed( AutonomousRotate(self.robot, setpoint=-60, timeout=4, source=None))
+        self.buttonY.whenPressed( AutonomousDrivePID(self.robot, setpoint=2, timeout=3, source='dashboard'))
+        self.buttonStart.whenPressed( AutonomousGroup(self.robot))
 
     def initialize_joystics(self):
         """
