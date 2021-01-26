@@ -75,8 +75,8 @@ class PhysicsEngine:
             self.x_limit, self.y_limit = 9.144, 9.144 / 2  # meters for a 30x15' field
 
         # Set our position on the field
-        self.x = 2  # x y rot position data calculated from the pose
-        self.y = 8.21/2
+        self.x = 1.16 #2  # x y rot position data calculated from the pose
+        self.y = 0.74 # 8.21/2
         initial_pose = geo.Pose2d(0, 0, geo.Rotation2d(0))
         final_pose = geo.Pose2d(self.x, self.y, geo.Rotation2d(0))
         initial_position_transform = geo.Transform2d(initial_pose, final_pose)

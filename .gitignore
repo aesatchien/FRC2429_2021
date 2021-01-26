@@ -1,6 +1,7 @@
 # CJH pycharm gitignore
 
 /robot/guis
+/robot/imgui.ini
 
 #pycharm directory
 .idea/

@@ -27,7 +27,7 @@ class AutonomousDrivePID(Command):
         else:
             if setpoint is None:
                 setpoint = 2
-        self.setpoint = setpoint
+        self.setpoint = (setpoint+0.51)/1.76  # correction for overshoot
 
         if timeout is None:
             self.setTimeout(5)
@@ -39,6 +39,8 @@ class AutonomousDrivePID(Command):
         self.tolerance = 0.1
         self.has_finished = False
 
+        # using these values (1.8,0,0.2) a _really_ good fit is dist = -0.51+1.76*setpoint
+        # so setpoint = (dist+0.51/1.76)
         self.kp = 1.8; SmartDashboard.putNumber('kp', self.kp)
         self.kd = 0.2; SmartDashboard.putNumber('kd', self.kd)
         self.ki = 0.00; SmartDashboard.putNumber('ki', self.ki)
@@ -49,12 +51,13 @@ class AutonomousDrivePID(Command):
 
         # allow setpoint to be controlled by the dashboard
         if self.source == 'dashboard':
-            self.setpoint = SmartDashboard.getNumber('distance', 1)
+            self.setpoint = (SmartDashboard.getNumber('distance', 1) +0.51)/1.76
 
         self.start_time = round(Timer.getFPGATimestamp() - self.robot.enabled_time, 1)
         print("\n" + f"** Started {self.getName()} with setpoint {self.setpoint} at {self.start_time} s **")
         SmartDashboard.putString("alert", f"** Started {self.getName()} with setpoint {self.setpoint} at {self.start_time} s **")
         self.has_finished = False
+
         # self.robot.drivetrain.reset_encoders()  # does not work in sim mode
         self.start_pos = self.robot.drivetrain.get_average_encoder_distance()
 
@@ -62,7 +65,6 @@ class AutonomousDrivePID(Command):
         self.ki, self.period = SmartDashboard.getNumber('ki', self.ki), SmartDashboard.getNumber('kperiod', self.kperiod)
 
         self.controller = wpilib.controller.PIDController(self.kp, self.ki, self.kd, period=self.kperiod)
-        #self.controller = wpilib.controller.PIDController(self.kp, self.ki, self.kd, period=0.5)
         self.controller.setSetpoint(self.setpoint)
         self.controller.setTolerance(0.1)
         self.controller.reset()
