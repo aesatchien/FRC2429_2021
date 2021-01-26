@@ -6,12 +6,13 @@ from networktables import NetworkTables
 
 class AutonomousRotate(Command):
     """ This command rotates the robot over a given angle with simple proportional + derivative control """
-    def __init__(self, robot, setpoint=None, timeout=None, source=None):
+    def __init__(self, robot, setpoint=None, timeout=None, source=None, absolute=False):
         """The constructor"""
         Command.__init__(self, name='autorotate')
         self.requires(robot.drivetrain)
         self.setpoint = setpoint
-        self.source = source
+        self.source = source  # sent directly to command or via dashboard
+        self.absolute = absolute  # use a relative turn or absolute
 
         if timeout is None:
             self.timeout = 5
@@ -40,6 +41,13 @@ class AutonomousRotate(Command):
         # may want to break if no valid setpoint is passed
 
         self.start_angle = self.robot.drivetrain.navx.getAngle()
+        if self.absolute:  # trust the navx to be correctly oriented to the field
+            self.setpoint = self.setpoint - self.start_angle
+            if self.setpoint > 180:
+                self.setpoint = -(360 - self.setpoint)
+            if self.setpoint < -180:
+                self.setpoint = (360 + self.setpoint)
+
         self.error = 0
         self.prev_error = 0
 

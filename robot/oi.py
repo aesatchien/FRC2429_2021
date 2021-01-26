@@ -38,7 +38,7 @@ class OI(object):
         # also bound to asdfg on the 2021 keyboard
         self.buttonA.whenPressed( AutonomousDriveTimed(self.robot, setpoint=2, timeout=3) )
         self.buttonB.whenPressed( AutonomousRotate(self.robot, setpoint=60, timeout=4, source='dashboard') )
-        self.buttonX.whenPressed( AutonomousRotate(self.robot, setpoint=-60, timeout=4, source=None) )
+        self.buttonX.whenPressed( AutonomousRotate(self.robot, setpoint=-60, timeout=4, source='dashboard', absolute=True) )
         self.buttonY.whenPressed( AutonomousDrivePID(self.robot, setpoint=2, timeout=3, source='dashboard') )
         self.buttonStart.whenPressed( AutonomousGroup(self.robot) )
 
