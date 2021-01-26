@@ -2,6 +2,7 @@ from wpilib.command import Command
 from wpilib import Timer
 import wpilib.controller
 from wpilib import SmartDashboard
+import math
 
 class AutonomousDrivePID(Command):
     """ This command drives the robot over a given distance with simple proportional control """
@@ -22,7 +23,10 @@ class AutonomousDrivePID(Command):
         else:
             if setpoint is None:
                 setpoint = 2
-        self.setpoint = self.corrected_setpoint(setpoint)  # correction for overshoot
+
+        # wpilib PID controller apparently does not like negative setpoints, so use this to allow going backwards
+        self.setpoint_sign = math.copysign(1, setpoint)
+        self.setpoint = self.corrected_setpoint(math.fabs(setpoint))  # correction for overshoot
 
         if timeout is None:
             self.timeout = 5
@@ -51,7 +55,9 @@ class AutonomousDrivePID(Command):
 
         # allow setpoint to be controlled by the dashboard
         if self.source == 'dashboard':
-            self.setpoint = self.corrected_setpoint(SmartDashboard.getNumber('distance', 1))
+            setpoint = SmartDashboard.getNumber('distance', 1)
+            self.setpoint_sign = math.copysign(1, setpoint)
+            self.setpoint = self.corrected_setpoint(math.fabs(setpoint))  # correction for overshoot
 
         self.start_time = round(Timer.getFPGATimestamp() - self.robot.enabled_time, 1)
         print("\n" + f"** Started {self.getName()} with setpoint {self.setpoint} at {self.start_time} s **")
@@ -71,9 +77,9 @@ class AutonomousDrivePID(Command):
 
     def execute(self):
         """Called repeatedly when this Command is scheduled to run"""
-        self.error = self.robot.drivetrain.get_average_encoder_distance() - self.start_pos
+        self.error = self.setpoint_sign*(self.robot.drivetrain.get_average_encoder_distance() - self.start_pos)
         output = self.controller.calculate(self.error)
-        self.robot.drivetrain.arcade_drive(output, 0)
+        self.robot.drivetrain.arcade_drive(self.setpoint_sign * output, 0)
 
     def isFinished(self):
         """Make this return true when this Command no longer needs to run execute()"""
