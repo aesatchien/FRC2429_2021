@@ -39,8 +39,8 @@ class AutonomousDrivePID(Command):
         self.tolerance = 0.1
         self.has_finished = False
 
-        self.kp = 1.0; SmartDashboard.putNumber('kp', self.kp)
-        self.kd = 0.1; SmartDashboard.putNumber('kd', self.kd)
+        self.kp = 1.8; SmartDashboard.putNumber('kp', self.kp)
+        self.kd = 0.2; SmartDashboard.putNumber('kd', self.kd)
         self.ki = 0.00; SmartDashboard.putNumber('ki', self.ki)
         self.kperiod = 0.1; SmartDashboard.putNumber('kperiod', self.kperiod)
 
