@@ -38,7 +38,7 @@ class OI(object):
         self.dpad.whenPressed(DpadDrive(self.robot, button=self.dpad))
 
         # also bound to asdf on the 2021 keyboard
-        self.buttonA.whenPressed( AutonomousDriveTimed(self.robot, setpoint=2, timeout=3) )
+        self.buttonA.whenPressed( AutonomousDriveTimed(self.robot, timeout=3) )
         self.buttonB.whenPressed( AutonomousRotate(self.robot, setpoint=60, timeout=4, source='dashboard') )
         self.buttonX.whenPressed( AutonomousRotate(self.robot, setpoint=-60, timeout=4, source='dashboard', absolute=True) )
         self.buttonY.whenPressed( AutonomousDrivePID(self.robot, setpoint=2, timeout=3, source='dashboard') )
@@ -89,7 +89,7 @@ class OI(object):
         SmartDashboard.putNumber('distance', 2.0)
         SmartDashboard.putNumber('angle', 60)
 
-        self.drive_fwd_command =  AutonomousDriveTimed(self.robot, setpoint=2, timeout=3)
+        self.drive_fwd_command =  AutonomousDriveTimed(self.robot, timeout=3)
         self.rotate_command = AutonomousRotate(self.robot, setpoint=45, timeout=3, source='dashboard')
         self.autonomous_test_command = AutonomousSlalom(self.robot)
         self.autonomous_test_ramsete_command = AutonomousRamsete(self.robot)
