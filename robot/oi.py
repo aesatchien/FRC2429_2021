@@ -10,7 +10,9 @@ from commands.dpad_drive import DpadDrive
 from commands.autonomous_rotate import AutonomousRotate
 from commands.autonomous_drive_timed import AutonomousDriveTimed
 from commands.autonomous_ramsete import AutonomousRamsete
-from commands.autonomous_group import AutonomousGroup
+from commands.autonomous_home_slalom import AutonomousSlalom
+from commands.autonomous__home_barrel import AutonomousBarrel
+from commands.autonomous__home_bounce import AutonomousBounce
 from commands.autonomous_drive_pid import AutonomousDrivePID
 
 
@@ -35,12 +37,16 @@ class OI(object):
         # *** NOTE - THESE CAN FAIL IN COMPETITION IF YOU ARE RELYING ON A BUTTON TO BE HELD DOWN! ***
         self.dpad.whenPressed(DpadDrive(self.robot, button=self.dpad))
 
-        # also bound to asdfg on the 2021 keyboard
+        # also bound to asdf on the 2021 keyboard
         self.buttonA.whenPressed( AutonomousDriveTimed(self.robot, setpoint=2, timeout=3) )
         self.buttonB.whenPressed( AutonomousRotate(self.robot, setpoint=60, timeout=4, source='dashboard') )
         self.buttonX.whenPressed( AutonomousRotate(self.robot, setpoint=-60, timeout=4, source='dashboard', absolute=True) )
         self.buttonY.whenPressed( AutonomousDrivePID(self.robot, setpoint=2, timeout=3, source='dashboard') )
-        self.buttonStart.whenPressed( AutonomousGroup(self.robot) )
+
+        # g h j on the keyboard
+        self.buttonLB.whenPressed( AutonomousSlalom(self.robot)  )
+        self.buttonRB.whenPressed( AutonomousBarrel(self.robot) )
+        self.buttonBack.whenPressed( AutonomousBounce(self.robot) )
 
     def initialize_joystics(self):
         """
@@ -85,7 +91,7 @@ class OI(object):
 
         self.drive_fwd_command =  AutonomousDriveTimed(self.robot, setpoint=2, timeout=3)
         self.rotate_command = AutonomousRotate(self.robot, setpoint=45, timeout=3, source='dashboard')
-        self.autonomous_test_command = AutonomousGroup(self.robot)
+        self.autonomous_test_command = AutonomousSlalom(self.robot)
         self.autonomous_test_ramsete_command = AutonomousRamsete(self.robot)
 
         # set up the dashboard chooser for the autonomous options

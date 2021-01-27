@@ -7,7 +7,6 @@ import math
 class AutonomousDrivePID(Command):
     """ This command drives the robot over a given distance with simple proportional control """
     # may need to use variables at some point ...
-    tolerance = 0.2
 
     def __init__(self, robot, setpoint=None, timeout=None, source=None):
         """The constructor"""
@@ -26,7 +25,7 @@ class AutonomousDrivePID(Command):
 
         # wpilib PID controller apparently does not like negative setpoints, so use this to allow going backwards
         self.setpoint_sign = math.copysign(1, setpoint)
-        self.setpoint = self.corrected_setpoint(math.fabs(setpoint))  # correction for overshoot
+        self.setpoint = math.fabs(setpoint)  # correction for overshoot
 
         if timeout is None:
             self.timeout = 5
@@ -35,20 +34,21 @@ class AutonomousDrivePID(Command):
         self.setTimeout(timeout)
 
         self.robot = robot
-        self.tolerance = 0.1
         self.has_finished = False
         self.error = 0
 
-        # using these k-values (1.8,0,0.2) a _really_ good fit is actual_dist = -0.51+1.76*setpoint
+        # using these k-values (1.8,0,0.2) a _really_ good fit is actual_dist = 1.51*setpoint -0.46
         self.kp = 1.8; SmartDashboard.putNumber('kp', self.kp)
-        self.kd = 0.2; SmartDashboard.putNumber('kd', self.kd)
+        self.kd = 4.0; SmartDashboard.putNumber('kd', self.kd)
         self.ki = 0.00; SmartDashboard.putNumber('ki', self.ki)
         self.kperiod = 0.1; SmartDashboard.putNumber('kperiod', self.kperiod)
+        self.tolerance = 0.1
 
     def corrected_setpoint(self, setpoint):
         """Found an excellent linear fit to the overshoot"""
-        intercept, slope = 0.51, 1.76  # fit for kp=1.8, kd=0.2
-        return (setpoint + intercept) / slope
+        intercept, slope = 0.45, 1.56  # fit for kp=1.8, kd=0.2
+        #return (setpoint - intercept) / slope
+        return setpoint
 
     def initialize(self):
         """Called just before this Command runs the first time."""
@@ -57,7 +57,7 @@ class AutonomousDrivePID(Command):
         if self.source == 'dashboard':
             setpoint = SmartDashboard.getNumber('distance', 1)
             self.setpoint_sign = math.copysign(1, setpoint)
-            self.setpoint = self.corrected_setpoint(math.fabs(setpoint))  # correction for overshoot
+            self.setpoint = (math.fabs(setpoint))  # correction for overshoot
 
         self.start_time = round(Timer.getFPGATimestamp() - self.robot.enabled_time, 1)
         print("\n" + f"** Started {self.getName()} with setpoint {self.setpoint} at {self.start_time} s **")
@@ -71,8 +71,8 @@ class AutonomousDrivePID(Command):
         self.ki, self.period = SmartDashboard.getNumber('ki', self.ki), SmartDashboard.getNumber('kperiod', self.kperiod)
 
         self.controller = wpilib.controller.PIDController(self.kp, self.ki, self.kd, period=self.kperiod)
-        self.controller.setSetpoint(self.setpoint)
-        self.controller.setTolerance(0.1)
+        self.controller.setSetpoint(self.corrected_setpoint(self.setpoint))
+        self.controller.setTolerance(self.tolerance)
         self.controller.reset()
 
     def execute(self):

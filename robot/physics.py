@@ -48,7 +48,7 @@ class PhysicsEngine:
 
         # set up two simulated encoders to see how they effect the robot
         self.l_distance, self.r_distance = 0, 0
-        self.l_distance_old, self.r_distance_old = 0, 0
+        self.l_distance_old, self.r_distance_old = 0, 0  # used for calculating encoder rates
         if version == '2020':
             self.r_encoder = simlib.EncoderSim(0)
             self.l_encoder = simlib.EncoderSim(1)
@@ -67,12 +67,21 @@ class PhysicsEngine:
         field_size = 'home'
         if field_size == 'competition':
             self.x_limit, self.y_limit = 15.97, 8.21  # meters for a 52.4x26.9' field
+            self.x, self.y = 2, 8.21/2
         else: # at home autonomous challenge for 2021
             self.x_limit, self.y_limit = 9.144, 9.144 / 2  # meters for a 30x15' field
+                    # Set our position on the field
+            position = 'slalom'  # set this to put the robot on the field
+            if position == 'slalom':
+                self.x, self.y = 1.2, 0.74
+            elif position  == 'barrel':
+                self.x, self.y = 1.2, 2.1
+            elif position == 'bounce':
+                self.x, self.y = 1.2, 2.3
+            else:
+                pass
 
-        # Set our position on the field
-        self.x = 1.16 #2  # x y rot position data calculated from the pose
-        self.y = 0.74 # 8.21/2
+
         initial_pose = geo.Pose2d(0, 0, geo.Rotation2d(0))
         final_pose = geo.Pose2d(self.x, self.y, geo.Rotation2d(0))
         initial_position_transform = geo.Transform2d(initial_pose, final_pose)
@@ -113,6 +122,7 @@ class PhysicsEngine:
         transform = self.drivetrain.calculate(l_motor, r_motor, tm_diff)
         pose = self.physics_controller.move_robot(transform)  # includes inertia
 
+
         # keep us on the simulated field - reverse the transform if we try to go out of bounds
         if (pose.translation().x < 0 or pose.translation().x > self.x_limit or
                 pose.translation().y < 0 or pose.translation().y > self.y_limit):
@@ -122,23 +132,25 @@ class PhysicsEngine:
             pose = self.physics_controller.move_robot(new_transform)
 
         # Update encoders - need use the pose so it updates properly for coasting to a stop
-        self.l_distance += l_motor * 3.0*tm_diff
-        self.r_distance += -r_motor * 3.0*tm_diff
-        if l_motor==0 and r_motor==0:  # update encoders even when coasting
-            coast_distance = pose.translation().x - self.x
-            self.l_distance += coast_distance
-            self.r_distance += coast_distance
+        # ToDo: get the actual values, probably from wheelspeeds?
+        #self.l_distance += l_motor * 3.5*tm_diff
+        #self.r_distance += -r_motor * 3.5*tm_diff
+        #if l_motor==0 and r_motor==0:  # update encoders even when coasting
+        #    coast_distance = pose.translation().x - self.x
+        #    self.l_distance += coast_distance
+        #    self.r_distance += coast_distance
+
 
         if version == '2021':
-            self.l_encoder.setDistance(self.l_distance)
-            self.r_encoder.setDistance(self.r_distance)
-            self.l_encoder.setRate((self.l_distance-self.l_distance_old)/tm_diff)
-            self.r_encoder.setRate((self.r_distance-self.r_distance_old)/tm_diff)
-            self.l_distance_old = self.l_distance
-            self.r_distance_old = self.r_distance
+            self.l_encoder.setDistance(self.drivetrain.l_position * 0.3048)  # pull this from the drivetrain
+            self.r_encoder.setDistance(self.drivetrain.r_position * 0.3048)
+            self.l_encoder.setRate((self.drivetrain.l_position-self.l_distance_old)/tm_diff)
+            self.r_encoder.setRate((self.drivetrain.r_position-self.r_distance_old)/tm_diff)
+            self.l_distance_old = self.drivetrain.l_position
+            self.r_distance_old = self.drivetrain.r_position
         else:
-            self.l_encoder.setCount(int(self.l_distance / drive_constants.encoder_distance_per_pulse_m))
-            self.r_encoder.setCount(int(self.r_distance / drive_constants.encoder_distance_per_pulse_m))
+            self.l_encoder.setCount(int(self.drivetrain.l_position / drive_constants.encoder_distance_per_pulse_m))
+            self.r_encoder.setCount(int(self.self.drivetrain.r_position / drive_constants.encoder_distance_per_pulse_m))
 
         self.x, self.y = pose.translation().x, pose.translation().y
         # Update the navx gyro simulation
