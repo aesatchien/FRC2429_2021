@@ -5,61 +5,61 @@ Collapsed=0
 
 [Window][Robot State]
 Pos=5,20
-Size=126,129
+Size=109,114
 Collapsed=0
 
 [Window][###Timing]
-Pos=5,166
-Size=188,157
+Pos=6,141
+Size=162,142
 Collapsed=0
 
 [Window][###NetworkTables]
-Pos=322,30
-Size=998,417
+Pos=195,27
+Size=966,257
 Collapsed=0
 
 [Window][###FMS]
-Pos=2,333
-Size=326,211
+Pos=2,290
+Size=281,190
 Collapsed=0
 
 [Window][###Joysticks]
-Pos=331,460
-Size=1156,316
+Pos=191,291
+Size=976,219
 Collapsed=0
 
 [Window][###System Joysticks]
-Pos=27,554
-Size=273,290
+Pos=7,521
+Size=232,254
 Collapsed=0
 
 [Window][###Other Devices]
-Pos=1333,33
+Pos=1209,26
 Size=368,332
 Collapsed=0
 
 [Window][###/SmartDashboard/Field]
-Pos=337,776
-Size=897,559
+Pos=249,516
+Size=796,440
 Collapsed=0
 
 [Window][###Plot <0>]
-Pos=1361,595
-Size=679,377
+Pos=1183,404
+Size=622,366
 Collapsed=0
 
 [Window][###Encoders]
-Pos=1717,32
-Size=328,559
+Pos=1627,22
+Size=280,502
 Collapsed=0
 
 [Window][###PWM Outputs]
-Pos=1523,370
-Size=151,165
+Pos=4,288
+Size=131,150
 Collapsed=0
 
 [Window][###Plot <1>]
-Pos=1357,969
+Pos=1054,639
 Size=687,385
 Collapsed=0
 
@@ -79,16 +79,16 @@ Size=344,378
 Collapsed=0
 
 [MainWindow][GLOBAL]
-width=2103
-height=1388
+width=1924
+height=1061
 maximized=0
-xpos=336
-ypos=109
-userScale=4
+xpos=0
+ypos=31
+userScale=3
 style=0
 
 [GlassStorage][/SmartDashboard/Field]
-image=C:\Cory\CJH Shared\Python\FRC\2021\robot\sim\2021-slalom.png
+image=C:\Cory\Python\FRC\FRC2429_2021\robot\sim\2021-slalom.png
 top=0
 left=0
 bottom=-1
@@ -290,10 +290,10 @@ name=
 [Data Sources][NT:/SmartDashboard/error]
 name=
 
-[Data Sources][NT:/SmartDashboard/kperiod]
+[Data Sources][Joystick[1] Axis[1]]
 name=
 
-[Data Sources][Joystick[0] Axis[2]]
+[Data Sources][NT:/SmartDashboard/kperiod]
 name=
 
 [Data Sources][NT:/SmartDashboard/kd]
@@ -302,7 +302,7 @@ name=
 [Data Sources][Z Accel[0]]
 name=
 
-[Data Sources][Joystick[1] Axis[1]]
+[Data Sources][Joystick[0] Axis[2]]
 name=
 
 [Data Sources][PWM[2]]
@@ -431,13 +431,13 @@ name=
 [Data Sources][NT:/LiveWindow/Ungrouped/Encoder[0]/Distance per Tick]
 name=
 
-[Data Sources][NT:/LiveWindow/Ungrouped/Jaguar[4]/Value]
+[Data Sources][Joystick[0] Button[3]]
 name=
 
 [Data Sources][PWM[4]]
 name=
 
-[Data Sources][Joystick[0] Button[3]]
+[Data Sources][NT:/LiveWindow/Ungrouped/Jaguar[4]/Value]
 name=
 
 [Data Sources][Joystick[1] Button[8]]
@@ -714,7 +714,7 @@ name=DifferentialDrive
 
 [DSManager][FMS]
 name=
-visible=1
+visible=0
 enabled=1
 
 [DSManager][Joysticks]
@@ -750,10 +750,6 @@ enabled=1
 [Joystick][0]
 useGamepad=0
 guid=Keyboard0
-
-[Joystick][1]
-useGamepad=1
-guid=78696e70757401000000000000000000
 
 [KeyboardJoystick][0]
 axisCount=5
