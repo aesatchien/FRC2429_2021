@@ -52,9 +52,9 @@ class AutonomousSlalom(CommandGroup):
             self.addSequential(AutonomousRotate(robot, setpoint=115, absolute=True, timeout=3))  # SW point down
             self.addSequential(AutonomousDrivePID(robot, setpoint=0.8*diagonal_distance, timeout=3))  # drive down diagonal
             self.addSequential(AutonomousRotate(robot, setpoint=180, absolute=True, timeout=3))  # face back to home
-            self.addSequential(AutonomousDrivePID(robot, setpoint=3.4, timeout=3))  # cross the bottom
+            self.addSequential(AutonomousDrivePID(robot, setpoint=3.3, timeout=3))  # cross the bottom
             self.addSequential(AutonomousRotate(robot, setpoint=-115, absolute=True, timeout=3))  # point back NW
-            self.addSequential(AutonomousDrivePID(robot, setpoint= 0.8*diagonal_distance, timeout=3))  # drive up diagonal
+            self.addSequential(AutonomousDrivePID(robot, setpoint= 0.75*diagonal_distance, timeout=3))  # drive up diagonal
             self.addSequential(AutonomousRotate(robot, setpoint=180, absolute=True, timeout=3))  # CCW turn to finish
             self.addSequential(AutonomousDrivePID(robot, setpoint=1.0, timeout=3))  # drive on finish area
 

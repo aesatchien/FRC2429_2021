@@ -10,7 +10,6 @@ from commands.autonomous_home_slalom import AutonomousSlalom
 
 # 2429-specific imports - need to import every subsystem you instantiate
 from subsystems.drivetrain_sim import DriveTrainSim
-from subsystems.drivetrain import DriveTrain
 # ToDo: make a real drivetrain
 from oi import OI
 
@@ -22,6 +21,7 @@ class Robot(CommandBasedRobot):
         super().__init__()
 
         if self.isReal():  # use the real drive train
+            from subsystems.drivetrain import DriveTrain  # now nobody needs to install actual hardware libs
             self.drivetrain = DriveTrain(self)
         else:  # use the simulated drive train
             self.drivetrain = DriveTrainSim(self)
