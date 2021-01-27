@@ -6,16 +6,12 @@ from networktables import NetworkTables
 class AutonomousDriveTimed(Command):
     """ This command drives the robot for a fixed amount of time """
 
-    def __init__(self, robot, setpoint=None, timeout=None, source=None):
+    def __init__(self, robot, timeout=None):
         """The constructor"""
         #super().__init__()
         Command.__init__(self, name='autodrivetimed')
         # Signal that we require ExampleSubsystem
         self.requires(robot.drivetrain)
-
-        if setpoint is None:
-            setpoint = 2
-        self.setpoint = setpoint
 
         if timeout is None:
             self.timeout = 5
