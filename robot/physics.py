@@ -79,7 +79,7 @@ class PhysicsEngine:
             elif position == 'bounce':
                 self.x, self.y = 1.2, 2.3
             else:
-                pass
+                self.x, self.y = 0, 2
 
 
         initial_pose = geo.Pose2d(0, 0, geo.Rotation2d(0))
@@ -97,8 +97,8 @@ class PhysicsEngine:
             110 * units.lbs,                    # robot mass
             drive_constants.gear_ratio,         # drivetrain gear ratio
             2,                                  # motors per side
-            22 * units.inch,                    # robot wheelbase
-            23 * units.inch + bumper_width * 2, # robot width
+            27 * units.inch,                    # robot wheelbase
+            27 * units.inch + bumper_width * 2, # robot width
             32 * units.inch + bumper_width * 2, # robot length
             8 * units.inch,                     # wheel diameter
         )
@@ -122,7 +122,6 @@ class PhysicsEngine:
         transform = self.drivetrain.calculate(l_motor, r_motor, tm_diff)
         pose = self.physics_controller.move_robot(transform)  # includes inertia
 
-
         # keep us on the simulated field - reverse the transform if we try to go out of bounds
         if (pose.translation().x < 0 or pose.translation().x > self.x_limit or
                 pose.translation().y < 0 or pose.translation().y > self.y_limit):
@@ -140,15 +139,16 @@ class PhysicsEngine:
         #    self.l_distance += coast_distance
         #    self.r_distance += coast_distance
 
-
         if version == '2021':
-            self.l_encoder.setDistance(self.drivetrain.l_position * 0.3048)  # pull this from the drivetrain
-            self.r_encoder.setDistance(self.drivetrain.r_position * 0.3048)
-            self.l_encoder.setRate((self.drivetrain.l_position-self.l_distance_old)/tm_diff)
-            self.r_encoder.setRate((self.drivetrain.r_position-self.r_distance_old)/tm_diff)
+            # have to only work with deltas otherwise we can't reset the encoder from the real code
+            self.l_encoder.setDistance(self.l_encoder.getDistance() + (self.drivetrain.l_position-self.l_distance_old) * 0.3105)
+            self.r_encoder.setDistance(self.r_encoder.getDistance() + (self.drivetrain.r_position-self.r_distance_old) * 0.3105)
+            self.l_encoder.setRate(0.31*(self.drivetrain.l_position -self.l_distance_old)/tm_diff)
+            self.r_encoder.setRate(0.31*(self.drivetrain.r_position -self.r_distance_old)/tm_diff)
             self.l_distance_old = self.drivetrain.l_position
             self.r_distance_old = self.drivetrain.r_position
         else:
+            # haven't updated this for the delta pose approach
             self.l_encoder.setCount(int(self.drivetrain.l_position / drive_constants.encoder_distance_per_pulse_m))
             self.r_encoder.setCount(int(self.self.drivetrain.r_position / drive_constants.encoder_distance_per_pulse_m))
 

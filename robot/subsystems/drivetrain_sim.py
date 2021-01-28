@@ -42,7 +42,7 @@ class DriveTrainSim(Subsystem):
         self.r_encoder.setDistancePerPulse(drive_constants.encoder_distance_per_pulse_m)
 
         # odometry for tracking the robot pose
-        self.odometry = wpilib.kinematics.DifferentialDriveOdometry(geo.Rotation2d( self.navx.getYaw() ))
+        self.odometry = wpilib.kinematics.DifferentialDriveOdometry(geo.Rotation2d( -self.navx.getAngle() ))
 
     def initDefaultCommand(self):
         """ When other commands aren't using the drivetrain, allow arcade drive with the joystick. """
@@ -71,11 +71,11 @@ class DriveTrainSim(Subsystem):
 
     def reset_odometry(self, pose):
         self.reset_encoders()
-        self.odometry.resetPosition(pose, geo.Rotation2d(self.navx.getYaw()))
+        self.odometry.resetPosition(pose, geo.Rotation2d.fromDegrees(-self.navx.getAngle()))
 
     def tank_drive_volts(self, left_volts, right_volts):
         self.speedgroup_left.setVoltage(left_volts)
-        self.speedgroup_right.setVoltage((right_volts))
+        self.speedgroup_right.setVoltage(right_volts)
 
     def get_average_encoder_distance(self):
         return (self.l_encoder.getDistance() + self.r_encoder.getDistance())/2
@@ -87,10 +87,12 @@ class DriveTrainSim(Subsystem):
     def periodic(self) -> None:
         """Perform odometry and update dash with telemetry"""
         self.counter += 1
-        self.odometry.update(geo.Rotation2d(self.navx.getYaw()), self.l_encoder.getDistance(), self.r_encoder.getDistance())
+        self.odometry.update(geo.Rotation2d.fromDegrees(-self.navx.getAngle()), self.l_encoder.getDistance(), self.r_encoder.getDistance())
 
         if self.counter % 10 == 0:
             # start keeping track of where the robot is with an x and y position (only good for WCD)'
+            pose = self.get_pose()
+            SmartDashboard.putString('drive_pose', f'[{pose.X():2.2f}, {pose.Y():2.2f}, {pose.rotation().degrees():2.2f}]' )
             pass
         if self.counter % 100 == 0:
             pass

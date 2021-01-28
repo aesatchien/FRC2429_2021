@@ -14,7 +14,7 @@ class AutonomousDriveTimed(Command):
         self.requires(robot.drivetrain)
 
         if timeout is None:
-            self.timeout = 5
+            self.timeout = 2
         else:
             self.timeout = timeout
         self.setTimeout(self.timeout)
@@ -24,8 +24,8 @@ class AutonomousDriveTimed(Command):
     def initialize(self):
         """Called just before this Command runs the first time."""
         self.start_time = round(Timer.getFPGATimestamp() - self.robot.enabled_time, 1)
-        print("\n" + f"** Started {self.getName()} with setpoint {self.setpoint} at {self.start_time} s **")
-        SmartDashboard.putString("alert", f"** Started {self.getName()} with setpoint {self.setpoint} at {self.start_time} s **")
+        print("\n" + f"** Started {self.getName()} with timeout {self.timeout} at {self.start_time} s **")
+        SmartDashboard.putString("alert", f"** Started {self.getName()} with timeout {self.timeout} at {self.start_time} s **")
 
     def execute(self):
         """Called repeatedly when this Command is scheduled to run"""

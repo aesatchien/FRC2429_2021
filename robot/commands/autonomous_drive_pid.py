@@ -15,6 +15,7 @@ class AutonomousDrivePID(Command):
         # Signal that we require ExampleSubsystem
         self.requires(robot.drivetrain)
         self.source = source
+        self.k_dash = False
 
         # allow setpoint to be controlled by the dashboard
         if source == 'dashboard':
@@ -37,12 +38,19 @@ class AutonomousDrivePID(Command):
         self.has_finished = False
         self.error = 0
 
-        # using these k-values (1.8,0,0.2) a _really_ good fit is actual_dist = 1.51*setpoint -0.46
-        self.kp = 1.8; SmartDashboard.putNumber('kp', self.kp)
-        self.kd = 4.0; SmartDashboard.putNumber('kd', self.kd)
-        self.ki = 0.00; SmartDashboard.putNumber('ki', self.ki)
-        self.kperiod = 0.1; SmartDashboard.putNumber('kperiod', self.kperiod)
+        # using these k-values
+        self.kp = 1.8
+        self.kd = 4.0
+        self.ki = 0.00
+        self.kperiod = 0.1
         self.tolerance = 0.1
+
+        if self.k_dash:
+            SmartDashboard.putNumber('kperiod_drive', self.kperiod)
+            SmartDashboard.putNumber('ki_drive', self.ki)
+            SmartDashboard.putNumber('kd_drive', self.kd)
+            SmartDashboard.putNumber('kp_drive', self.kp)
+
 
     def corrected_setpoint(self, setpoint):
         """Found an excellent linear fit to the overshoot"""
@@ -67,8 +75,9 @@ class AutonomousDrivePID(Command):
         # self.robot.drivetrain.reset_encoders()  # does not work in sim mode
         self.start_pos = self.robot.drivetrain.get_average_encoder_distance()
 
-        self.kp, self.kd  = SmartDashboard.getNumber('kp', self.kp), SmartDashboard.getNumber('kd', self.kd)
-        self.ki, self.period = SmartDashboard.getNumber('ki', self.ki), SmartDashboard.getNumber('kperiod', self.kperiod)
+        if self.k_dash:
+            self.kp, self.kd  = SmartDashboard.getNumber('kp', self.kp), SmartDashboard.getNumber('kd', self.kd)
+            self.ki, self.period = SmartDashboard.getNumber('ki', self.ki), SmartDashboard.getNumber('kperiod', self.kperiod)
 
         self.controller = wpilib.controller.PIDController(self.kp, self.ki, self.kd, period=self.kperiod)
         self.controller.setSetpoint(self.corrected_setpoint(self.setpoint))
