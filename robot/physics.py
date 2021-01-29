@@ -12,7 +12,6 @@
 from pyfrc.physics.core import PhysicsInterface
 from pyfrc.physics import motor_cfgs, tankmodel
 from pyfrc.physics.units import units
-import wpilib.geometry as geo
 
 import subsystems.drive_constants as drive_constants
 
@@ -20,8 +19,10 @@ import wpilib # need some other way of checking version w/o importing unneeded s
 version = wpilib.__version__[0:4]
 print(f'*** Version is {version} ***')
 if version == '2020':
+    import wpilib.geometry as geo
     import hal.simulation as simlib # 2020
 elif version == '2021':
+    import wpimath.geometry as geo
     import wpilib.simulation as simlib #2021
 
 
@@ -69,15 +70,15 @@ class PhysicsEngine:
             self.x_limit, self.y_limit = 15.97, 8.21  # meters for a 52.4x26.9' field
             self.x, self.y = 2, 8.21/2
         else: # at home autonomous challenge for 2021
-            self.x_limit, self.y_limit = 9.144, 9.144 / 2  # meters for a 30x15' field
+            self.x_limit, self.y_limit = 9.63, 5.05  # meters for a 30x15' field with the border
                     # Set our position on the field
             position = 'slalom'  # set this to put the robot on the field
             if position == 'slalom':
-                self.x, self.y = 1.2, 0.74
+                self.x, self.y = 1.25, 0.91
             elif position  == 'barrel':
-                self.x, self.y = 1.2, 2.1
-            elif position == 'bounce':
                 self.x, self.y = 1.2, 2.3
+            elif position == 'bounce':
+                self.x, self.y = 1.2, 2.5
             else:
                 self.x, self.y = 0, 2
 

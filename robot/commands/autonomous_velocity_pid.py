@@ -2,11 +2,10 @@
 # Note - this is just for playing around - not the the feed forward works this is fine
 
 from wpilib.command import Command
-from wpilib.trajectory.constraint import DifferentialDriveVoltageConstraint
-import wpilib.trajectory
 import wpilib.controller
 import wpilib.kinematics
 from wpilib import Timer, SmartDashboard
+
 import subsystems.drive_constants as drive_constants
 
 class AutonomousVelocityPID(Command):

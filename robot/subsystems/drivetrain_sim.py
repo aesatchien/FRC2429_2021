@@ -4,9 +4,9 @@ import wpilib.kinematics
 import wpilib.drive
 from wpilib.command import Subsystem
 from wpilib import SmartDashboard, SpeedControllerGroup, Timer
-import wpilib.geometry as geo
-import subsystems.drive_constants as drive_constants
+import wpimath.geometry as geo
 
+import subsystems.drive_constants as drive_constants
 from commands.drive_by_joystick import DriveByJoystick
 import navx
 
@@ -79,6 +79,9 @@ class DriveTrainSim(Subsystem):
 
     def get_average_encoder_distance(self):
         return (self.l_encoder.getDistance() + self.r_encoder.getDistance())/2
+
+    def get_average_encoder_rate(self):
+        return (self.l_encoder.getRate() + self.r_encoder.getRate())/2
 
     def zero_heading(self):
         self.navx.reset()

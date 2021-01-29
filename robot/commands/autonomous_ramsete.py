@@ -1,17 +1,22 @@
 
 from wpilib.command import Command
-from wpilib.trajectory.constraint import DifferentialDriveVoltageConstraint
-import wpilib.trajectory
 import wpilib.controller
 import wpilib.kinematics
-import wpilib.geometry as geo
 from wpilib import Timer, SmartDashboard
+from wpimath.trajectory.constraint import DifferentialDriveVoltageConstraint
+import wpimath.trajectory
+import wpimath.geometry as geo
+
+from pathlib import Path
+from datetime import datetime
+import pickle
+
 import subsystems.drive_constants as drive_constants
 
 class AutonomousRamsete(Command):
     """Attempting to translate the Ramsete command from commands V2 into a V1 version since robotpy doesn't have this command yet
     this does not work yet - it just sits there and quivers.  Have to go through piece by piece """
-    def __init__(self, robot, timeout=30):
+    def __init__(self, robot, timeout=50):
         Command.__init__(self, name='auto_ramsete')
         self.robot = robot
         self.requires(robot.drivetrain)
@@ -20,47 +25,23 @@ class AutonomousRamsete(Command):
         self.previous_speeds = None
         self.use_PID = True
         self.counter = 0
+        self.telemetry = []
+        self.trajectory = None
 
-        # Create a voltage constraint to ensure we don't accelerate too fast
-        self.feed_forward = wpilib.controller.SimpleMotorFeedforwardMeters(
-            drive_constants.ks_volts, drive_constants.kv_volt_seconds_per_meter, drive_constants.ka_volt_seconds_squared_per_meter)
-        self.autonomous_voltage_constraint = DifferentialDriveVoltageConstraint(self.feed_forward, drive_constants.drive_kinematics, 10)
+        # constants for ramsete follower
+        self.beta = drive_constants.ramsete_B
+        self.zeta = drive_constants.ramsete_Zeta
 
         # create controllers
-        self.follower = wpilib.controller.RamseteController(drive_constants.ramsete_B, drive_constants.ramsete_Zeta)
+        self.follower = wpilib.controller.RamseteController(self.beta, self.zeta)
         self.kp_vel = drive_constants.kp_drive_vel; SmartDashboard.putNumber("kp_vel_ramsete", self.kp_vel)
-        self.left_controller = wpilib.controller.PIDController(self.kp_vel, 0 , 0)
-        self.right_controller = wpilib.controller.PIDController(self.kp_vel, 0 , 0)
+        self.kd_vel = 0
+        self.left_controller = wpilib.controller.PIDController(self.kp_vel, 0 , self.kd_vel)
+        self.right_controller = wpilib.controller.PIDController(self.kp_vel, 0 , self.kd_vel)
 
-
-        # Create config for trajectory
-        self.config = wpilib.trajectory.TrajectoryConfig(
-            drive_constants.k_max_speed_meters_per_second, drive_constants.k_max_acceleration_meters_per_second_squared)
-        self.config.setKinematics(drive_constants.drive_kinematics)
-        self.config.addConstraint(self.autonomous_voltage_constraint)
-
-        # example trajectory to test
-        self.start_pose = geo.Pose2d(0, 0, geo.Rotation2d(0))
-        self.end_pose = geo.Pose2d(3, 0, geo.Rotation2d(0))
-        self.midpoints = [geo.Translation2d(1, 1), geo.Translation2d(2, -1)]
-        test_trajectory = wpilib.trajectory.TrajectoryGenerator.generateTrajectory(self.start_pose, self.midpoints, self.end_pose, self.config)
-
-        # minimum slalom test - nice thing about having the points means you can change the speeds for the
-        # trajectory config and then you can go faster and faster.  but it's better to use the pathweaver once you have the speeds you want
-        self.start_pose = geo.Pose2d(0, 0, geo.Rotation2d(0))
-        self.end_pose = geo.Pose2d(0, 1.7, geo.Rotation2d(3.14))
-        self.midpoints = [geo.Translation2d(0.97, 0.23), geo.Translation2d(1.93, 1.59), geo.Translation2d(3.47, 2.05),
-                          geo.Translation2d(5.38, 1.18), geo.Translation2d(6.48, -0.01), geo.Translation2d(7.36, 0.88),
-                          geo.Translation2d(6.38, 1.76), geo.Translation2d(5.53, 0.85), geo.Translation2d(5.10, 0.20),
-                          geo.Translation2d(3.55, -0.05), geo.Translation2d(1.84, 0.16), geo.Translation2d(1.21, 0.84),
-                          geo.Translation2d(0.51, 1.55)]
-
-        self.trajectory = wpilib.trajectory.TrajectoryGenerator.generateTrajectory(self.start_pose, self.midpoints, self.end_pose, self.config)
-
+        self.feed_forward = drive_constants.feed_forward
         self.kinematics = drive_constants.drive_kinematics
-
-    # alternately, import a pathweaver json
-    # https://docs.wpilib.org/en/stable/docs/software/wpilib-tools/pathweaver/integrating-robot-program.html#importing-a-pathweaver-json
+        self.course = drive_constants.course
 
     def initialize(self):
         """Called just before this Command runs the first time."""
@@ -68,9 +49,32 @@ class AutonomousRamsete(Command):
         print("\n" + f"** Started {self.getName()} at {self.start_time} s **")
         SmartDashboard.putString("alert", f"** Started {self.getName()} at {self.start_time} s **")
 
-        self.robot.drivetrain.reset_odometry(self.start_pose)
-
         self.previous_time = -1
+
+        #ToDo - make this selectable, probably from the dash, add the other trajectories
+        trajectory_choice = 'points'
+        if trajectory_choice == 'pathweaver':
+            self.trajectory = drive_constants.pathweaver_trajectory
+            self.start_pose = geo.Pose2d(0, 0, geo.Rotation2d(0))
+        elif trajectory_choice == 'loop':
+            self.course = 'loop'
+            self.trajectory = drive_constants.loop_trajectory
+            self.start_pose = geo.Pose2d(0, 0, geo.Rotation2d(0))
+        elif trajectory_choice == 'poses':
+            self.course = 'slalom_poses'
+            self.trajectory = drive_constants.pose_trajectory
+            self.start_pose = geo.Pose2d(0, 0, geo.Rotation2d(0))
+        elif trajectory_choice == 'points':
+            self.course = 'slalom_points'
+            self.trajectory = drive_constants.slalom_point_trajectory
+            self.start_pose = geo.Pose2d(0, 0, geo.Rotation2d(0))
+        else:
+            self.course = 'test'
+            self.trajectory = drive_constants.test_trajectory
+            self.start_pose = geo.Pose2d(0, 0, geo.Rotation2d(0))
+
+
+        self.robot.drivetrain.reset_odometry(self.start_pose)  # need to sort this out - pathweaver vs. self-made
         initial_state = self.trajectory.sample(0)
         # these are all meters in 2021
         self.previous_speeds = self.kinematics.toWheelSpeeds(wpilib.kinematics.ChassisSpeeds(
@@ -93,11 +97,15 @@ class AutonomousRamsete(Command):
             self.previous_time = current_time
             return
 
-        ramsete = self.follower.calculate(self.robot.drivetrain.get_pose(), self.trajectory.sample(current_time))
+        # get the robot's current field pose, current trajectory point, and feed to the ramsete controller
+        pose = self.robot.drivetrain.get_pose()
+        sample = self.trajectory.sample(current_time)
+        ramsete = self.follower.calculate(pose, sample)
         target_wheel_speeds = self.kinematics.toWheelSpeeds(ramsete)
 
         left_speed_setpoint = target_wheel_speeds.left
         right_speed_setpoint = target_wheel_speeds.right
+
         if self.use_PID:
             left_feed_forward = self.feed_forward.calculate(left_speed_setpoint, (left_speed_setpoint - self.previous_speeds.left)/dt)
             right_feed_forward = self.feed_forward.calculate(right_speed_setpoint, (right_speed_setpoint - self.previous_speeds.right)/dt)
@@ -120,7 +128,15 @@ class AutonomousRamsete(Command):
         SmartDashboard.putNumber('left_speed_setpoint', left_speed_setpoint)
         SmartDashboard.putNumber('right_speed_setpoint', right_speed_setpoint)
 
-        if self.counter % 10 == 0:
+        if self.counter % 5 == 0:  # ten times per second
+            telemetry_data = {'TIME':current_time, 'RBT_X':pose.X(), 'RBT_Y':pose.Y(), 'RBT_TH':pose.rotation().radians(),
+                            'RBT_VEL':self.robot.drivetrain.get_average_encoder_rate(),
+                            'RBT_RVEL':self.robot.drivetrain.r_encoder.getRate(), 'RBT_LVEL':self.robot.drivetrain.l_encoder.getRate(),
+                            'TRAJ_X':sample.pose.X(), 'TRAJ_Y':sample.pose.Y(), 'TRAJ_TH':sample.pose.rotation().radians(), 'TRAJ_VEL':sample.velocity,
+                            'RAM_VELX':ramsete.vx, 'RAM_LVEL_SP':left_speed_setpoint, 'RAM_RVEL_SP':right_speed_setpoint,
+                            'RAM_OM':ramsete.omega, 'LFF':left_feed_forward, 'RFF':right_feed_forward, 'LPID': left_output_pid, 'RPID':right_output_pid}
+            self.telemetry.append(telemetry_data)
+        if self.counter % 20 == 0:
             out_string = f'{current_time:2.2f}\t{self.trajectory.sample(current_time).velocity:2.1f}\t{self.trajectory.sample(current_time).pose.rotation().radians():2.2f}\t'
             out_string += f'{left_speed_setpoint:2.2f}\t{right_speed_setpoint:2.2f}\t{ramsete.omega:2.2f}\t{ramsete.vx:2.2f}\t{ramsete.vy:2.2f}\t'
             out_string += f'{left_feed_forward:2.2f}\t{right_feed_forward:2.2f}\t{left_output_pid:2.2f}\t{right_output_pid:2.2f}'
@@ -135,6 +151,17 @@ class AutonomousRamsete(Command):
         print(f"** {message} {self.getName()} at {end_time} s after {round(end_time-self.start_time,1)} s **")
         SmartDashboard.putString("alert", f"** Ended {self.getName()} at {end_time} s after {round(end_time-self.start_time,1)} s **")
         self.robot.drivetrain.stop()
+
+        write_telemetry = True
+        if write_telemetry:
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            file_name = timestamp + '_'+ self.course + f'_kpvel_{self.kp_vel:2.1f}'.replace('.','p') + f'vel_{drive_constants.k_max_speed_meters_per_second}'   +'.pkl'
+            pickle_file = Path.cwd() / 'sim' / 'data' / file_name
+            with open(pickle_file.absolute(), 'wb') as fp:
+                out_dict = {'TIMESTAMP':timestamp,'DATA':self.telemetry, 'COURSE':self.course, 'VELOCITY':drive_constants.k_max_speed_meters_per_second,
+                            'KP_VEL':self.kp_vel, 'KD_VEL':self.kd_vel, 'BETA':self.beta, 'ZETA':self.zeta}
+                pickle.dump(out_dict, fp)
+            print(f'*** Wrote ramsete command data to {file_name} ***')
 
     def interrupted(self):
         self.end(message='Interrupted')
