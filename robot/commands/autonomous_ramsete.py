@@ -52,7 +52,7 @@ class AutonomousRamsete(Command):
         self.previous_time = -1
 
         #ToDo - make this selectable, probably from the dash, add the other trajectories
-        trajectory_choice = 'points'
+        trajectory_choice = 'loop'
         if trajectory_choice == 'pathweaver':
             self.trajectory = drive_constants.pathweaver_trajectory
             self.start_pose = geo.Pose2d(0, 0, geo.Rotation2d(0))

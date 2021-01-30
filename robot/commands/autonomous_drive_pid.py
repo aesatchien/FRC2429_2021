@@ -15,7 +15,7 @@ class AutonomousDrivePID(Command):
         # Signal that we require ExampleSubsystem
         self.requires(robot.drivetrain)
         self.source = source
-        self.k_dash = False
+        self.k_dash = True
 
         # allow setpoint to be controlled by the dashboard
         if source == 'dashboard':
