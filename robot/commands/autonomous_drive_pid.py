@@ -15,11 +15,14 @@ class AutonomousDrivePID(Command):
         # Signal that we require ExampleSubsystem
         self.requires(robot.drivetrain)
         self.source = source
-        self.k_dash = True
+        self.k_dash = False
+        self.start_time = 0
+        self.teaching = False  # switch to True if you want to learn about PID controllers
 
         # allow setpoint to be controlled by the dashboard
         if source == 'dashboard':
             setpoint = SmartDashboard.getNumber('distance', 1)
+            self.k_dash = True
         else:
             if setpoint is None:
                 setpoint = 2
@@ -46,17 +49,11 @@ class AutonomousDrivePID(Command):
         self.tolerance = 0.1
 
         if self.k_dash:
-            SmartDashboard.putNumber('kperiod_drive', self.kperiod)
-            SmartDashboard.putNumber('ki_drive', self.ki)
-            SmartDashboard.putNumber('kd_drive', self.kd)
-            SmartDashboard.putNumber('kp_drive', self.kp)
+            SmartDashboard.putNumber('zdrive_kp', self.kp)
+            SmartDashboard.putNumber('zdrive_ki', self.ki)
+            SmartDashboard.putNumber('zdrive_kd', self.kd)
+            SmartDashboard.putNumber('zdrive_per', self.kperiod)
 
-
-    def corrected_setpoint(self, setpoint):
-        """Found an excellent linear fit to the overshoot"""
-        intercept, slope = 0.45, 1.56  # fit for kp=1.8, kd=0.2
-        #return (setpoint - intercept) / slope
-        return setpoint
 
     def initialize(self):
         """Called just before this Command runs the first time."""
@@ -67,20 +64,20 @@ class AutonomousDrivePID(Command):
             self.setpoint_sign = math.copysign(1, setpoint)
             self.setpoint = (math.fabs(setpoint))  # correction for overshoot
 
-        self.start_time = round(Timer.getFPGATimestamp() - self.robot.enabled_time, 1)
-        print("\n" + f"** Started {self.getName()} with setpoint {self.setpoint} at {self.start_time} s **")
-        SmartDashboard.putString("alert", f"** Started {self.getName()} with setpoint {self.setpoint} at {self.start_time} s **")
-        self.has_finished = False
-
         # self.robot.drivetrain.reset_encoders()  # does not work in sim mode
         self.start_pos = self.robot.drivetrain.get_average_encoder_distance()
 
         if self.k_dash:
-            self.kp, self.kd  = SmartDashboard.getNumber('kp', self.kp), SmartDashboard.getNumber('kd', self.kd)
-            self.ki, self.period = SmartDashboard.getNumber('ki', self.ki), SmartDashboard.getNumber('kperiod', self.kperiod)
+            self.kp, self.kd  = SmartDashboard.getNumber('zdrive_kp', self.kp), SmartDashboard.getNumber('zdrive_kd', self.kd)
+            self.ki, self.period = SmartDashboard.getNumber('zdrive_ki', self.ki), SmartDashboard.getNumber('zdrive_per', self.kperiod)
+
+        self.start_time = round(Timer.getFPGATimestamp() - self.robot.enabled_time, 1)
+        print("\n" + f"** Started {self.getName()} with setpoint {self.setpoint} (kp={self.kp}, ki={self.ki}, kd={self.kd}) at {self.start_time} s **")
+        SmartDashboard.putString("alert", f"** Started {self.getName()} with setpoint {self.setpoint} at {self.start_time} s **")
+        self.has_finished = False
 
         self.controller = wpilib.controller.PIDController(self.kp, self.ki, self.kd, period=self.kperiod)
-        self.controller.setSetpoint(self.corrected_setpoint(self.setpoint))
+        self.controller.setSetpoint(self.setpoint)
         self.controller.setTolerance(self.tolerance)
         self.controller.reset()
 
@@ -95,7 +92,10 @@ class AutonomousDrivePID(Command):
         # somehow need to wait for the error level to get to a tolerance... request from drivetrain?
         if self.error > (self.setpoint - self.tolerance):
             self.has_finished = True
-        return self.has_finished or self.isTimedOut()
+        if self.teaching:
+            return self.isTimedOut()  # if trying to demonstrate how PIDs work
+        else:
+            return self.has_finished or self.isTimedOut()
 
     def end(self, message='Ended'):
         """Called once after isFinished returns true"""

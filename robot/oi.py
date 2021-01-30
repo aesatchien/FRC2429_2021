@@ -42,7 +42,7 @@ class OI(object):
         self.buttonA.whenPressed( AutonomousDriveTimed(self.robot, timeout=1) )
         self.buttonB.whenPressed( AutonomousRotate(self.robot, setpoint=60, timeout=4, source='dashboard') )
         self.buttonX.whenPressed( AutonomousRotate(self.robot, setpoint=-60, timeout=4, source='dashboard', absolute=True) )
-        self.buttonY.whenPressed( AutonomousDrivePID(self.robot, setpoint=2, timeout=3, source='dashboard') )
+        self.buttonY.whenPressed( AutonomousDrivePID(self.robot, setpoint=2, timeout=4, source='dashboard') )
 
         # g h j on the keyboard
         self.buttonLB.whenPressed( AutonomousSlalom(self.robot)  )
@@ -105,3 +105,12 @@ class OI(object):
             else:
                 self.routine_chooser.addOption(position, position)
         wpilib.SmartDashboard.putData('Autonomous Routine', self.routine_chooser)
+
+        self.path_chooser = SendableChooser()
+        wpilib.SmartDashboard.putData('Ramsete Path', self.path_chooser)
+        choices = ['loop', 'pathweaver', 'poses', 'points', 'test']
+        for ix, position in enumerate(choices):
+            if ix == 0:
+                self.path_chooser.setDefaultOption(position, position)
+            else:
+                self.path_chooser.addOption(position, position)

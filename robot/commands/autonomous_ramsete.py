@@ -1,4 +1,5 @@
-
+# intended to have the robot follow a trajectory path
+# ToDo: make sure velocity controllers are actually helping and optimize the B, Z and kp gains
 from wpilib.command import Command
 import wpilib.controller
 import wpilib.kinematics
@@ -27,17 +28,20 @@ class AutonomousRamsete(Command):
         self.counter = 0
         self.telemetry = []
         self.trajectory = None
+        self.write_telemetry = False
+        self.dash = True
 
-        # constants for ramsete follower
+        # constants for ramsete follower and velocity PID controllers
         self.beta = drive_constants.ramsete_B
         self.zeta = drive_constants.ramsete_Zeta
-
-        # create controllers
-        self.follower = wpilib.controller.RamseteController(self.beta, self.zeta)
-        self.kp_vel = drive_constants.kp_drive_vel; SmartDashboard.putNumber("kp_vel_ramsete", self.kp_vel)
+        self.kp_vel = drive_constants.kp_drive_vel
         self.kd_vel = 0
-        self.left_controller = wpilib.controller.PIDController(self.kp_vel, 0 , self.kd_vel)
-        self.right_controller = wpilib.controller.PIDController(self.kp_vel, 0 , self.kd_vel)
+
+        if self.dash is True:
+            SmartDashboard.putNumber("ramsete_kpvel", self.kp_vel)
+            SmartDashboard.putNumber("ramsete_B", self.beta)
+            SmartDashboard.putNumber("ramsete_Z", self.zeta)
+            SmartDashboard.putBoolean("ramsete_write", self.write_telemetry)
 
         self.feed_forward = drive_constants.feed_forward
         self.kinematics = drive_constants.drive_kinematics
@@ -45,34 +49,46 @@ class AutonomousRamsete(Command):
 
     def initialize(self):
         """Called just before this Command runs the first time."""
-        self.start_time = round(Timer.getFPGATimestamp() - self.robot.enabled_time, 1)
-        print("\n" + f"** Started {self.getName()} at {self.start_time} s **")
-        SmartDashboard.putString("alert", f"** Started {self.getName()} at {self.start_time} s **")
 
         self.previous_time = -1
 
+        # update gains from dash if desired
+        if self.dash is True:
+            self.kp_vel = SmartDashboard.getNumber("ramsete_kpvel", self.kp_vel)
+            self.beta = SmartDashboard.getNumber("ramsete_B", self.beta)
+            self.zeta = SmartDashboard.getNumber("ramsete_Z", self.zeta)
+
+        # create controllers
+        self.follower = wpilib.controller.RamseteController(self.beta, self.zeta)
+        self.left_controller = wpilib.controller.PIDController(self.kp_vel, 0 , self.kd_vel)
+        self.right_controller = wpilib.controller.PIDController(self.kp_vel, 0 , self.kd_vel)
+        self.left_controller.reset()
+        self.right_controller.reset()
+
         #ToDo - make this selectable, probably from the dash, add the other trajectories
-        trajectory_choice = 'loop'
+
+        # trajectory_choice = 'loop'
+        trajectory_choice = self.robot.oi.path_chooser.getSelected()  # get path from the GUI
         if trajectory_choice == 'pathweaver':
-            self.trajectory = drive_constants.pathweaver_trajectory
-            self.start_pose = geo.Pose2d(0, 0, geo.Rotation2d(0))
+            self.course = 'slalom_pathweaver'
+            self.trajectory = drive_constants.get_pathweaver_trajectory()
+            self.start_pose = geo.Pose2d(1.3, 0.66, geo.Rotation2d(0))
         elif trajectory_choice == 'loop':
             self.course = 'loop'
-            self.trajectory = drive_constants.loop_trajectory
+            self.trajectory = drive_constants.get_loop_trajectory()
             self.start_pose = geo.Pose2d(0, 0, geo.Rotation2d(0))
         elif trajectory_choice == 'poses':
             self.course = 'slalom_poses'
-            self.trajectory = drive_constants.pose_trajectory
+            self.trajectory = drive_constants.get_pose_trajectory()
             self.start_pose = geo.Pose2d(0, 0, geo.Rotation2d(0))
         elif trajectory_choice == 'points':
             self.course = 'slalom_points'
-            self.trajectory = drive_constants.slalom_point_trajectory
+            self.trajectory = drive_constants.get_point_trajectory()
             self.start_pose = geo.Pose2d(0, 0, geo.Rotation2d(0))
         else:
             self.course = 'test'
-            self.trajectory = drive_constants.test_trajectory
+            self.trajectory = drive_constants.get_test_directory()
             self.start_pose = geo.Pose2d(0, 0, geo.Rotation2d(0))
-
 
         self.robot.drivetrain.reset_odometry(self.start_pose)  # need to sort this out - pathweaver vs. self-made
         initial_state = self.trajectory.sample(0)
@@ -80,11 +96,10 @@ class AutonomousRamsete(Command):
         self.previous_speeds = self.kinematics.toWheelSpeeds(wpilib.kinematics.ChassisSpeeds(
             initial_state.velocity, 0, initial_state.curvature*initial_state.velocity))
 
-        self.kp_vel = SmartDashboard.getNumber("kp_vel_ramsete", self.kp_vel)
-        self.left_controller = wpilib.controller.PIDController(self.kp_vel, 0 , 0)
-        self.right_controller = wpilib.controller.PIDController(self.kp_vel, 0 , 0)
-        self.left_controller.reset()
-        self.right_controller.reset()
+        self.start_time = round(Timer.getFPGATimestamp() - self.robot.enabled_time, 1)
+        print("\n" + f"** Started {self.getName()} on {self.course} (b={self.beta}, z={self.zeta}, kp_vel={self.kp_vel}) at {self.start_time} s **")
+        SmartDashboard.putString("alert", f"** Started {self.getName()} at {self.start_time} s **")
+
         print('Time\tTr Vel\tTr Rot\tlspd\trspd\tram ang\tram vx\tram vy\tlffw\trffw\tlpid\trpid')
 
     def execute(self) -> None:
@@ -152,8 +167,8 @@ class AutonomousRamsete(Command):
         SmartDashboard.putString("alert", f"** Ended {self.getName()} at {end_time} s after {round(end_time-self.start_time,1)} s **")
         self.robot.drivetrain.stop()
 
-        write_telemetry = True
-        if write_telemetry:
+        self.write_telemetry = SmartDashboard.getBoolean("ramsete_write", self.write_telemetry)
+        if self.write_telemetry:
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
             file_name = timestamp + '_'+ self.course + f'_kpvel_{self.kp_vel:2.1f}'.replace('.','p') + f'vel_{drive_constants.k_max_speed_meters_per_second}'   +'.pkl'
             pickle_file = Path.cwd() / 'sim' / 'data' / file_name
@@ -162,6 +177,8 @@ class AutonomousRamsete(Command):
                             'KP_VEL':self.kp_vel, 'KD_VEL':self.kd_vel, 'BETA':self.beta, 'ZETA':self.zeta}
                 pickle.dump(out_dict, fp)
             print(f'*** Wrote ramsete command data to {file_name} ***')
+        else:
+            print(f'*** Skipping saving of telemetry to disk ***')
 
     def interrupted(self):
         self.end(message='Interrupted')
