@@ -69,19 +69,19 @@ class AutonomousRamsete(Command):
 
         #ToDo - make this selectable, probably from the dash, add the other trajectories
 
-        # trajectory_choice = 'loop'
+        # Note - we are setting to pose to have the robot physically in the start position
         trajectory_choice = self.robot.oi.path_chooser.getSelected()  # get path from the GUI
-        if trajectory_choice == 'slalom_pathweaver':
-            self.course = 'slalom_pathweaver'
-            self.trajectory = drive_constants.get_pathweaver_trajectory('slalom')
+        if 'slalom' in trajectory_choice and 'pw' in trajectory_choice:
+            self.course = trajectory_choice
+            self.trajectory = drive_constants.get_pathweaver_trajectory(trajectory_choice)
             self.start_pose = geo.Pose2d(1.3, 0.66, geo.Rotation2d(0))
-        elif trajectory_choice == 'barrel_pathweaver':
-            self.course = 'barrel_pathweaver'
-            self.trajectory = drive_constants.get_pathweaver_trajectory('barrel')
+        elif 'barrel' in trajectory_choice and 'pw' in trajectory_choice:
+            self.course = trajectory_choice
+            self.trajectory = drive_constants.get_pathweaver_trajectory(trajectory_choice)
             self.start_pose = geo.Pose2d(1.3, 2.40, geo.Rotation2d(0))
-        elif trajectory_choice == 'bounce_pathweaver':
-            self.course = 'bounce_pathweaver'
-            self.trajectory = drive_constants.get_pathweaver_trajectory('bounce')
+        elif 'bounce' in trajectory_choice and 'pw' in trajectory_choice:
+            self.course = trajectory_choice
+            self.trajectory = drive_constants.get_pathweaver_trajectory(trajectory_choice)
             self.start_pose = geo.Pose2d(1.3, 2.62, geo.Rotation2d(0))
         elif trajectory_choice == 'loop':
             self.course = 'loop'
@@ -100,7 +100,7 @@ class AutonomousRamsete(Command):
             self.trajectory = drive_constants.get_test_directory()
             self.start_pose = geo.Pose2d(0, 0, geo.Rotation2d(0))
 
-        self.robot.drivetrain.reset_odometry(self.start_pose)  # need to sort this out - pathweaver vs. self-made
+        self.robot.drivetrain.reset_odometry(self.start_pose)  # ToDo need to sort this out - pathweaver vs. self-made padding
         initial_state = self.trajectory.sample(0)
         # these are all meters in 2021
         self.previous_speeds = self.kinematics.toWheelSpeeds(wpilib.kinematics.ChassisSpeeds(
@@ -151,8 +151,8 @@ class AutonomousRamsete(Command):
         self.previous_time = current_time
         self.robot.drivetrain.drive.feed()
 
-        SmartDashboard.putNumber('left_speed_setpoint', left_speed_setpoint)
-        SmartDashboard.putNumber('right_speed_setpoint', right_speed_setpoint)
+        #SmartDashboard.putNumber('rz_left_speed_setpoint', left_speed_setpoint)
+        #SmartDashboard.putNumber('rz_right_speed_setpoint', right_speed_setpoint)
 
         if self.counter % 5 == 0:  # ten times per second
             telemetry_data = {'TIME':current_time, 'RBT_X':pose.X(), 'RBT_Y':pose.Y(), 'RBT_TH':pose.rotation().radians(),

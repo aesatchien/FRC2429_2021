@@ -12,6 +12,7 @@
 from pyfrc.physics.core import PhysicsInterface
 from pyfrc.physics import motor_cfgs, tankmodel
 from pyfrc.physics.units import units
+from wpilib import SmartDashboard
 
 import subsystems.drive_constants as drive_constants
 
@@ -36,6 +37,7 @@ class PhysicsEngine:
     def __init__(self, physics_controller: PhysicsInterface):
 
         self.physics_controller = physics_controller
+
         self.counter = 0
         self.x, self.y = 0, 0
 
@@ -67,22 +69,24 @@ class PhysicsEngine:
         # keep us on the field - set x,y limits for driving
         field_size = 'home'
         if field_size == 'competition':
-            self.x_limit, self.y_limit = 15.97, 8.21  # meters for a 52.4x26.9' field
+            self.x_limit, self.y_limit = 15.97+0.5, 8.21+0.5  # meters for a 52.4x26.9' field PLUS 0.5 meter border
             self.x, self.y = 2, 8.21/2
         else: # at home autonomous challenge for 2021
-            self.x_limit, self.y_limit = 9.63, 5.05  # meters for a 30x15' field with the border
+            self.x_limit, self.y_limit = 9.62, 5.02  # meters for a 30x15' field incl the 0.5m border
                     # Set our position on the field
             position = 'slalom'  # set this to put the robot on the field
             if position == 'slalom':
-                self.x, self.y = 1.25, 0.91
+                self.x, self.y = 1.1, 0.68
             elif position  == 'barrel':
-                self.x, self.y = 1.2, 2.3
+                self.x, self.y = 1.1, 2.3-.25
             elif position == 'bounce':
-                self.x, self.y = 1.2, 2.5
+                self.x, self.y = 1.1, 2.5-.25
             else:
-                self.x, self.y = 0, 2
+                self.x, self.y = 0, 0
 
+        self.field_offset = geo.Transform2d(geo.Translation2d(0.25,0.25), geo.Rotation2d(0))
 
+        # is all this necessary?
         initial_pose = geo.Pose2d(0, 0, geo.Rotation2d(0))
         final_pose = geo.Pose2d(self.x, self.y, geo.Rotation2d(0))
         initial_position_transform = geo.Transform2d(initial_pose, final_pose)
@@ -124,8 +128,9 @@ class PhysicsEngine:
         pose = self.physics_controller.move_robot(transform)  # includes inertia
 
         # keep us on the simulated field - reverse the transform if we try to go out of bounds
-        if (pose.translation().x < 0 or pose.translation().x > self.x_limit or
-                pose.translation().y < 0 or pose.translation().y > self.y_limit):
+        sim_padding = 0.25  # let us go a bit outside but not get lost
+        if (pose.translation().x < -sim_padding or pose.translation().x > self.x_limit + sim_padding or
+                pose.translation().y < -sim_padding or pose.translation().y > self.y_limit + sim_padding):
             curr_x, curr_y = transform.translation().x, transform.translation().y
             # in 2021 library they added an inverse() to transforms so this could all be one line
             new_transform = geo.Transform2d(geo.Translation2d(-curr_x, curr_y), transform.rotation())
@@ -158,3 +163,7 @@ class PhysicsEngine:
         # -> FRC gyros like NavX are positive clockwise, but the returned pose is positive counter-clockwise
         self.navx_yaw.set(-pose.rotation().degrees())
 
+        self.counter += 1
+        if self.counter % 5 == 0:
+            SmartDashboard.putNumber('field_x', self.x)
+            SmartDashboard.putNumber('field_y', self.y)

@@ -104,11 +104,12 @@ class OI(object):
                 self.routine_chooser.setDefaultOption(position, position)
             else:
                 self.routine_chooser.addOption(position, position)
-        wpilib.SmartDashboard.putData('Autonomous Routine', self.routine_chooser)
+        #wpilib.SmartDashboard.putData('Autonomous Routine', self.routine_chooser)
 
         self.path_chooser = SendableChooser()
         wpilib.SmartDashboard.putData('Ramsete Path', self.path_chooser)
-        choices = ['loop', 'slalom_pathweaver', 'barrel_pathweaver', 'bounce_pathweaver', 'poses', 'points', 'test']
+        choices = ['loop', 'poses', 'points', 'test', 'slalom_pw0_0.75','slalom_pw1_0.75', 'slalom_pw2_0.75', 'slalom_pw0_1.25', 'slalom_pw1_1.25',
+                   'slalom_pw2_1.25', 'barrel_pw1_0.75', 'barrel_pw1_1.25', 'bounce_pw1_0.75', 'bounce_pw1_1.25']
         for ix, position in enumerate(choices):
             if ix == 0:
                 self.path_chooser.setDefaultOption(position, position)

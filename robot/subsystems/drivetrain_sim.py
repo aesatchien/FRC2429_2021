@@ -42,7 +42,7 @@ class DriveTrainSim(Subsystem):
         self.r_encoder.setDistancePerPulse(drive_constants.encoder_distance_per_pulse_m)
 
         # odometry for tracking the robot pose
-        self.odometry = wpilib.kinematics.DifferentialDriveOdometry(geo.Rotation2d( -self.navx.getAngle() ))
+        self.odometry = wpilib.kinematics.DifferentialDriveOdometry(geo.Rotation2d.fromDegrees( -self.navx.getAngle() ))
 
     def initDefaultCommand(self):
         """ When other commands aren't using the drivetrain, allow arcade drive with the joystick. """
