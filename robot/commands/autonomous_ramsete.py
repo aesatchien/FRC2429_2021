@@ -51,6 +51,7 @@ class AutonomousRamsete(Command):
         """Called just before this Command runs the first time."""
 
         self.previous_time = -1
+        self.telemetry = []
 
         # update gains from dash if desired
         if self.dash is True:
@@ -65,14 +66,23 @@ class AutonomousRamsete(Command):
         self.left_controller.reset()
         self.right_controller.reset()
 
+
         #ToDo - make this selectable, probably from the dash, add the other trajectories
 
         # trajectory_choice = 'loop'
         trajectory_choice = self.robot.oi.path_chooser.getSelected()  # get path from the GUI
-        if trajectory_choice == 'pathweaver':
+        if trajectory_choice == 'slalom_pathweaver':
             self.course = 'slalom_pathweaver'
-            self.trajectory = drive_constants.get_pathweaver_trajectory()
+            self.trajectory = drive_constants.get_pathweaver_trajectory('slalom')
             self.start_pose = geo.Pose2d(1.3, 0.66, geo.Rotation2d(0))
+        elif trajectory_choice == 'barrel_pathweaver':
+            self.course = 'barrel_pathweaver'
+            self.trajectory = drive_constants.get_pathweaver_trajectory('barrel')
+            self.start_pose = geo.Pose2d(1.3, 2.40, geo.Rotation2d(0))
+        elif trajectory_choice == 'bounce_pathweaver':
+            self.course = 'bounce_pathweaver'
+            self.trajectory = drive_constants.get_pathweaver_trajectory('bounce')
+            self.start_pose = geo.Pose2d(1.3, 2.62, geo.Rotation2d(0))
         elif trajectory_choice == 'loop':
             self.course = 'loop'
             self.trajectory = drive_constants.get_loop_trajectory()
@@ -128,6 +138,7 @@ class AutonomousRamsete(Command):
             ws_left, ws_right = self.robot.drivetrain.l_encoder.getRate(), self.robot.drivetrain.r_encoder.getRate()
             left_output_pid = self.left_controller.calculate(ws_left, left_speed_setpoint)
             right_output_pid = self.right_controller.calculate(ws_right, right_speed_setpoint)
+            # 100% sure that these signs are right - see plots.   Want minus the PID and plus the feedfwd
             left_output = -left_output_pid + left_feed_forward
             right_output = -right_output_pid + right_feed_forward
 

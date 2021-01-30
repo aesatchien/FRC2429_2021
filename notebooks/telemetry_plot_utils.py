@@ -18,6 +18,33 @@ def load_file(infile):
         print(f'Missing item  in pickle {infile}, please create it and re-pickle')
     return telemetry
 
+def get_data(file_name=None, x_offset=1.2, y_offset=0.9):
+    files = glob.glob('../robot/sim/data/*')
+    if file_name is None:  # get the latest file
+        telemetry = load_file(files[-1])
+    else:  # try and match the filename passed in
+        matches = [file for file in files if file_name in file]
+        telemetry = load_file(matches[0])
+    df = fix_data(telemetry, x_offset=x_offset, y_offset=y_offset)
+    return df, telemetry
+
+def get_points_df(name='slalom', data=None, x_shift=0, y_shift=4.87):
+    # get a list of all the points from a pathweaver file
+    path_files = glob.glob('../robot/paths/*')
+    matches = [file for file in path_files if name.lower() in file.lower()]
+
+    if data is None:  # get the data from a file
+        df_points = pd.DataFrame()
+        if len(matches) > 0:
+            df_points = pd.read_csv(matches[0], sep=',', header='infer')
+            # fix the pathweaver offsets for the 2021 fields
+            df_points['X'] = df_points['X']
+            df_points['Y'] = df_points['Y'] + y_shift
+        return df_points
+    else:  # pass the data in
+        pass
+
+
 # take data, massage it to get what we need to plot
 def fix_data(telemetry, x_offset=0, y_offset=0):
     df = pd.DataFrame(telemetry['DATA'], columns=telemetry['DATA'][0].keys())
@@ -36,7 +63,8 @@ def fix_data(telemetry, x_offset=0, y_offset=0):
     return df
 
 
-def plot_df(df, telemetry, arrows=True, point_df=None, background='slalom', save=False, fname='odometry.png'):
+# ----------------- PLOT UTILS -----------------
+def plot_df(df, telemetry, arrows=True, point_df=None, pathweaver=False, background='slalom', save=False, fname='odometry.png'):
 
     # generate a title
     label = f"Mapping odometry from {telemetry['COURSE']}: {telemetry['TIMESTAMP']} " \
@@ -67,7 +95,7 @@ def plot_df(df, telemetry, arrows=True, point_df=None, background='slalom', save
     # trajectory generation data
     if point_df is not None:
         labels = [str(i) for i in range(len(point_df))]
-        x, y = np.asarray(point_df['X']), 4.87+np.asarray(point_df['Y'])
+        x, y = np.asarray(point_df['X']), np.asarray(point_df['Y'])
         for i, txt in enumerate(labels):
             ax.annotate(txt, (x[i] - .1, y[i] - .3), size=20)
         plt.scatter(x, y, marker='o', c='r', s=150, linewidths=3)
@@ -90,27 +118,29 @@ def plot_df(df, telemetry, arrows=True, point_df=None, background='slalom', save
         plt.close()
     plt.show()
 
-def get_data(file_name=None, x_offset=1.2, y_offset=0.9):
-    files = glob.glob('../robot/sim/data/*')
-    if file_name is None:  # get the latest file
-        telemetry = load_file(files[-1])
-    else:  # try and match the filename passed in
-        matches = [file for file in files if file_name in file]
-        telemetry = load_file(matches[0])
-    df = fix_data(telemetry, x_offset=x_offset, y_offset=y_offset)
-    return df, telemetry
+def velocity_plot(df):
+    fig, (ax,ax2) = plt.subplots(2,1, figsize=(20, 10))
+    # robot velocity scatterplot and annotation
+    ax.plot(df['TIME'], df['RBT_VEL'], c='g', linestyle='-', label='robot vel')
+    ax.plot(df['TIME'], df['RBT_RVEL'], c='g', linestyle='--', label='robot rvel')
+    ax.plot(df['TIME'], df['RBT_LVEL'], c='g', linestyle='dotted', label='robot lvel')
+    ax.plot(df['TIME'], df['RAM_VELX'], c='b', label='ramsete vel')
+    ax.plot(df['TIME'], df['RAM_RVEL_SP'], c='b', linestyle='--', label='ramsete rsp')
+    ax.plot(df['TIME'], df['RAM_LVEL_SP'], c='b', linestyle='dotted', label='ramsete lsp')
 
-def get_points_df(name='slalom', x_shift=0, y_shift=4.87 ):
-    # get a list of all the points from a pathweaver file
-    path_files = glob.glob('../robot/paths/*')
-    matches = [file for file in path_files if name.lower() in file.lower()]
-    df_points = pd.DataFrame()
-    if len(matches) > 0:
-        df_points = pd.read_csv(matches[0], sep=',', header='infer')
-        # fix the pathweaver offsets for the 2021 fields
-        df_points['X'] = df_points['X']
-        df_points['Y'] = df_points['Y'] + y_shift
-    return df_points
+    #ax2.plot(df['TIME'], df['TRAJ_VEL'], c='b', label='traj vel')
+    ax2.plot(df['TIME'], df['LFF'], c='r', linestyle='-', label='rff')
+    ax2.plot(df['TIME'], df['RFF'], c='c', linestyle='-', label='lff')
+    ax2.plot(df['TIME'], df['RPID'], c='r', linestyle='--', label='rpid')
+    ax2.plot(df['TIME'], df['LPID'], c='c', linestyle='--', label='lpid')
+
+    ax.set_ylabel('velocity (m/s)', fontsize=14)
+    ax2.set_ylabel('motor output (V)', fontsize=14)
+    ax2.set_xlabel('time in command (s)', fontsize=14)
+
+    ax.legend()
+    ax2.legend()
+
 
 
 

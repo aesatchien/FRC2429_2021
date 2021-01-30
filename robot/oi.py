@@ -108,7 +108,7 @@ class OI(object):
 
         self.path_chooser = SendableChooser()
         wpilib.SmartDashboard.putData('Ramsete Path', self.path_chooser)
-        choices = ['loop', 'pathweaver', 'poses', 'points', 'test']
+        choices = ['loop', 'slalom_pathweaver', 'barrel_pathweaver', 'bounce_pathweaver', 'poses', 'points', 'test']
         for ix, position in enumerate(choices):
             if ix == 0:
                 self.path_chooser.setDefaultOption(position, position)
