@@ -38,8 +38,8 @@ class DriveTrainSim(Subsystem):
         # initialize encoders - doing this after motors because they may be part of the motor controller
         self.l_encoder = wpilib.Encoder(0, 1, True)
         self.r_encoder = wpilib.Encoder(2, 3, True)
-        self.l_encoder.setDistancePerPulse(drive_constants.encoder_distance_per_pulse_m)
-        self.r_encoder.setDistancePerPulse(drive_constants.encoder_distance_per_pulse_m)
+        self.l_encoder.setDistancePerPulse(drive_constants.k_encoder_distance_per_pulse_m)
+        self.r_encoder.setDistancePerPulse(drive_constants.k_encoder_distance_per_pulse_m)
 
         # odometry for tracking the robot pose
         self.odometry = wpilib.kinematics.DifferentialDriveOdometry(geo.Rotation2d.fromDegrees( -self.navx.getAngle() ))

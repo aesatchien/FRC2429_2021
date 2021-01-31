@@ -1,3 +1,4 @@
+# need a file to communicate to the robot and the sim (sim is not aware of the robot object)
 import math
 import wpilib.kinematics
 import wpimath.geometry as geo
@@ -7,24 +8,24 @@ from wpimath.trajectory.constraint import DifferentialDriveVoltageConstraint
 from pathlib import Path
 
 # drivetrain constants
-wheel_diameter_in = 8  # wheel diameter in inches
-wheel_diameter_m = 8 * 0.0254  # wheel diameter in meters
+k_wheel_diameter_in = 8  # wheel diameter in inches
+k_wheel_diameter_m = 8 * 0.0254  # wheel diameter in meters
 
 # Configure encoders and controllers
 # should be wheel_diameter * pi / gear_ratio - and for the old double reduction gear box the gear ratio was 4.17:1.
 # With the shifter (low gear) I think it was a 12.26.  Then new 2020 WCD gearbox is 9.52, and the tuffbox is 12.75
-gear_ratio = 9.52
-sparkmax_conversion_factor_inches = wheel_diameter_in * math.pi / gear_ratio
-sparkmax_conversion_factor_meters = wheel_diameter_m * math.pi / gear_ratio
+k_gear_ratio = 9.52
+k_sparkmax_conversion_factor_inches = k_wheel_diameter_in * math.pi / k_gear_ratio
+k_sparkmax_conversion_factor_meters = k_wheel_diameter_m * math.pi / k_gear_ratio
 
 # pretend encoders for simulation
-encoder_CPR = 1024 # encoder counts per revolution
+k_encoder_CPR = 1024 # encoder counts per revolution
 # encoder_distance_per_pulse_m = wheel_diameter_m * math.pi / (encoder_CPR * gear_ratio)
-encoder_distance_per_pulse_m = wheel_diameter_m * math.pi / (encoder_CPR )
+k_encoder_distance_per_pulse_m = k_wheel_diameter_m * math.pi / (k_encoder_CPR)
 
 # set up the wpilib kinematics model
-track_width_meters = 0.69
-drive_kinematics = wpilib.kinematics.DifferentialDriveKinematics(track_width_meters)
+k_track_width_meters = 0.69
+drive_kinematics = wpilib.kinematics.DifferentialDriveKinematics(k_track_width_meters)
 
 # get these from robot characterization tools - using simulated values for now
 # ToDo: characterize this on the real robot
@@ -107,7 +108,7 @@ def get_pose_trajectory():
 course = 'slalom'
 
 def get_pathweaver_trajectory(course):
-
+    """ Load different trajectories based on separate velocity directories for pathweaver output"""
     trajectory_json = course[:-5] + '.wpilib.json'  # my naming convention marks the last four characters to mark the velocity
     pathweaver_dir = 'pathweaver'
     if '75' in course:
@@ -123,7 +124,7 @@ def get_pathweaver_trajectory(course):
         pathweaver_trajectory = None
     return pathweaver_trajectory
 
-# ----------------------  FUN WITH SIMULATIONS - hit the  obstructions ------------
+# ----------------------  FUN WITH SIMULATIONS - list the obstructions for different courses ------------
 spacing = 2.5 * .3084
 slalom_points = [(1,2), (2,2), (4,2), (5,2), (6,2), (7,2), (8,2), (10,2), (1,4), (2,4)]
 slalom_points = [(spacing*i[0], spacing*i[1]) for i in slalom_points]
@@ -134,4 +135,5 @@ bounce_points = [(3,1), (1,2), (2,2), (3,2), (5,2), (7,2), (8,2), (8,2), (10,2),
 bounce_points = [(spacing*i[0], spacing*i[1]) for i in bounce_points]
 
 def distance(pose, point):
+    """ Find the distance between a pose and a point """
     return ((pose.translation().x - point[0])**2 + (pose.translation().y - point[1])**2)**0.5

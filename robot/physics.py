@@ -61,8 +61,8 @@ class PhysicsEngine:
             self.r_encoder = simlib.EncoderSim.createForChannel(0)
             self.l_encoder = simlib.EncoderSim.createForChannel(2)
         # update units from drive constants
-        self.l_encoder.setDistancePerPulse(drive_constants.encoder_distance_per_pulse_m)
-        self.r_encoder.setDistancePerPulse(drive_constants.encoder_distance_per_pulse_m)
+        self.l_encoder.setDistancePerPulse(drive_constants.k_encoder_distance_per_pulse_m)
+        self.r_encoder.setDistancePerPulse(drive_constants.k_encoder_distance_per_pulse_m)
 
 
         # --------  INITIALIZE FIELD SETTINGS  ---------------
@@ -101,7 +101,7 @@ class PhysicsEngine:
         self.drivetrain = tankmodel.TankModel.theory(
             motor_cfgs.MOTOR_CFG_CIM,           # motor configuration
             110 * units.lbs,                    # robot mass
-            drive_constants.gear_ratio,         # drivetrain gear ratio
+            drive_constants.k_gear_ratio,         # drivetrain gear ratio
             2,                                  # motors per side
             27 * units.inch,                    # robot wheelbase
             27 * units.inch + bumper_width * 2, # robot width
@@ -144,7 +144,7 @@ class PhysicsEngine:
         if 'bounce' in self.obstacles:
             pylon_points = drive_constants.bounce_points
         if any([drive_constants.distance(pose, i)
-                < drive_constants.track_width_meters/2 for i in pylon_points]):
+                < drive_constants.k_track_width_meters / 2 for i in pylon_points]):
             bad_move = True
 
         # this resets the move if we are hitting a barrier
@@ -174,8 +174,8 @@ class PhysicsEngine:
             self.r_distance_old = self.drivetrain.r_position
         else:
             # haven't updated this for the delta pose approach
-            self.l_encoder.setCount(int(self.drivetrain.l_position / drive_constants.encoder_distance_per_pulse_m))
-            self.r_encoder.setCount(int(self.self.drivetrain.r_position / drive_constants.encoder_distance_per_pulse_m))
+            self.l_encoder.setCount(int(self.drivetrain.l_position / drive_constants.k_encoder_distance_per_pulse_m))
+            self.r_encoder.setCount(int(self.self.drivetrain.r_position / drive_constants.k_encoder_distance_per_pulse_m))
 
         self.x, self.y = pose.translation().x, pose.translation().y
         # Update the navx gyro simulation
