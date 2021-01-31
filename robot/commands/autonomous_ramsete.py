@@ -53,6 +53,7 @@ class AutonomousRamsete(Command):
         self.previous_time = -1
         self.telemetry = []
 
+        self.robot.drivetrain.drive.feed() # this initialization is taking some time now
         # update gains from dash if desired
         if self.dash is True:
             self.kp_vel = SmartDashboard.getNumber("ramsete_kpvel", self.kp_vel)

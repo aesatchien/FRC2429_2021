@@ -97,8 +97,11 @@ class OI(object):
         self.autonomous_test_ramsete_command = AutonomousRamsete(self.robot)
         self.autonomous_pid_command = AutonomousDrivePID(self.robot, setpoint=2, timeout=4, source='dashboard')
 
-        SmartDashboard.putData("Auto Ramsete", self.autonomous_test_ramsete_command)
+        # these don't work right in 2021 as of 20210131 - keep interrupting and restarting - old ocmmand structure issue?
+        #SmartDashboard.putData("Auto Ramsete", self.autonomous_test_ramsete_command)
         #SmartDashboard.putData("Auto PID", self.autonomous_pid_command)
+        #SmartDashboard.putData("Auto Drive", self.drive_fwd_command )
+        SmartDashboard.put
 
         # set up the dashboard chooser for the autonomous options
         self.obstacle_chooser = SendableChooser()
