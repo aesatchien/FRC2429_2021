@@ -1,6 +1,6 @@
 ## FRC2429_2021 - autonomous ramsete control using robotpy
 
-Stripped-down version of the 2020 Python code for our robot - it is basically simulated drivetrain that takes advantage of all of the robotpy simulation capabilities (2021 libraries).  This is a work in progress (Jan-March 2021) designed to integrate the robot simulation of autonomous and pathweaver trajectories with jupyter notebooks testing our code. 
+Stripped-down version of the 2020 Python code for our robot - it is basically a simulated drivetrain that takes advantage of all of the robotpy simulation capabilities (via the 2021 libraries).  This is a work in progress (Jan-March 2021) designed to integrate the robot simulation of autonomous and pathweaver trajectories with jupyter notebooks testing our code. 
 
 Clone the git and install on your own machine:
 Use "git clone https://github.com/aesatchien/FRC2429_2021.git" from the git bash (or any git aware) shell to download.
@@ -13,7 +13,7 @@ Once everything is installed, you need to go to the folder with robot.py.  From 
 
 ```python robot.py sim```
 
-should bring up the simulator and allow you to check to see if your gamepad is recognized and should be able to let you drive a virtual robot around the field if you have a gamepad. 
+should bring up the simulator and allow you to check to see if your gamepad is recognized (you can also use the keyboard) and should be able to let you drive a virtual robot around the field if you have a gamepad. 
 
 ---
 #### Organization:
