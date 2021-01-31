@@ -69,7 +69,7 @@ class AutonomousRamsete(Command):
 
         #ToDo - make this selectable, probably from the dash, add the other trajectories
 
-        # Note - we are setting to pose to have the robot physically in the start position
+        # Note - we are setting to pose to have the robot physically in the start position - usually absolute matters
         trajectory_choice = self.robot.oi.path_chooser.getSelected()  # get path from the GUI
         if 'slalom' in trajectory_choice and 'pw' in trajectory_choice:
             self.course = trajectory_choice
@@ -99,6 +99,7 @@ class AutonomousRamsete(Command):
             self.course = 'test'
             self.trajectory = drive_constants.get_test_trajectory()
             self.start_pose = geo.Pose2d(0, 0, geo.Rotation2d(0))
+        #SmartDashboard.set ('obstacles', self.course)
 
         self.robot.drivetrain.reset_odometry(self.start_pose)  # ToDo need to sort this out - pathweaver vs. self-made padding
         initial_state = self.trajectory.sample(0)

@@ -101,14 +101,14 @@ class OI(object):
         #SmartDashboard.putData("Auto PID", self.autonomous_pid_command)
 
         # set up the dashboard chooser for the autonomous options
-        self.routine_chooser = SendableChooser()
-        routes = ['Slalom', 'Barrel Roll', 'Bounce']
+        self.obstacle_chooser = SendableChooser()
+        routes = ['slalom', 'barrel', 'bounce', 'none']
         for ix, position in enumerate(routes):
             if ix == 0:
-                self.routine_chooser.setDefaultOption(position, position)
+                self.obstacle_chooser.setDefaultOption(position, position)
             else:
-                self.routine_chooser.addOption(position, position)
-        #wpilib.SmartDashboard.putData('Autonomous Routine', self.routine_chooser)
+                self.obstacle_chooser.addOption(position, position)
+        wpilib.SmartDashboard.putData('obstacles', self.obstacle_chooser)
 
         self.path_chooser = SendableChooser()
         wpilib.SmartDashboard.putData('Ramsete Path', self.path_chooser)

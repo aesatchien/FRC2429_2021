@@ -19,3 +19,6 @@ right=780
 width=9.114000
 height=4.572000
 
+BUT all of this is moot if you load the JSON file instead of the raw image.
+The JSON file knows the borders are 20 pixels and it sets them for you.
+

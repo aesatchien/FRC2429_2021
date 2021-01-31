@@ -122,3 +122,16 @@ def get_pathweaver_trajectory(course):
         print(f"*** Unable to open trajectory: {trajectory_path} ***")
         pathweaver_trajectory = None
     return pathweaver_trajectory
+
+# ----------------------  FUN WITH SIMULATIONS - hit the  obstructions ------------
+spacing = 2.5 * .3084
+slalom_points = [(1,2), (2,2), (4,2), (5,2), (6,2), (7,2), (8,2), (10,2), (1,4), (2,4)]
+slalom_points = [(spacing*i[0], spacing*i[1]) for i in slalom_points]
+barrel_points = [(1,2), (2,2), (5, 2), (10,2), (1,4), (2,4), (8,4)]
+barrel_points = [(spacing*i[0], spacing*i[1]) for i in barrel_points]
+bounce_points = [(3,1), (1,2), (2,2), (3,2), (5,2), (7,2), (8,2), (8,2), (10,2), (11,2),
+                 (1,4), (2,4), (3,4), (5,4), (7,4), (8,4), (8,4), (10,4), (11,4)]
+bounce_points = [(spacing*i[0], spacing*i[1]) for i in bounce_points]
+
+def distance(pose, point):
+    return ((pose.translation().x - point[0])**2 + (pose.translation().y - point[1])**2)**0.5

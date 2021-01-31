@@ -40,6 +40,7 @@ class PhysicsEngine:
 
         self.counter = 0
         self.x, self.y = 0, 0
+        self.obstacles = 'slalom'
 
         # --------  INITIALIZE HARDWARE  ---------------
         self.l_motor = simlib.PWMSim(1)
@@ -129,8 +130,25 @@ class PhysicsEngine:
 
         # keep us on the simulated field - reverse the transform if we try to go out of bounds
         sim_padding = 0.25  # let us go a bit outside but not get lost
+        bad_move = False  # see if we are out of bounds or hitting a barrier
         if (pose.translation().x < -sim_padding or pose.translation().x > self.x_limit + sim_padding or
                 pose.translation().y < -sim_padding or pose.translation().y > self.y_limit + sim_padding):
+            bad_move = True
+
+        # allowing the user to change the obstacles
+        pylon_points = []
+        if 'slalom' in self.obstacles:
+            pylon_points = drive_constants.slalom_points
+        if 'barrel' in self.obstacles:
+            pylon_points = drive_constants.barrel_points
+        if 'bounce' in self.obstacles:
+            pylon_points = drive_constants.bounce_points
+
+        if any([drive_constants.distance(pose, i)
+                < drive_constants.track_width_meters/2 for i in pylon_points]):
+            bad_move = True
+
+        if bad_move:
             curr_x, curr_y = transform.translation().x, transform.translation().y
             # in 2021 library they added an inverse() to transforms so this could all be one line
             new_transform = geo.Transform2d(geo.Translation2d(-curr_x, curr_y), transform.rotation())
@@ -167,3 +185,7 @@ class PhysicsEngine:
         if self.counter % 5 == 0:
             SmartDashboard.putNumber('field_x', self.x)
             SmartDashboard.putNumber('field_y', self.y)
+        if self.counter % 50 == 0:
+            pass
+            self.obstacles = SmartDashboard.getData('obstacles').getSelected()
+
