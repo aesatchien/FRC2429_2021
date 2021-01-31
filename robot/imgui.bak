@@ -9,7 +9,7 @@ Size=109,114
 Collapsed=0
 
 [Window][###Timing]
-Pos=5,166
+Pos=121,29
 Size=162,142
 Collapsed=0
 
@@ -19,7 +19,7 @@ Size=755,417
 Collapsed=0
 
 [Window][###FMS]
-Pos=2,333
+Pos=6,178
 Size=281,190
 Collapsed=0
 
@@ -29,7 +29,7 @@ Size=976,219
 Collapsed=0
 
 [Window][###System Joysticks]
-Pos=27,554
+Pos=15,372
 Size=232,254
 Collapsed=0
 
@@ -39,12 +39,12 @@ Size=368,332
 Collapsed=0
 
 [Window][###/SmartDashboard/Field]
-Pos=316,458
+Pos=295,452
 Size=891,482
 Collapsed=0
 
 [Window][###Plot <0>]
-Pos=1186,221
+Pos=1192,249
 Size=679,377
 Collapsed=0
 
@@ -59,7 +59,7 @@ Size=131,150
 Collapsed=0
 
 [Window][###Plot <1>]
-Pos=1224,405
+Pos=1200,621
 Size=687,385
 Collapsed=0
 
@@ -79,18 +79,28 @@ Size=344,378
 Collapsed=0
 
 [Window][###/SmartDashboard/Ramsete Path]
-Pos=2,920
+Pos=2,642
 Size=307,60
 Collapsed=0
 
 [Window][###/SmartDashboard/Autonomous Routine]
-Pos=3,845
+Pos=5,826
+Size=307,60
+Collapsed=0
+
+[Window][###/SmartDashboard/Auto Ramsete]
+Pos=60,60
+Size=109,80
+Collapsed=0
+
+[Window][###/SmartDashboard/obstacles]
+Pos=4,712
 Size=307,60
 Collapsed=0
 
 [MainWindow][GLOBAL]
-width=1924
-height=1061
+width=1920
+height=1017
 maximized=1
 xpos=0
 ypos=23
@@ -99,12 +109,12 @@ style=0
 
 [GlassStorage][/SmartDashboard/Field]
 image=C:\Cory\Python\FRC\FRC2429_2021\robot\sim\2021-slalom.png
-top=0
-left=0
-bottom=-1
-right=-1
-width=9.630000
-height=5.050000
+top=20
+left=20
+bottom=400
+right=780
+width=9.144000
+height=4.572000
 
 [GlassStorage][/SmartDashboard/Field###Robot]
 image=
@@ -191,6 +201,9 @@ open=0
 [GlassStorage][NetworkTables###SmartDashboard]
 open=1
 
+[GlassStorage][NetworkTables###SmartDashboard###Auto Ramsete]
+open=0
+
 [GlassStorage][NetworkTables###SmartDashboard###Autonomous Routine]
 open=0
 
@@ -198,6 +211,9 @@ open=0
 open=1
 
 [GlassStorage][NetworkTables###SmartDashboard###Ramsete Path]
+open=0
+
+[GlassStorage][NetworkTables###SmartDashboard###obstacles]
 open=0
 
 [GlassStorage][Other Devices###navX-Sensor[4]]
@@ -214,6 +230,9 @@ name=
 name=
 
 [GlassStorage][PWM Outputs###4]
+name=
+
+[Data Sources][NT:/LiveWindow/Ungrouped/DigitalInput[1]/.controllable]
 name=
 
 [Data Sources][NT:/LiveWindow/drivetrainsim/.hasDefault]
@@ -291,6 +310,9 @@ name=
 [Data Sources][NT:/LiveWindow/Ungrouped/DifferentialDrive[1]/Right Motor Speed]
 name=
 
+[Data Sources][NTCmd:/SmartDashboard/Auto Ramsete]
+name=
+
 [Data Sources][navX-Sensor[4]-Yaw]
 name=
 
@@ -318,13 +340,13 @@ name=
 [Data Sources][NT:/SmartDashboard/error]
 name=
 
-[Data Sources][Joystick[0] Axis[2]]
-name=
-
-[Data Sources][Joystick[1] Axis[1]]
+[Data Sources][NT:/SmartDashboard/kperiod]
 name=
 
 [Data Sources][NT:/SmartDashboard/kd]
+name=
+
+[Data Sources][NT:/SmartDashboard/ramsete_Z]
 name=
 
 [Data Sources][Z Accel[0]]
@@ -333,7 +355,7 @@ name=
 [Data Sources][NT:/SmartDashboard/l_vel]
 name=
 
-[Data Sources][NT:/SmartDashboard/kperiod]
+[Data Sources][Joystick[0] Axis[2]]
 name=
 
 [Data Sources][PWM[2]]
@@ -345,13 +367,13 @@ name=
 [Data Sources][NT:/LiveWindow/Ungrouped/Encoder[2]/Distance per Tick]
 name=
 
+[Data Sources][Joystick[1] Axis[1]]
+name=
+
 [Data Sources][NT:/SmartDashboard/r_vel]
 name=
 
 [Data Sources][NT:/FMSInfo/MatchNumber]
-name=
-
-[Data Sources][Joystick[1] Button[6]]
 name=
 
 [Data Sources][NT:/SmartDashboard/kp]
@@ -369,6 +391,9 @@ name=
 [Data Sources][FMS:AllianceStationID]
 name=
 
+[Data Sources][Joystick[1] Button[6]]
+name=
+
 [Data Sources][NT:/SmartDashboard/adrive_per]
 name=
 
@@ -382,9 +407,6 @@ name=
 name=
 
 [Data Sources][NT:/LiveWindow/Ungrouped/Encoder[2]/Distance]
-name=
-
-[Data Sources][NT:/SmartDashboard/ramsete_Z]
 name=
 
 [Data Sources][NT:/LiveWindow/Ungrouped/Jaguar[3]/.controllable]
@@ -439,6 +461,9 @@ name=
 name=
 
 [Data Sources][Joystick[1] Button[7]]
+name=
+
+[Data Sources][NT:/SmartDashboard/obstacles/.controllable]
 name=
 
 [Data Sources][NT:/LiveWindow/Ungrouped/Encoder[2147483647]/Distance]
@@ -534,6 +559,9 @@ name=
 [Data Sources][NT:/LiveWindow/Ungrouped/Encoder[0]/.controllable]
 name=
 
+[Data Sources][NT:/SmartDashboard/field_y]
+name=
+
 [Data Sources][navX-Sensor[4]-Pitch]
 name=
 
@@ -541,6 +569,9 @@ name=
 name=
 
 [Data Sources][NT:/FMSInfo/StationNumber]
+name=
+
+[Data Sources][NT:/SmartDashboard/field_x]
 name=
 
 [Data Sources][NT:/LiveWindow/Ungrouped/DifferentialDrive[1]/.actuator]
@@ -565,6 +596,9 @@ name=
 name=
 
 [Data Sources][NT:/LiveWindow/drivetrainsim/.controllable]
+name=
+
+[Data Sources][NT:/SmartDashboard/Auto Ramsete/running]
 name=
 
 [Data Sources][NT:/SmartDashboard/kd_vel]
@@ -619,6 +653,9 @@ name=
 name=
 
 [Data Sources][FMS:FMSAttached]
+name=
+
+[Data Sources][NT:/SmartDashboard/obstacles/.instance]
 name=
 
 [Data Sources][NT:/LiveWindow/Ungrouped/Scheduler/.controllable]
@@ -705,6 +742,9 @@ name=
 [Data Sources][Joystick[0] Axis[0]]
 name=
 
+[Data Sources][NT:/SmartDashboard/Auto Ramsete/.controllable]
+name=
+
 [Data Sources][X Accel[0]]
 name=
 
@@ -714,7 +754,7 @@ name=
 [Data Sources][Joystick[1] Button[10]]
 name=
 
-[Data Sources][NT:/LiveWindow/Ungrouped/DigitalInput[1]/.controllable]
+[Data Sources][NT:/SmartDashboard/Auto Ramsete/.isParented]
 name=
 
 [SimWindow][Mechanism 2D]
@@ -742,9 +782,14 @@ name=
 visible=1
 enabled=1
 
+[NTProviderWindow][/SmartDashboard/Auto Ramsete]
+name=
+visible=0
+enabled=1
+
 [NTProviderWindow][/SmartDashboard/Autonomous Routine]
 name=
-visible=1
+visible=0
 enabled=1
 
 [NTProviderWindow][/SmartDashboard/Field]
@@ -754,6 +799,11 @@ enabled=1
 
 [NTProviderWindow][/SmartDashboard/Ramsete Path]
 name=Ramsete Path
+visible=1
+enabled=1
+
+[NTProviderWindow][/SmartDashboard/obstacles]
+name=
 visible=1
 enabled=1
 
@@ -789,6 +839,9 @@ name=Scheduler
 [NTProvider][/SmartDashboard/Autonomous Routine]
 name=String Chooser
 
+[NTProvider][/SmartDashboard/obstacles]
+name=String Chooser
+
 [NTProvider][/SmartDashboard/Field]
 name=Field2d
 
@@ -806,6 +859,9 @@ name=Gyro
 
 [NTProvider][/LiveWindow/Ungrouped/Jaguar[1]]
 name=Speed Controller
+
+[NTProvider][/SmartDashboard/Auto Ramsete]
+name=Command
 
 [NTProvider][/LiveWindow/Ungrouped/DifferentialDrive[1]]
 name=DifferentialDrive
@@ -956,11 +1012,6 @@ name=Encoder Rate
 visible=1
 enabled=1
 
-[PlotWindow][Plot <2>]
-name=Volts
-visible=1
-enabled=1
-
 [Plot][Plot <0>#0]
 name=Motor Output
 visible=1
@@ -1013,32 +1064,6 @@ y2_lockMin=0
 y2_lockMax=0
 y2_label=
 
-[Plot][Plot <2>#0]
-name=
-visible=1
-showPause=1
-lockPrevX=0
-legend=1
-yaxis2=0
-yaxis3=0
-viewTime=10000
-height=300
-y0_min=0
-y0_max=1000
-y0_lockMin=0
-y0_lockMax=0
-y0_label=
-y1_min=0
-y1_max=1000
-y1_lockMin=0
-y1_lockMax=0
-y1_label=
-y2_min=0
-y2_max=1000
-y2_lockMin=0
-y2_lockMax=0
-y2_label=
-
 [PlotSeries][Plot <0>#0#PWM[1]]
 name=
 yAxis=0
@@ -1075,26 +1100,6 @@ yAxis=0
 color=4278252799
 marker=8
 weight=0.000000
-digital=0
-digitalBitHeight=8
-digitalBitGap=4
-
-[PlotSeries][Plot <2>#0#NT:/SmartDashboard/right_speed_setpoint]
-name=
-yAxis=0
-color=4294950656
-marker=8
-weight=-1.000000
-digital=0
-digitalBitHeight=8
-digitalBitGap=4
-
-[PlotSeries][Plot <2>#0#NT:/SmartDashboard/left_speed_setpoint]
-name=
-yAxis=0
-color=4278190335
-marker=0
-weight=-1.000000
 digital=0
 digitalBitHeight=8
 digitalBitGap=4
