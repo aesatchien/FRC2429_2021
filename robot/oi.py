@@ -39,7 +39,7 @@ class OI(object):
         self.dpad.whenPressed(DpadDrive(self.robot, button=self.dpad))
 
         # also bound to asdf on the 2021 keyboard
-        self.buttonA.whenPressed( AutonomousDriveTimed(self.robot, timeout=1) )
+        self.buttonA.whenPressed( AutonomousDriveTimed(self.robot, timeout=1.5) )
         self.buttonB.whenPressed( AutonomousRotate(self.robot, setpoint=60, timeout=4, source='dashboard') )
         self.buttonX.whenPressed( AutonomousRotate(self.robot, setpoint=-60, timeout=4, source='dashboard', absolute=True) )
         self.buttonY.whenPressed( AutonomousDrivePID(self.robot, setpoint=2, timeout=4, source='dashboard') )
@@ -101,7 +101,6 @@ class OI(object):
         #SmartDashboard.putData("Auto Ramsete", self.autonomous_test_ramsete_command)
         #SmartDashboard.putData("Auto PID", self.autonomous_pid_command)
         #SmartDashboard.putData("Auto Drive", self.drive_fwd_command )
-        SmartDashboard.put
 
         # set up the dashboard chooser for the autonomous options
         self.obstacle_chooser = SendableChooser()

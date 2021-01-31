@@ -115,7 +115,7 @@ class AutonomousRamsete(Command):
         print('Time\tTr Vel\tTr Rot\tlspd\trspd\tram ang\tram vx\tram vy\tlffw\trffw\tlpid\trpid')
 
     def execute(self) -> None:
-        self.counter += 1
+
         current_time = self.timeSinceInitialized()
         dt = current_time - self.previous_time
 
@@ -156,7 +156,7 @@ class AutonomousRamsete(Command):
         #SmartDashboard.putNumber('rz_left_speed_setpoint', left_speed_setpoint)
         #SmartDashboard.putNumber('rz_right_speed_setpoint', right_speed_setpoint)
 
-        if self.counter % 5 == 0:  # ten times per second
+        if self.counter % 5 == 0:  # ten times per second update the telemetry array
             telemetry_data = {'TIME':current_time, 'RBT_X':pose.X(), 'RBT_Y':pose.Y(), 'RBT_TH':pose.rotation().radians(),
                             'RBT_VEL':self.robot.drivetrain.get_average_encoder_rate(),
                             'RBT_RVEL':self.robot.drivetrain.r_encoder.getRate(), 'RBT_LVEL':self.robot.drivetrain.l_encoder.getRate(),
@@ -164,11 +164,12 @@ class AutonomousRamsete(Command):
                             'RAM_VELX':ramsete.vx, 'RAM_LVEL_SP':left_speed_setpoint, 'RAM_RVEL_SP':right_speed_setpoint,
                             'RAM_OM':ramsete.omega, 'LFF':left_feed_forward, 'RFF':right_feed_forward, 'LPID': left_output_pid, 'RPID':right_output_pid}
             self.telemetry.append(telemetry_data)
-        if self.counter % 20 == 0:
+        if self.counter % 50 == 0: # once per second send data to the console
             out_string = f'{current_time:2.2f}\t{self.trajectory.sample(current_time).velocity:2.1f}\t{self.trajectory.sample(current_time).pose.rotation().radians():2.2f}\t'
             out_string += f'{left_speed_setpoint:2.2f}\t{right_speed_setpoint:2.2f}\t{ramsete.omega:2.2f}\t{ramsete.vx:2.2f}\t{ramsete.vy:2.2f}\t'
             out_string += f'{left_feed_forward:2.2f}\t{right_feed_forward:2.2f}\t{left_output_pid:2.2f}\t{right_output_pid:2.2f}'
             print(out_string)
+        self.counter += 1
 
     def isFinished(self) -> bool:
         return self.isTimedOut() or self.timeSinceInitialized() > self.trajectory.totalTime()

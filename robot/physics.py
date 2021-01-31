@@ -143,11 +143,12 @@ class PhysicsEngine:
             pylon_points = drive_constants.barrel_points
         if 'bounce' in self.obstacles:
             pylon_points = drive_constants.bounce_points
-
         if any([drive_constants.distance(pose, i)
                 < drive_constants.track_width_meters/2 for i in pylon_points]):
             bad_move = True
 
+        # this resets the move if we are hitting a barrier
+        # ToDo: stop the motion as well.  Perhaps in addition to moving back we should redo transform w/ no motor speed
         if bad_move:
             curr_x, curr_y = transform.translation().x, transform.translation().y
             # in 2021 library they added an inverse() to transforms so this could all be one line
