@@ -97,7 +97,7 @@ class AutonomousRamsete(Command):
             self.start_pose = geo.Pose2d(0, 0, geo.Rotation2d(0))
         else:
             self.course = 'test'
-            self.trajectory = drive_constants.get_test_directory()
+            self.trajectory = drive_constants.get_test_trajectory()
             self.start_pose = geo.Pose2d(0, 0, geo.Rotation2d(0))
 
         self.robot.drivetrain.reset_odometry(self.start_pose)  # ToDo need to sort this out - pathweaver vs. self-made padding

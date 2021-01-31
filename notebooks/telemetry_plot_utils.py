@@ -77,8 +77,8 @@ def plot_df(df, telemetry, arrows=True, point_df=None, pathweaver=False, backgro
     # background image
     # ToDo - have this search for and grab the right image instead of getting it exact
     img = plt.imread('../robot/sim/2021-' + background + '.png')
-    field_offset = 0.0
-    ax.imshow(img, extent=[0-field_offset, 9.114-field_offset, 0-field_offset, 4.572-field_offset])
+    field_offset = 0.25
+    ax.imshow(img, extent=[0-field_offset, 9.114+field_offset, 0-field_offset, 4.572+field_offset])
 
     # robot scatterplot and annotation
     scat = ax.scatter(x=df['RBT_X'], y=df['RBT_Y'], c=df['RBT_TH'], s=20, label='robot')
@@ -109,7 +109,7 @@ def plot_df(df, telemetry, arrows=True, point_df=None, pathweaver=False, backgro
     cb.set_label('robot theta', rotation=270)
 
     # legends and labels
-    ax.legend(loc='upper right', bbox_to_anchor=(0.99, 0.99), fontsize=font_size-2)
+    ax.legend(loc='upper right', bbox_to_anchor=(0.97, 0.95), fontsize=font_size-2)
     leg = ax.get_legend()
     #leg.legendHandles[2].set_color('yellow')
     leg.legendHandles[2]._sizes = [50]

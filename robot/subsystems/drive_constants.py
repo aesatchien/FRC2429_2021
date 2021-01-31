@@ -8,7 +8,7 @@ from pathlib import Path
 
 # drivetrain constants
 wheel_diameter_in = 8  # wheel diameter in inches
-wheel_diameter_m = 8 * 0.0254  # wheel diameter in inches
+wheel_diameter_m = 8 * 0.0254  # wheel diameter in meters
 
 # Configure encoders and controllers
 # should be wheel_diameter * pi / gear_ratio - and for the old double reduction gear box the gear ratio was 4.17:1.
@@ -58,7 +58,7 @@ config.addConstraint(autonomous_voltage_constraint)
 # --------------  SAMPLE TRAJECTORIES  -------------
 
 # example trajectory to test
-def get_test_directory():
+def get_test_trajectory():
     start_pose = geo.Pose2d(0, 0, geo.Rotation2d(0))
     end_pose = geo.Pose2d(4, 0, geo.Rotation2d(0))
     midpoints = [geo.Translation2d(1.5, 0.5), geo.Translation2d(2.5, -0.5)]
@@ -105,9 +105,10 @@ def get_pose_trajectory():
 # https://docs.wpilib.org/en/stable/docs/software/wpilib-tools/pathweaver/integrating-robot-program.html#importing-a-pathweaver-json
 
 course = 'slalom'
+
 def get_pathweaver_trajectory(course):
-    #start_pose = geo.Pose2d(1.23, 0, geo.Rotation2d(0))  # just slalom for now
-    trajectory_json = course[:-5] + '.wpilib.json'
+
+    trajectory_json = course[:-5] + '.wpilib.json'  # my naming convention marks the last four characters to mark the velocity
     pathweaver_dir = 'pathweaver'
     if '75' in course:
         trajectory_dir = 'vel_0p75'

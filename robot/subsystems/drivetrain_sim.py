@@ -96,7 +96,7 @@ class DriveTrainSim(Subsystem):
             # start keeping track of where the robot is with an x and y position (only good for WCD)'
             pose = self.get_pose()
             SmartDashboard.putString('drive_pose', f'[{pose.X():2.2f}, {pose.Y():2.2f}, {pose.rotation().degrees():2.2f}]' )
-            pass
+
         if self.counter % 100 == 0:
             pass
             # self.display_PIDs()
