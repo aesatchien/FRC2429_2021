@@ -9,8 +9,7 @@ from wpilib import Timer, SmartDashboard
 import subsystems.drive_constants as drive_constants
 
 class AutonomousVelocityPID(Command):
-    """Attempting to translate the Ramsete command from commands V2 into a V1 version since robotpy doesn't have this command yet
-    this does not work yet - it just sits there and quivers.  Have to go through piece by piece """
+    """Testing the velocity controllers before constructing the ramsete command """
     def __init__(self, robot, left_speed_setpoint=2.0, right_speed_setpoint=1.5, timeout=4):
         Command.__init__(self, name='auto_velocity')
         self.robot = robot
@@ -26,7 +25,6 @@ class AutonomousVelocityPID(Command):
         self.kd = 0.0
         self.left_speed_setpoint = left_speed_setpoint
         self.right_speed_setpoint = right_speed_setpoint
-
 
         if self.use_dash:
             SmartDashboard.putNumber('l_vel', self.left_speed_setpoint)
@@ -72,7 +70,6 @@ class AutonomousVelocityPID(Command):
 
         self.robot.drivetrain.tank_drive_volts(left_output, - right_output)
         self.robot.drivetrain.drive.feed()
-
 
     def isFinished(self) -> bool:
         return self.isTimedOut()

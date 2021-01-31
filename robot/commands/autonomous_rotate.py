@@ -8,7 +8,7 @@ class AutonomousRotate(Command):
     """ This command rotates the robot over a given angle with simple proportional + derivative control """
     def __init__(self, robot, setpoint=None, timeout=None, source=None, absolute=False):
         """The constructor"""
-        Command.__init__(self, name='autorotate')
+        Command.__init__(self, name='auto_rotate')
         self.requires(robot.drivetrain)
         self.setpoint = setpoint
         self.source = source  # sent directly to command or via dashboard

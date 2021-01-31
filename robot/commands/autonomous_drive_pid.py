@@ -11,7 +11,7 @@ class AutonomousDrivePID(Command):
     def __init__(self, robot, setpoint=None, timeout=None, source=None):
         """The constructor"""
         #super().__init__()
-        Command.__init__(self, name='autodrivepid')
+        Command.__init__(self, name='auto_pid')
         # Signal that we require ExampleSubsystem
         self.requires(robot.drivetrain)
         self.source = source

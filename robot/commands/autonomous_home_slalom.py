@@ -8,7 +8,7 @@ class AutonomousSlalom(CommandGroup):
     """ allows for stringing together autonomous commands """
 
     def __init__(self, robot, timeout=None):
-        CommandGroup.__init__(self, name='AutonomousSlalom')
+        CommandGroup.__init__(self, name='auto_slalom')
         # slalom
         relative_angles = False
         if relative_angles:

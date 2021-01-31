@@ -18,8 +18,9 @@ def load_file(infile):
         print(f'Missing item  in pickle {infile}, please create it and re-pickle')
     return telemetry
 
-def get_data(file_name=None, x_offset=1.2, y_offset=0.9):
-    files = glob.glob('../robot/sim/data/*')
+def get_data(file_name=None, x_offset=0, y_offset=0):
+    files = glob.glob('../robot/sim/data/*.pkl')
+    #print(files)
     if file_name is None:  # get the latest file
         telemetry = load_file(files[-1])
     else:  # try and match the filename passed in
@@ -28,9 +29,9 @@ def get_data(file_name=None, x_offset=1.2, y_offset=0.9):
     df = fix_data(telemetry, x_offset=x_offset, y_offset=y_offset)
     return df, telemetry
 
-def get_points_df(name='slalom', data=None, x_shift=0, y_shift=4.87):
+def get_points_df(name='slalom', data=None, x_shift=0, y_shift=4.87-0.25):
     # get a list of all the points from a pathweaver file
-    path_files = glob.glob('../robot/paths/*')
+    path_files = glob.glob('../robot/pathweaver/paths/*')
     matches = [file for file in path_files if name.lower() in file.lower()]
 
     if data is None:  # get the data from a file
@@ -38,7 +39,7 @@ def get_points_df(name='slalom', data=None, x_shift=0, y_shift=4.87):
         if len(matches) > 0:
             df_points = pd.read_csv(matches[0], sep=',', header='infer')
             # fix the pathweaver offsets for the 2021 fields
-            df_points['X'] = df_points['X']
+            df_points['X'] = df_points['X'] + x_shift
             df_points['Y'] = df_points['Y'] + y_shift
         return df_points
     else:  # pass the data in
@@ -69,25 +70,26 @@ def plot_df(df, telemetry, arrows=True, point_df=None, pathweaver=False, backgro
     # generate a title
     label = f"Mapping odometry from {telemetry['COURSE']}: {telemetry['TIMESTAMP']} " \
             f"(vel = {telemetry['VELOCITY']}, kp_vel={telemetry['KP_VEL']:2.1f}, " \
-            f"beta={telemetry['BETA']:2.1f}, zeta={telemetry['ZETA']:2.1f}"
+            f"beta={telemetry['BETA']:2.1f}, zeta={telemetry['ZETA']:2.1f})"
 
-    fig, ax = plt.subplots(figsize=(18, 10))
-
+    fig, ax = plt.subplots(figsize=(12, 10), dpi=100)
+    font_size = 12
     # background image
     # ToDo - have this search for and grab the right image instead of getting it exact
     img = plt.imread('../robot/sim/2021-' + background + '.png')
-    ax.imshow(img, extent=[0, 9.63, 0, 5.05])
+    field_offset = 0.0
+    ax.imshow(img, extent=[0-field_offset, 9.114-field_offset, 0-field_offset, 4.572-field_offset])
 
     # robot scatterplot and annotation
-    scat = ax.scatter(x=df['RBT_X'], y=df['RBT_Y'], c=df['RBT_TH'], label='robot')
+    scat = ax.scatter(x=df['RBT_X'], y=df['RBT_Y'], c=df['RBT_TH'], s=20, label='robot')
 
     if arrows:
         x = np.array(df['RBT_X'])
         y = np.array(df['RBT_Y'])
-        ax.quiver(x, y, df['VEC_X'], df['VEC_Y'], df['RBT_TH'])
+        ax.quiver(x, y, df['VEC_X'], df['VEC_Y'], df['RBT_TH'], headwidth=2, width=0.002)
 
-    plt.text(df.iloc[[0]]['RBT_X'], df.iloc[[0]]['RBT_Y'] - .2, 'START', ha='center', size=16)
-    plt.text(df.iloc[[-1]]['RBT_X'], df.iloc[[-1]]['RBT_Y'] + .2, 'FINISH', ha='center', size=16)
+    ax.text(df.iloc[[0]]['RBT_X'], df.iloc[[0]]['RBT_Y'] - .2, 'START', ha='center', size=font_size)
+    ax.text(df.iloc[[-1]]['RBT_X'], df.iloc[[-1]]['RBT_Y'] + .2, 'FINISH', ha='center', size=font_size)
 
     # trajectory data
     traj = ax.scatter(x=df['TRAJ_X'], y=df['TRAJ_Y'], c=df['TRAJ_TH'], marker='x', label='trajectory')
@@ -97,8 +99,8 @@ def plot_df(df, telemetry, arrows=True, point_df=None, pathweaver=False, backgro
         labels = [str(i) for i in range(len(point_df))]
         x, y = np.asarray(point_df['X']), np.asarray(point_df['Y'])
         for i, txt in enumerate(labels):
-            ax.annotate(txt, (x[i] - .1, y[i] - .3), size=20)
-        plt.scatter(x, y, marker='o', c='r', s=150, linewidths=3)
+            ax.annotate(txt, (x[i] - .1, y[i] - .3), size=font_size)
+        ax.scatter(x, y, marker='o', c='r', s=120, linewidths=2, label='path point')
 
     # make a color bar to help visualize direction
     divider = make_axes_locatable(ax)
@@ -107,10 +109,14 @@ def plot_df(df, telemetry, arrows=True, point_df=None, pathweaver=False, backgro
     cb.set_label('robot theta', rotation=270)
 
     # legends and labels
-    ax.legend(loc='upper right', bbox_to_anchor=(0.95, 0.95), fontsize=14)
-    ax.set_title(label, fontsize=16)
-    ax.set_ylabel('y position on field', fontsize=16)
-    ax.set_xlabel('x position on field', fontsize=16)
+    ax.legend(loc='upper right', bbox_to_anchor=(0.99, 0.99), fontsize=font_size-2)
+    leg = ax.get_legend()
+    #leg.legendHandles[2].set_color('yellow')
+    leg.legendHandles[2]._sizes = [50]
+    ax.set_title(label, fontsize=font_size)
+    ax.set_ylabel('y position on field', fontsize=font_size)
+    ax.set_xlabel('x position on field', fontsize=font_size)
+
     plt.tight_layout()
     if save:
         plt.ioff()
@@ -119,7 +125,7 @@ def plot_df(df, telemetry, arrows=True, point_df=None, pathweaver=False, backgro
     plt.show()
 
 def velocity_plot(df):
-    fig, (ax,ax2) = plt.subplots(2,1, figsize=(20, 10))
+    fig, (ax,ax2) = plt.subplots(2,1, figsize=(18, 6))
     # robot velocity scatterplot and annotation
     ax.plot(df['TIME'], df['RBT_VEL'], c='g', linestyle='-', label='robot vel')
     ax.plot(df['TIME'], df['RBT_RVEL'], c='g', linestyle='--', label='robot rvel')
@@ -137,9 +143,11 @@ def velocity_plot(df):
     ax.set_ylabel('velocity (m/s)', fontsize=14)
     ax2.set_ylabel('motor output (V)', fontsize=14)
     ax2.set_xlabel('time in command (s)', fontsize=14)
+    ax.get_xaxis().set_visible(False)
 
-    ax.legend()
-    ax2.legend()
+    ax.legend(loc='lower right')
+    ax2.legend(loc='lower left')
+    plt.tight_layout()
 
 
 

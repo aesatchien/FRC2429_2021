@@ -9,7 +9,7 @@ class AutonomousDriveTimed(Command):
     def __init__(self, robot, timeout=None):
         """The constructor"""
         #super().__init__()
-        Command.__init__(self, name='autodrivetimed')
+        Command.__init__(self, name='auto_drivetimed')
         # Signal that we require ExampleSubsystem
         self.requires(robot.drivetrain)
 

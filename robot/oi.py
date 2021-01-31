@@ -95,6 +95,10 @@ class OI(object):
         self.rotate_command = AutonomousRotate(self.robot, setpoint=45, timeout=3, source='dashboard')
         self.autonomous_test_command = AutonomousSlalom(self.robot)
         self.autonomous_test_ramsete_command = AutonomousRamsete(self.robot)
+        self.autonomous_pid_command = AutonomousDrivePID(self.robot, setpoint=2, timeout=4, source='dashboard')
+
+        SmartDashboard.putData("Auto Ramsete", self.autonomous_test_ramsete_command)
+        #SmartDashboard.putData("Auto PID", self.autonomous_pid_command)
 
         # set up the dashboard chooser for the autonomous options
         self.routine_chooser = SendableChooser()
@@ -111,7 +115,7 @@ class OI(object):
         choices = ['loop', 'poses', 'points', 'test', 'slalom_pw0_0.75','slalom_pw1_0.75', 'slalom_pw2_0.75', 'slalom_pw0_1.25', 'slalom_pw1_1.25',
                    'slalom_pw2_1.25', 'barrel_pw1_0.75', 'barrel_pw1_1.25', 'bounce_pw1_0.75', 'bounce_pw1_1.25']
         for ix, position in enumerate(choices):
-            if ix == 0:
+            if ix == 8: # slalom_pw1_1.25 at the moment
                 self.path_chooser.setDefaultOption(position, position)
             else:
                 self.path_chooser.addOption(position, position)
