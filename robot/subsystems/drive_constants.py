@@ -6,6 +6,7 @@ import wpimath
 import wpilib.controller
 from wpimath.trajectory.constraint import DifferentialDriveVoltageConstraint
 from pathlib import Path
+import glob
 
 # drivetrain constants
 k_wheel_diameter_in = 8  # wheel diameter in inches
@@ -107,14 +108,16 @@ def get_pose_trajectory():
 
 course = 'slalom'
 
-def get_pathweaver_trajectory(course):
+def get_pathweaver_trajectory_old(course):  # ToDo: just read the directories and get everything with a glob - simpler that way
     """ Load different trajectories based on separate velocity directories for pathweaver output"""
     trajectory_json = course[:-5] + '.wpilib.json'  # my naming convention marks the last four characters to mark the velocity
     pathweaver_dir = 'pathweaver'
     if '75' in course:
         trajectory_dir = 'vel_0p75'
-    else:
+    elif '25' in course:
         trajectory_dir = 'vel_1p25'
+    elif '80' in course:
+        trajectory_dir = 'vel_1p80'
     try:
         trajectory_path = Path.cwd() / pathweaver_dir / trajectory_dir / 'output' / trajectory_json
         pathweaver_trajectory = wpimath.trajectory.TrajectoryUtil.fromPathweaverJson(str(trajectory_path))
@@ -123,6 +126,25 @@ def get_pathweaver_trajectory(course):
         print(f"*** Unable to open trajectory: {trajectory_path} ***")
         pathweaver_trajectory = None
     return pathweaver_trajectory
+
+def get_pathweaver_trajectory(course):
+    """ Load different trajectories based on separate velocity directories for pathweaver output"""
+    trajectory_json = course[:-9] + '.wpilib.json'  # my naming convention marks the last 9 chars for the directory
+    pathweaver_dir = 'pathweaver'
+    trajectory_dir = course[-8:]  # i made the last 8 digits the directory name
+    try:
+        trajectory_path = Path.cwd() / pathweaver_dir / trajectory_dir / 'output' / trajectory_json
+        pathweaver_trajectory = wpimath.trajectory.TrajectoryUtil.fromPathweaverJson(str(trajectory_path))
+        print(f"*** Successfully loaded: {trajectory_path} ***")
+    except Exception as ex:
+        print(f"*** Unable to open trajectory: {trajectory_path} ***")
+        pathweaver_trajectory = None
+    return pathweaver_trajectory
+
+def get_pathweaver_files():
+    path_files = glob.glob('../robot/pathweaver/vel*/*/*pw*', recursive=True)
+    file_names = [Path(file).name[:-12] + '_' + Path(file).parent.parent.name for file in path_files]
+    return file_names
 
 # ----------------------  FUN WITH SIMULATIONS - list the obstructions for different courses ------------
 spacing = 2.5 * .3084

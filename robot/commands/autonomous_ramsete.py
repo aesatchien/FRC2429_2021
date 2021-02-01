@@ -84,15 +84,19 @@ class AutonomousRamsete(Command):
             self.course = trajectory_choice
             self.trajectory = drive_constants.get_pathweaver_trajectory(trajectory_choice)
             self.start_pose = geo.Pose2d(1.3, 2.62, geo.Rotation2d(0))
-        elif trajectory_choice == 'loop':
+        elif 'student' in trajectory_choice and 'pw' in trajectory_choice:
+            self.course = trajectory_choice
+            self.trajectory = drive_constants.get_pathweaver_trajectory(trajectory_choice)
+            self.start_pose = geo.Pose2d(1.3, 0.66, geo.Rotation2d(0))  # student needs to change this
+        elif 'loop' in trajectory_choice:
             self.course = 'loop'
             self.trajectory = drive_constants.get_loop_trajectory()
             self.start_pose = geo.Pose2d(0, 0, geo.Rotation2d(0))
-        elif trajectory_choice == 'poses':
+        elif 'poses' in trajectory_choice:
             self.course = 'slalom_poses'
             self.trajectory = drive_constants.get_pose_trajectory()
             self.start_pose = geo.Pose2d(0, 0, geo.Rotation2d(0))
-        elif trajectory_choice == 'points':
+        elif 'points' in trajectory_choice:
             self.course = 'slalom_points'
             self.trajectory = drive_constants.get_point_trajectory()
             self.start_pose = geo.Pose2d(0, 0, geo.Rotation2d(0))

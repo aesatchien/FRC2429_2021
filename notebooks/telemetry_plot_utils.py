@@ -125,7 +125,7 @@ def plot_df(df, telemetry, arrows=True, point_df=None, pathweaver=False, backgro
     plt.show()
 
 def velocity_plot(df):
-    fig, (ax,ax2) = plt.subplots(2,1, figsize=(18, 6))
+    fig, (ax,ax2) = plt.subplots(2,1, figsize=(16, 6))
     # robot velocity scatterplot and annotation
     ax.plot(df['TIME'], df['RBT_VEL'], c='g', linestyle='-', label='robot vel')
     ax.plot(df['TIME'], df['RBT_RVEL'], c='g', linestyle='--', label='robot rvel')

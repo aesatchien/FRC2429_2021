@@ -16,6 +16,7 @@ from commands.autonomous__home_bounce import AutonomousBounce
 from commands.autonomous_drive_pid import AutonomousDrivePID
 from commands.autonomous_velocity_pid import AutonomousVelocityPID
 
+import subsystems.drive_constants as drive_constants
 
 class OI(object):
     """
@@ -115,9 +116,11 @@ class OI(object):
         self.path_chooser = SendableChooser()
         wpilib.SmartDashboard.putData('Ramsete Path', self.path_chooser)
         choices = ['loop', 'poses', 'points', 'test', 'slalom_pw0_0.75','slalom_pw1_0.75', 'slalom_pw2_0.75', 'slalom_pw0_1.25', 'slalom_pw1_1.25',
-                   'slalom_pw2_1.25', 'barrel_pw1_0.75', 'barrel_pw1_1.25', 'bounce_pw1_0.75', 'bounce_pw1_1.25']
+                   'slalom_pw2_1.25', 'slalom_pw1_1.80', 'barrel_pw1_0.75', 'barrel_pw1_1.25', 'bounce_pw1_0.75', 'bounce_pw1_1.25', 'student_pw0_0p75',
+                   'student_pw1_0p75','student_pw0_1p25', 'student_pw1_1p25']
+        choices = drive_constants.get_pathweaver_files() + ['z_loop', 'z_poses', 'z_points', 'z_test']
         for ix, position in enumerate(choices):
-            if ix == 8: # slalom_pw1_1.25 at the moment
+            if ix == 18: # slalom_pw1_1.25 at the moment
                 self.path_chooser.setDefaultOption(position, position)
             else:
                 self.path_chooser.addOption(position, position)
