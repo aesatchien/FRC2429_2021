@@ -4,9 +4,11 @@ import wpilib.kinematics
 import wpimath.geometry as geo
 import wpimath
 import wpilib.controller
+import wpilib.trajectory
 from wpimath.trajectory.constraint import DifferentialDriveVoltageConstraint
 from pathlib import Path
 import glob
+import pandas as pd
 
 # drivetrain constants
 k_wheel_diameter_in = 8  # wheel diameter in inches
@@ -52,24 +54,32 @@ feed_forward = wpilib.controller.SimpleMotorFeedforwardMeters(ks_volts, kv_volt_
 autonomous_voltage_constraint = DifferentialDriveVoltageConstraint(feed_forward, drive_kinematics, 10)
 
 # Create config for trajectories
+
+
 config = wpimath.trajectory.TrajectoryConfig(k_max_speed_meters_per_second, k_max_acceleration_meters_per_second_squared)
 config.setKinematics(drive_kinematics)
 config.addConstraint(autonomous_voltage_constraint)
+
+def make_config(velocity=k_max_speed_meters_per_second):
+    temp_config = wpimath.trajectory.TrajectoryConfig(velocity, k_max_acceleration_meters_per_second_squared)
+    temp_config.setKinematics(drive_kinematics)
+    temp_config.addConstraint(autonomous_voltage_constraint)
+    return temp_config
 
 
 # --------------  SAMPLE TRAJECTORIES  -------------
 
 # example trajectory to test
-def get_test_trajectory():
+def get_test_trajectory(velocity=k_max_speed_meters_per_second):
     start_pose = geo.Pose2d(0, 0, geo.Rotation2d(0))
     end_pose = geo.Pose2d(4, 0, geo.Rotation2d(0))
     midpoints = [geo.Translation2d(1.5, 0.5), geo.Translation2d(2.5, -0.5)]
-    test_trajectory = wpimath.trajectory.TrajectoryGenerator.generateTrajectory(start_pose, midpoints, end_pose, config)
+    test_trajectory = wpimath.trajectory.TrajectoryGenerator.generateTrajectory(start_pose, midpoints, end_pose, make_config(velocity))
     return test_trajectory
 
 # minimum slalom test - nice thing about having the points means you can change the speeds for the
 # trajectory config and then you can go faster and faster.  but it's better to use the pathweaver once you have the speeds you want
-def get_point_trajectory():
+def get_point_trajectory(velocity=k_max_speed_meters_per_second):
     start_pose = geo.Pose2d(0, 0, geo.Rotation2d(0))
     end_pose = geo.Pose2d(0, 1.7, geo.Rotation2d(3.14))
     midpoints = [geo.Translation2d(0.32, 0.01), geo.Translation2d(1.25, 0.47), geo.Translation2d(2.16, 1.71),
@@ -78,19 +88,19 @@ def get_point_trajectory():
                     geo.Translation2d(6.10, 1.48), geo.Translation2d(5.87, 0.84), geo.Translation2d(5.30, 0.17),
                     geo.Translation2d(3.77, -0.05), geo.Translation2d(1.81, 0.33), geo.Translation2d(1.12, 1.36),
                      geo.Translation2d(-0.15, 1.76)]
-    slalom_point_trajectory = wpimath.trajectory.TrajectoryGenerator.generateTrajectory(start_pose, midpoints, end_pose, config)
+    slalom_point_trajectory = wpimath.trajectory.TrajectoryGenerator.generateTrajectory(start_pose, midpoints, end_pose, make_config(velocity))
     return slalom_point_trajectory
 
 # just waypoints of poses - try a simple loop
-def get_loop_trajectory():
+def get_loop_trajectory(velocity=k_max_speed_meters_per_second):
     pose_points = [geo.Pose2d(0.09, 0.02, geo.Rotation2d(0.00)),
                     geo.Pose2d(6.17, 0.16, geo.Rotation2d(0.00)), geo.Pose2d(7.62, 0.87, geo.Rotation2d(1.60)),
                     geo.Pose2d(6.06, 1.75, geo.Rotation2d(3.14)), geo.Pose2d(0.21, 1.70, geo.Rotation2d(3.14))]
-    loop_trajectory = wpimath.trajectory.TrajectoryGenerator.generateTrajectory(pose_points, config)
+    loop_trajectory = wpimath.trajectory.TrajectoryGenerator.generateTrajectory(pose_points, make_config(velocity))
     return loop_trajectory
 
 #lots of poses from above
-def get_pose_trajectory():
+def get_pose_trajectory(velocity=k_max_speed_meters_per_second):
     pose_points = [geo.Pose2d(0.32, 0.01, geo.Rotation2d(0.00)),
                         geo.Pose2d(1.25, 0.47, geo.Rotation2d(1.04)), geo.Pose2d(2.16, 1.71, geo.Rotation2d(0.69)),
                         geo.Pose2d(4.74, 1.91, geo.Rotation2d(0.00)), geo.Pose2d(5.74, 1.06, geo.Rotation2d(-1.21)),
@@ -100,7 +110,7 @@ def get_pose_trajectory():
                         geo.Pose2d(5.30, 0.17, geo.Rotation2d(-2.55)), geo.Pose2d(3.77, -0.05, geo.Rotation2d(3.12)),
                         geo.Pose2d(1.81, 0.33, geo.Rotation2d(2.38)), geo.Pose2d(1.12, 1.36, geo.Rotation2d(2.30)),
                         geo.Pose2d(0.22, 1.69, geo.Rotation2d(-3.14)), geo.Pose2d(-0.15, 1.76, geo.Rotation2d(3.14))]
-    pose_trajectory = wpimath.trajectory.TrajectoryGenerator.generateTrajectory(pose_points, config)
+    pose_trajectory = wpimath.trajectory.TrajectoryGenerator.generateTrajectory(pose_points, make_config(velocity))
     return pose_trajectory
 
 # alternately, import a pathweaver json
@@ -145,6 +155,31 @@ def get_pathweaver_files():
     path_files = glob.glob('../robot/pathweaver/vel*/*/*pw*', recursive=True)
     file_names = [Path(file).name[:-12] + '_' + Path(file).parent.parent.name for file in path_files]
     return file_names
+
+def get_pathweaver_paths():  # use this to fill the drop down for file selection
+    path_files = glob.glob('pathweaver/paths/*', recursive=True)
+    path_names = [Path(file).name for file in path_files]
+    return path_names
+
+def generate_trajectory(path_name, velocity=k_max_speed_meters_per_second, save=False):
+    pathweaver_y_offfset = 4.572
+    p = Path('pathweaver/paths/' + path_name)
+    if p.is_file():
+        df_points = pd.read_csv(p, sep=',', header='infer')  # ToDo: do this without pandas
+        cvector_list = [wpimath.spline.Spline5.ControlVector((row['X'], row['Tangent X'], 0),
+                                                             (row['Y'] + pathweaver_y_offfset, row['Tangent Y'], 0)) for ix, row in df_points.iterrows()]
+        config = wpimath.trajectory.TrajectoryConfig(velocity,
+                                                     k_max_acceleration_meters_per_second_squared)
+        config.setKinematics(drive_kinematics)
+        config.addConstraint(autonomous_voltage_constraint)
+        pw_trajectory = wpimath.trajectory.TrajectoryGenerator.generateTrajectory(cvector_list, config)
+        if save:
+            wpilib.trajectory.TrajectoryUtil.toPathweaverJson(pw_trajectory, 'pathweaver\\test.json')
+    else:
+        pw_trajectory = None  # do something else
+    return pw_trajectory
+
+
 
 # ----------------------  FUN WITH SIMULATIONS - list the obstructions for different courses ------------
 spacing = 2.5 * .3084

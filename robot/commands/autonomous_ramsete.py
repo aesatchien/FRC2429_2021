@@ -4,8 +4,6 @@ from wpilib.command import Command
 import wpilib.controller
 import wpilib.kinematics
 from wpilib import Timer, SmartDashboard
-from wpimath.trajectory.constraint import DifferentialDriveVoltageConstraint
-import wpimath.trajectory
 import wpimath.geometry as geo
 
 from pathlib import Path
@@ -15,8 +13,7 @@ import pickle
 import subsystems.drive_constants as drive_constants
 
 class AutonomousRamsete(Command):
-    """Attempting to translate the Ramsete command from commands V2 into a V1 version since robotpy doesn't have this command yet
-    this does not work yet - it just sits there and quivers.  Have to go through piece by piece """
+    """Attempting to translate the Ramsete command from commands V2 into a V1 version since robotpy doesn't have this command yet """
     def __init__(self, robot, timeout=50):
         Command.__init__(self, name='auto_ramsete')
         self.robot = robot
@@ -52,6 +49,7 @@ class AutonomousRamsete(Command):
 
         self.previous_time = -1
         self.telemetry = []
+        self.init_time = round(Timer.getFPGATimestamp() - self.robot.enabled_time, 1)
 
         self.robot.drivetrain.drive.feed() # this initialization is taking some time now
         # update gains from dash if desired
@@ -69,51 +67,51 @@ class AutonomousRamsete(Command):
 
 
         #ToDo - make this selectable, probably from the dash, add the other trajectories
+        trajectory_choice = self.robot.oi.path_chooser.getSelected()  # get path from the GUI
+        velocity_choice = float(self.robot.oi.velocity_chooser.getSelected())
+        self.trajectory = drive_constants.generate_trajectory(trajectory_choice, velocity_choice, save=False)
+        self.course = trajectory_choice
+
+        self.robot.drivetrain.drive.feed()  # this initialization is taking some time now
 
         # Note - we are setting to pose to have the robot physically in the start position - usually absolute matters
-        trajectory_choice = self.robot.oi.path_chooser.getSelected()  # get path from the GUI
-        if 'slalom' in trajectory_choice and 'pw' in trajectory_choice:
-            self.course = trajectory_choice
-            self.trajectory = drive_constants.get_pathweaver_trajectory(trajectory_choice)
+
+        if 'slalom' in trajectory_choice:
             self.start_pose = geo.Pose2d(1.3, 0.66, geo.Rotation2d(0))
-        elif 'barrel' in trajectory_choice and 'pw' in trajectory_choice:
-            self.course = trajectory_choice
-            self.trajectory = drive_constants.get_pathweaver_trajectory(trajectory_choice)
-            self.start_pose = geo.Pose2d(1.3, 2.40, geo.Rotation2d(0))
-        elif 'bounce' in trajectory_choice and 'pw' in trajectory_choice:
-            self.course = trajectory_choice
-            self.trajectory = drive_constants.get_pathweaver_trajectory(trajectory_choice)
+        elif 'barrel' in trajectory_choice:
+            self.start_pose = geo.Pose2d(1.3, 2.40, geo.Rotation2d(0))  # may want to rotate this
+        elif 'bounce' in trajectory_choice:
             self.start_pose = geo.Pose2d(1.3, 2.62, geo.Rotation2d(0))
-        elif 'student' in trajectory_choice and 'pw' in trajectory_choice:
-            self.course = trajectory_choice
-            self.trajectory = drive_constants.get_pathweaver_trajectory(trajectory_choice)
-            self.start_pose = geo.Pose2d(1.3, 0.66, geo.Rotation2d(0))  # student needs to change this
+        elif 'student' in trajectory_choice:
+            self.start_pose = geo.Pose2d(0, 0, geo.Rotation2d(0))  # student should put barrel, slalom or bounce in name
         elif 'loop' in trajectory_choice:
             self.course = 'loop'
-            self.trajectory = drive_constants.get_loop_trajectory()
+            self.trajectory = drive_constants.get_loop_trajectory(velocity_choice)
             self.start_pose = geo.Pose2d(0, 0, geo.Rotation2d(0))
         elif 'poses' in trajectory_choice:
             self.course = 'slalom_poses'
-            self.trajectory = drive_constants.get_pose_trajectory()
+            self.trajectory = drive_constants.get_pose_trajectory(velocity_choice)
             self.start_pose = geo.Pose2d(0, 0, geo.Rotation2d(0))
         elif 'points' in trajectory_choice:
             self.course = 'slalom_points'
-            self.trajectory = drive_constants.get_point_trajectory()
+            self.trajectory = drive_constants.get_point_trajectory(velocity_choice)
+            self.start_pose = geo.Pose2d(0, 0, geo.Rotation2d(0))
+        elif 'z_test' in trajectory_choice:
+            self.course = 'test'
+            self.trajectory = drive_constants.get_test_trajectory(velocity_choice)
             self.start_pose = geo.Pose2d(0, 0, geo.Rotation2d(0))
         else:
-            self.course = 'test'
-            self.trajectory = drive_constants.get_test_trajectory()
             self.start_pose = geo.Pose2d(0, 0, geo.Rotation2d(0))
-        #SmartDashboard.set ('obstacles', self.course)
 
-        self.robot.drivetrain.reset_odometry(self.start_pose)  # ToDo need to sort this out - pathweaver vs. self-made padding
+        self.robot.drivetrain.reset_odometry(self.start_pose)
         initial_state = self.trajectory.sample(0)
         # these are all meters in 2021
         self.previous_speeds = self.kinematics.toWheelSpeeds(wpilib.kinematics.ChassisSpeeds(
             initial_state.velocity, 0, initial_state.curvature*initial_state.velocity))
 
         self.start_time = round(Timer.getFPGATimestamp() - self.robot.enabled_time, 1)
-        print("\n" + f"** Started {self.getName()} on {self.course} (b={self.beta}, z={self.zeta}, kp_vel={self.kp_vel}) at {self.start_time} s **")
+        print("\n" + f"** Started {self.getName()} on {self.course} with load time {self.start_time-self.init_time:2.2f}s"
+                     f" (b={self.beta}, z={self.zeta}, kp_vel={self.kp_vel}) at {self.start_time} s **")
         SmartDashboard.putString("alert", f"** Started {self.getName()} at {self.start_time} s **")
 
         print('Time\tTr Vel\tTr Rot\tlspd\trspd\tram ang\tram vx\tram vy\tlffw\trffw\tlpid\trpid')
@@ -156,9 +154,6 @@ class AutonomousRamsete(Command):
         self.previous_speeds = target_wheel_speeds
         self.previous_time = current_time
         self.robot.drivetrain.drive.feed()
-
-        #SmartDashboard.putNumber('rz_left_speed_setpoint', left_speed_setpoint)
-        #SmartDashboard.putNumber('rz_right_speed_setpoint', right_speed_setpoint)
 
         if self.counter % 5 == 0:  # ten times per second update the telemetry array
             telemetry_data = {'TIME':current_time, 'RBT_X':pose.X(), 'RBT_Y':pose.Y(), 'RBT_TH':pose.rotation().radians(),
