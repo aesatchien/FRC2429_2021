@@ -107,7 +107,7 @@ class OI(object):
         self.obstacle_chooser = SendableChooser()
         routes = ['slalom', 'barrel', 'bounce', 'none']
         for ix, position in enumerate(routes):
-            if ix == 0:
+            if ix == 3:
                 self.obstacle_chooser.setDefaultOption(position, position)
             else:
                 self.obstacle_chooser.addOption(position, position)
@@ -127,11 +127,10 @@ class OI(object):
                 self.path_chooser.addOption(position, position)
 
         self.velocity_chooser = SendableChooser()
-        wpilib.SmartDashboard.putData('ramsete velocity', self.velocity_chooser)
+        wpilib.SmartDashboard.putData('path velocity', self.velocity_chooser)
         velocities = [0.5, 0.75, 1.0, 1.5, 2.0, 2.5, 3.0]
         for ix, position in enumerate(velocities):
             if ix == 2: # 1.5 will be the default
                 self.velocity_chooser.setDefaultOption(str(position), position)
             else:
                 self.velocity_chooser.addOption(str(position), position)
-        wpilib.SmartDashboard.putData('path velocity', self.velocity_chooser)
