@@ -1,14 +1,17 @@
 # need a file to communicate to the robot and the sim (sim is not aware of the robot object)
 import math
-import wpilib.kinematics
-import wpimath.geometry as geo
-import wpimath
-import wpilib.controller
-import wpilib.trajectory
-from wpimath.trajectory.constraint import DifferentialDriveVoltageConstraint
 from pathlib import Path
 import glob
-import pandas as pd
+
+import wpilib.controller
+
+import wpimath
+import wpimath.kinematics
+import wpimath.geometry as geo
+import wpimath.trajectory
+from wpimath.trajectory.constraint import DifferentialDriveVoltageConstraint
+
+#import pandas as pd
 
 # drivetrain constants
 k_wheel_diameter_in = 8  # wheel diameter in inches
@@ -28,7 +31,7 @@ k_encoder_distance_per_pulse_m = k_wheel_diameter_m * math.pi / (k_encoder_CPR)
 
 # set up the wpilib kinematics model
 k_track_width_meters = 0.69
-drive_kinematics = wpilib.kinematics.DifferentialDriveKinematics(k_track_width_meters)
+drive_kinematics = wpimath.kinematics.DifferentialDriveKinematics(k_track_width_meters)
 
 # get these from robot characterization tools - using simulated values for now
 # ToDo: characterize this on the real robot
@@ -44,7 +47,7 @@ k_max_acceleration_meters_per_second_squared = 1 # get up to full speed this fas
 
 # Reasonable baseline values for a RAMSETE follower in units of meters and seconds
 ramsete_B = 2  # default 2.  like a proportional, higher is more aggressive
-ramsete_Zeta = 0.7  #  default 0.7.  like a damping term, needs to be between 0 and 1
+ramsete_Zeta = 0.8  #  default 0.7.  like a damping term, needs to be between 0 and 1
 
 
 # --------------  DRIVETRAIN OBJECTS FOR TRAJECTORy TRACKING  -------------
@@ -60,6 +63,7 @@ config = wpimath.trajectory.TrajectoryConfig(k_max_speed_meters_per_second, k_ma
 config.setKinematics(drive_kinematics)
 config.addConstraint(autonomous_voltage_constraint)
 
+# need to remake this on the fly when we make trajectories here
 def make_config(velocity=k_max_speed_meters_per_second):
     temp_config = wpimath.trajectory.TrajectoryConfig(velocity, k_max_acceleration_meters_per_second_squared)
     temp_config.setKinematics(drive_kinematics)
@@ -68,7 +72,7 @@ def make_config(velocity=k_max_speed_meters_per_second):
 
 
 # --------------  SAMPLE TRAJECTORIES  -------------
-
+#ToDo - maybe make these functions return the start pose as well
 # example trajectory to test
 def get_test_trajectory(velocity=k_max_speed_meters_per_second):
     start_pose = geo.Pose2d(0, 0, geo.Rotation2d(0))
@@ -118,6 +122,7 @@ def get_pose_trajectory(velocity=k_max_speed_meters_per_second):
 
 course = 'slalom'
 
+@DeprecationWarning
 def get_pathweaver_trajectory_old(course):  # ToDo: just read the directories and get everything with a glob - simpler that way
     """ Load different trajectories based on separate velocity directories for pathweaver output"""
     trajectory_json = course[:-5] + '.wpilib.json'  # my naming convention marks the last four characters to mark the velocity
@@ -161,20 +166,30 @@ def get_pathweaver_paths():  # use this to fill the drop down for file selection
     path_names = [Path(file).name for file in path_files]
     return path_names
 
-def generate_trajectory(path_name, velocity=k_max_speed_meters_per_second, save=False):
+def generate_trajectory(path_name, velocity=k_max_speed_meters_per_second, reset_pose=True, save=False):
     pathweaver_y_offfset = 4.572
     p = Path('pathweaver/paths/' + path_name)
     if p.is_file():
-        df_points = pd.read_csv(p, sep=',', header='infer')  # ToDo: do this without pandas
-        cvector_list = [wpimath.spline.Spline5.ControlVector((row['X'], row['Tangent X'], 0),
-                                                             (row['Y'] + pathweaver_y_offfset, row['Tangent Y'], 0)) for ix, row in df_points.iterrows()]
+
+        # pandas approach - best not to put this on the robot
+        #df_points = pd.read_csv(p, sep=',', header='infer')  # ToDo: do this without pandas
+        #cvector_list = [wpimath.spline.Spline5.ControlVector((row['X'], row['Tangent X'], 0),(row['Y'] + pathweaver_y_offfset, row['Tangent Y'], 0)) for ix, row in df_points.iterrows()]
+
+        lines = []
+        with open(p, "r") as f:
+            for line in f:
+                currentline = line.split(",")
+                lines.append(currentline)
+        cvector_list = [wpimath.spline.Spline5.ControlVector((float(row[0]), float(row[2]), 0), (float(row[1]) + pathweaver_y_offfset, float(row[3]), 0))
+                        for ix, row in enumerate(lines[1:])]
+
         config = wpimath.trajectory.TrajectoryConfig(velocity,
                                                      k_max_acceleration_meters_per_second_squared)
         config.setKinematics(drive_kinematics)
         config.addConstraint(autonomous_voltage_constraint)
         pw_trajectory = wpimath.trajectory.TrajectoryGenerator.generateTrajectory(cvector_list, config)
         if save:
-            wpilib.trajectory.TrajectoryUtil.toPathweaverJson(pw_trajectory, 'pathweaver\\test.json')
+            wpimath.trajectory.TrajectoryUtil.toPathweaverJson(pw_trajectory, 'pathweaver\\test.json')
     else:
         pw_trajectory = None  # do something else
     return pw_trajectory

@@ -3,7 +3,7 @@
 
 from wpilib.command import Command
 import wpilib.controller
-import wpilib.kinematics
+import wpimath.kinematics
 from wpilib import Timer, SmartDashboard
 
 import subsystems.drive_constants as drive_constants

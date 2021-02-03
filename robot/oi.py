@@ -121,14 +121,14 @@ class OI(object):
         #choices = drive_constants.get_pathweaver_files() + ['z_loop', 'z_poses', 'z_points', 'z_test']
         choices = drive_constants.get_pathweaver_paths() + ['z_loop', 'z_poses', 'z_points', 'z_test']
         for ix, position in enumerate(choices):
-            if position == 'slalom_pw1': # slalom_pw1_1.25 at the moment
+            if ix == 0:
                 self.path_chooser.setDefaultOption(position, position)
             else:
                 self.path_chooser.addOption(position, position)
 
         self.velocity_chooser = SendableChooser()
         wpilib.SmartDashboard.putData('path velocity', self.velocity_chooser)
-        velocities = [0.5, 0.75, 1.0, 1.5, 2.0, 2.5, 3.0]
+        velocities = [0.5, 0.75, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5]
         for ix, position in enumerate(velocities):
             if ix == 2: # 1.5 will be the default
                 self.velocity_chooser.setDefaultOption(str(position), position)

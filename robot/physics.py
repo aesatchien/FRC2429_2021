@@ -16,15 +16,15 @@ from wpilib import SmartDashboard
 
 import subsystems.drive_constants as drive_constants
 
-import wpilib # need some other way of checking version w/o importing unneeded stuff
-version = wpilib.__version__[0:4]
-print(f'*** Version is {version} ***')
-if version == '2020':
-    import wpilib.geometry as geo
-    import hal.simulation as simlib # 2020
-elif version == '2021':
-    import wpimath.geometry as geo
-    import wpilib.simulation as simlib #2021
+#import wpilib # need some other way of checking version w/o importing unneeded stuff
+#version = wpilib.__version__[0:4]
+#print(f'*** Version is {version} ***')
+#if version == '2020':
+#    import wpilib.geometry as geo
+#    import hal.simulation as simlib # 2020
+#elif version == '2021':
+import wpimath.geometry as geo
+import wpilib.simulation as simlib #2021
 
 
 class PhysicsEngine:
@@ -53,13 +53,13 @@ class PhysicsEngine:
         # set up two simulated encoders to see how they effect the robot
         self.l_distance, self.r_distance = 0, 0
         self.l_distance_old, self.r_distance_old = 0, 0  # used for calculating encoder rates
-        if version == '2020':
-            self.r_encoder = simlib.EncoderSim(0)
-            self.l_encoder = simlib.EncoderSim(1)
-        else:
+#        if version == '2020':
+#            self.r_encoder = simlib.EncoderSim(0)
+#            self.l_encoder = simlib.EncoderSim(1)
+#        else:
             # in 2021 you have to pass the actual object
-            self.r_encoder = simlib.EncoderSim.createForChannel(0)
-            self.l_encoder = simlib.EncoderSim.createForChannel(2)
+        self.r_encoder = simlib.EncoderSim.createForChannel(0)
+        self.l_encoder = simlib.EncoderSim.createForChannel(2)
         # update units from drive constants
         self.l_encoder.setDistancePerPulse(drive_constants.k_encoder_distance_per_pulse_m)
         self.r_encoder.setDistancePerPulse(drive_constants.k_encoder_distance_per_pulse_m)
@@ -164,18 +164,18 @@ class PhysicsEngine:
         #    self.l_distance += coast_distance
         #    self.r_distance += coast_distance
 
-        if version == '2021':
-            # have to only work with deltas otherwise we can't reset the encoder from the real code
-            self.l_encoder.setDistance(self.l_encoder.getDistance() + (self.drivetrain.l_position-self.l_distance_old) * 0.3105)
-            self.r_encoder.setDistance(self.r_encoder.getDistance() + (self.drivetrain.r_position-self.r_distance_old) * 0.3105)
-            self.l_encoder.setRate(0.31*(self.drivetrain.l_position -self.l_distance_old)/tm_diff)
-            self.r_encoder.setRate(0.31*(self.drivetrain.r_position -self.r_distance_old)/tm_diff)
-            self.l_distance_old = self.drivetrain.l_position
-            self.r_distance_old = self.drivetrain.r_position
-        else:
+#        if version == '2021':
+        # have to only work with deltas otherwise we can't reset the encoder from the real code
+        self.l_encoder.setDistance(self.l_encoder.getDistance() + (self.drivetrain.l_position-self.l_distance_old) * 0.3105)
+        self.r_encoder.setDistance(self.r_encoder.getDistance() + (self.drivetrain.r_position-self.r_distance_old) * 0.3105)
+        self.l_encoder.setRate(0.31*(self.drivetrain.l_position -self.l_distance_old)/tm_diff)
+        self.r_encoder.setRate(0.31*(self.drivetrain.r_position -self.r_distance_old)/tm_diff)
+        self.l_distance_old = self.drivetrain.l_position
+        self.r_distance_old = self.drivetrain.r_position
+#        else:
             # haven't updated this for the delta pose approach
-            self.l_encoder.setCount(int(self.drivetrain.l_position / drive_constants.k_encoder_distance_per_pulse_m))
-            self.r_encoder.setCount(int(self.self.drivetrain.r_position / drive_constants.k_encoder_distance_per_pulse_m))
+#            self.l_encoder.setCount(int(self.drivetrain.l_position / drive_constants.k_encoder_distance_per_pulse_m))
+#            self.r_encoder.setCount(int(self.self.drivetrain.r_position / drive_constants.k_encoder_distance_per_pulse_m))
 
         self.x, self.y = pose.translation().x, pose.translation().y
         # Update the navx gyro simulation

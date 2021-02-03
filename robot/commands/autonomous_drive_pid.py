@@ -17,7 +17,7 @@ class AutonomousDrivePID(Command):
         self.source = source
         self.k_dash = False
         self.start_time = 0
-        self.teaching = False  # switch to True if you want to learn about PID controllers
+        self.teaching = True  # switch to True if you want to learn about PID controllers
 
         # allow setpoint to be controlled by the dashboard
         if source == 'dashboard':

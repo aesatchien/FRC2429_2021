@@ -2,7 +2,7 @@
 # ToDo: make sure velocity controllers are actually helping and optimize the B, Z and kp gains
 from wpilib.command import Command
 import wpilib.controller
-import wpilib.kinematics
+import wpimath.kinematics
 from wpilib import Timer, SmartDashboard
 import wpimath.geometry as geo
 
@@ -26,6 +26,7 @@ class AutonomousRamsete(Command):
         self.telemetry = []
         self.trajectory = None
         self.write_telemetry = False
+        self.velocity = drive_constants.k_max_speed_meters_per_second
         self.dash = True
 
         # constants for ramsete follower and velocity PID controllers
@@ -57,6 +58,7 @@ class AutonomousRamsete(Command):
             self.kp_vel = SmartDashboard.getNumber("ramsete_kpvel", self.kp_vel)
             self.beta = SmartDashboard.getNumber("ramsete_B", self.beta)
             self.zeta = SmartDashboard.getNumber("ramsete_Z", self.zeta)
+            self.write_telemetry = SmartDashboard.getBoolean("ramsete_write", self.write_telemetry)
 
         # create controllers
         self.follower = wpilib.controller.RamseteController(self.beta, self.zeta)
@@ -68,8 +70,9 @@ class AutonomousRamsete(Command):
 
         #ToDo - make this selectable, probably from the dash, add the other trajectories
         trajectory_choice = self.robot.oi.path_chooser.getSelected()  # get path from the GUI
-        velocity_choice = float(self.robot.oi.velocity_chooser.getSelected())
-        self.trajectory = drive_constants.generate_trajectory(trajectory_choice, velocity_choice, save=False)
+        self.velocity = float(self.robot.oi.velocity_chooser.getSelected() )
+        print(self.velocity)
+        self.trajectory = drive_constants.generate_trajectory(trajectory_choice, self.velocity, save=False)
         self.course = trajectory_choice
 
         self.robot.drivetrain.drive.feed()  # this initialization is taking some time now
@@ -86,19 +89,19 @@ class AutonomousRamsete(Command):
             self.start_pose = geo.Pose2d(0, 0, geo.Rotation2d(0))  # student should put barrel, slalom or bounce in name
         elif 'loop' in trajectory_choice:
             self.course = 'loop'
-            self.trajectory = drive_constants.get_loop_trajectory(velocity_choice)
+            self.trajectory = drive_constants.get_loop_trajectory(self.velocity)
             self.start_pose = geo.Pose2d(0, 0, geo.Rotation2d(0))
         elif 'poses' in trajectory_choice:
             self.course = 'slalom_poses'
-            self.trajectory = drive_constants.get_pose_trajectory(velocity_choice)
+            self.trajectory = drive_constants.get_pose_trajectory(self.velocity)
             self.start_pose = geo.Pose2d(0, 0, geo.Rotation2d(0))
         elif 'points' in trajectory_choice:
             self.course = 'slalom_points'
-            self.trajectory = drive_constants.get_point_trajectory(velocity_choice)
+            self.trajectory = drive_constants.get_point_trajectory(self.velocity)
             self.start_pose = geo.Pose2d(0, 0, geo.Rotation2d(0))
         elif 'z_test' in trajectory_choice:
             self.course = 'test'
-            self.trajectory = drive_constants.get_test_trajectory(velocity_choice)
+            self.trajectory = drive_constants.get_test_trajectory(self.velocity)
             self.start_pose = geo.Pose2d(0, 0, geo.Rotation2d(0))
         else:
             self.start_pose = geo.Pose2d(0, 0, geo.Rotation2d(0))
@@ -183,10 +186,10 @@ class AutonomousRamsete(Command):
         self.write_telemetry = SmartDashboard.getBoolean("ramsete_write", self.write_telemetry)
         if self.write_telemetry:
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            file_name = timestamp + '_'+ self.course + f'_kpvel_{self.kp_vel:2.1f}'.replace('.','p') + f'vel_{drive_constants.k_max_speed_meters_per_second}'   +'.pkl'
+            file_name = timestamp + '_'+ self.course + f'_kpv_{self.kp_vel:2.1f}'.replace('.','p') + f'_vel_{str(self.velocity).replace(".","p")}'   +'.pkl'
             pickle_file = Path.cwd() / 'sim' / 'data' / file_name
             with open(pickle_file.absolute(), 'wb') as fp:
-                out_dict = {'TIMESTAMP':timestamp,'DATA':self.telemetry, 'COURSE':self.course, 'VELOCITY':drive_constants.k_max_speed_meters_per_second,
+                out_dict = {'TIMESTAMP':timestamp,'DATA':self.telemetry, 'COURSE':self.course, 'VELOCITY':self.velocity,
                             'KP_VEL':self.kp_vel, 'KD_VEL':self.kd_vel, 'BETA':self.beta, 'ZETA':self.zeta}
                 pickle.dump(out_dict, fp)
             print(f'*** Wrote ramsete command data to {file_name} ***')

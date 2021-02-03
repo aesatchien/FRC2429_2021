@@ -1,6 +1,6 @@
 #drivetrain to use if we are in simulation mode
 
-import wpilib.kinematics
+import wpimath.kinematics
 import wpilib.drive
 from wpilib.command import Subsystem
 from wpilib import SmartDashboard, SpeedControllerGroup, Timer
@@ -42,7 +42,7 @@ class DriveTrainSim(Subsystem):
         self.r_encoder.setDistancePerPulse(drive_constants.k_encoder_distance_per_pulse_m)
 
         # odometry for tracking the robot pose
-        self.odometry = wpilib.kinematics.DifferentialDriveOdometry(geo.Rotation2d.fromDegrees( -self.navx.getAngle() ))
+        self.odometry = wpimath.kinematics.DifferentialDriveOdometry(geo.Rotation2d.fromDegrees( -self.navx.getAngle() ))
 
     def initDefaultCommand(self):
         """ When other commands aren't using the drivetrain, allow arcade drive with the joystick. """
@@ -63,7 +63,7 @@ class DriveTrainSim(Subsystem):
         return self.odometry.getPose()
 
     def get_wheel_speeds(self):
-        wpilib.kinematics.DifferentialDriveWheelSpeeds(self.l_encoder.getRate(), self.r_encoder.getRate())
+        wpimath.kinematics.DifferentialDriveWheelSpeeds(self.l_encoder.getRate(), self.r_encoder.getRate())
 
     def reset_encoders(self):
         self.l_encoder.reset()
