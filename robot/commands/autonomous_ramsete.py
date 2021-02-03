@@ -71,7 +71,6 @@ class AutonomousRamsete(Command):
         #ToDo - make this selectable, probably from the dash, add the other trajectories
         trajectory_choice = self.robot.oi.path_chooser.getSelected()  # get path from the GUI
         self.velocity = float(self.robot.oi.velocity_chooser.getSelected() )
-        print(self.velocity)
         self.trajectory = drive_constants.generate_trajectory(trajectory_choice, self.velocity, save=False)
         self.course = trajectory_choice
 
