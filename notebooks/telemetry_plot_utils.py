@@ -5,7 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 import glob
-
+from pathlib import Path
 
 # load pickled data from robot telemetry output - it's one big dictionary as below
 # out_dict = {'TIMESTAMP':timestamp,'DATA':self.telemetry, 'COURSE':self.course,
@@ -25,7 +25,7 @@ def get_data(file_name=None, x_offset=0, y_offset=0):
         telemetry = load_file(files[-1])
     else:  # try and match the filename passed in
         matches = [file for file in files if file_name in file]
-        telemetry = load_file(matches[0])
+        telemetry = load_file(matches[-1])
     df = fix_data(telemetry, x_offset=x_offset, y_offset=y_offset)
     return df, telemetry
 
@@ -43,6 +43,26 @@ def get_points_df(name='slalom', data=None, x_shift=0, y_shift=4.87-0.25):
             df_points['Y'] = df_points['Y'] + y_shift
         return df_points
     else:  # pass the data in
+        pass
+
+def get_points_df_from_trajectory_data_file(trajectory_data_file_name=None, data=None, x_shift=0, y_shift=4.87-0.25):
+    # see if any of the paths are matches for the trajectory file name
+    path_files = glob.glob('../robot/pathweaver/paths/*')
+    path_file_names = [Path(file).name for file in path_files]
+
+    matches = [file for file in path_files if Path(file).name in trajectory_data_file_name]
+
+    if data is None:  # get the data from a file
+        df_points = pd.DataFrame()
+        if len(matches) > 0:
+            df_points = pd.read_csv(matches[0], sep=',', header='infer')
+            # fix the pathweaver offsets for the 2021 fields
+            df_points['X'] = df_points['X'] + x_shift
+            df_points['Y'] = df_points['Y'] + y_shift
+            return df_points
+        else:
+            return None
+    else:  # pass the data in ? maybe I don't need this option
         pass
 
 
@@ -65,7 +85,7 @@ def fix_data(telemetry, x_offset=0, y_offset=0):
 
 
 # ----------------- PLOT UTILS -----------------
-def plot_df(df, telemetry, arrows=True, point_df=None, pathweaver=False, background='slalom', save=False, fname='odometry.png'):
+def plot_df(df, telemetry, arrows=True, guess_points=True, point_df=None, pathweaver=False, background='slalom', save=False, fname='odometry.png'):
 
     # generate a title
     label = f"Mapping odometry from {telemetry['COURSE']}: {telemetry['TIMESTAMP']} " \
@@ -95,6 +115,9 @@ def plot_df(df, telemetry, arrows=True, point_df=None, pathweaver=False, backgro
     traj = ax.scatter(x=df['TRAJ_X'], y=df['TRAJ_Y'], c=df['TRAJ_TH'], marker='x', label='trajectory')
 
     # trajectory generation data
+    if guess_points:
+        point_df = get_points_df_from_trajectory_data_file(trajectory_data_file_name=telemetry['COURSE'])
+
     if point_df is not None:
         labels = [str(i) for i in range(len(point_df))]
         x, y = np.asarray(point_df['X']), np.asarray(point_df['Y'])

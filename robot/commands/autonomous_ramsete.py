@@ -14,32 +14,34 @@ import subsystems.drive_constants as drive_constants
 
 class AutonomousRamsete(Command):
     """Attempting to translate the Ramsete command from commands V2 into a V1 version since robotpy doesn't have this command yet """
+
+    # constants for ramsete follower and velocity PID controllers - don't want a different copy for each command
+    beta = drive_constants.ramsete_B
+    zeta = drive_constants.ramsete_Zeta
+    kp_vel = drive_constants.kp_drive_vel
+    kd_vel = 0
+    velocity = drive_constants.k_max_speed_meters_per_second
+    write_telemetry = False
+
+    dash = True  # ToDo: decide if I ever want to hide this
+    if dash is True:
+        SmartDashboard.putNumber("ramsete_kpvel", kp_vel)
+        SmartDashboard.putNumber("ramsete_B", beta)
+        SmartDashboard.putNumber("ramsete_Z", zeta)
+        SmartDashboard.putBoolean("ramsete_write", write_telemetry)
+
     def __init__(self, robot, timeout=50):
         Command.__init__(self, name='auto_ramsete')
         self.robot = robot
         self.requires(robot.drivetrain)
         self.setTimeout(timeout)
+
         self.previous_time = -1
         self.previous_speeds = None
         self.use_PID = True
         self.counter = 0
         self.telemetry = []
         self.trajectory = None
-        self.write_telemetry = False
-        self.velocity = drive_constants.k_max_speed_meters_per_second
-        self.dash = True
-
-        # constants for ramsete follower and velocity PID controllers
-        self.beta = drive_constants.ramsete_B
-        self.zeta = drive_constants.ramsete_Zeta
-        self.kp_vel = drive_constants.kp_drive_vel
-        self.kd_vel = 0
-
-        if self.dash is True:
-            SmartDashboard.putNumber("ramsete_kpvel", self.kp_vel)
-            SmartDashboard.putNumber("ramsete_B", self.beta)
-            SmartDashboard.putNumber("ramsete_Z", self.zeta)
-            SmartDashboard.putBoolean("ramsete_write", self.write_telemetry)
 
         self.feed_forward = drive_constants.feed_forward
         self.kinematics = drive_constants.drive_kinematics
@@ -68,9 +70,9 @@ class AutonomousRamsete(Command):
         self.right_controller.reset()
 
 
-        #ToDo - make this selectable, probably from the dash, add the other trajectories
+        #ToDo - make this selectable, probably from the dash, add the other trajectories (done)
         trajectory_choice = self.robot.oi.path_chooser.getSelected()  # get path from the GUI
-        self.velocity = float(self.robot.oi.velocity_chooser.getSelected() )
+        self.velocity = float(self.robot.oi.velocity_chooser.getSelected())  # get the velocity from the GUI
         self.trajectory = drive_constants.generate_trajectory(trajectory_choice, self.velocity, save=False)
         self.course = trajectory_choice
 
@@ -148,14 +150,14 @@ class AutonomousRamsete(Command):
             left_output = -left_output_pid + left_feed_forward
             right_output = -right_output_pid + right_feed_forward
 
-        else:
+        else:  # ToDo - fix this to just be the feed forwards and test it
             left_output = left_speed_setpoint
             right_output = right_speed_setpoint
 
-        self.robot.drivetrain.tank_drive_volts(left_output,  -right_output)
+        self.robot.drivetrain.tank_drive_volts(left_output, -right_output)
         self.previous_speeds = target_wheel_speeds
         self.previous_time = current_time
-        self.robot.drivetrain.drive.feed()
+        self.robot.drivetrain.drive.feed()  # should this be in tank drive?
 
         if self.counter % 5 == 0:  # ten times per second update the telemetry array
             telemetry_data = {'TIME':current_time, 'RBT_X':pose.X(), 'RBT_Y':pose.Y(), 'RBT_TH':pose.rotation().radians(),
@@ -172,7 +174,7 @@ class AutonomousRamsete(Command):
             print(out_string)
         self.counter += 1
 
-    def isFinished(self) -> bool:
+    def isFinished(self) -> bool:  # ToDo: investigate the different end methods
         return self.isTimedOut() or self.timeSinceInitialized() > self.trajectory.totalTime()
 
     def end(self, message='Ended'):
