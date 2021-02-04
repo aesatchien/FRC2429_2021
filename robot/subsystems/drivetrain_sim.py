@@ -77,6 +77,9 @@ class DriveTrainSim(Subsystem):
         self.speedgroup_left.setVoltage(left_volts)
         self.speedgroup_right.setVoltage(right_volts)
 
+    def get_rotation2d(self):
+        return geo.Rotation2d.fromDegrees(-self.navx.getAngle())
+
     def get_average_encoder_distance(self):
         return (self.l_encoder.getDistance() + self.r_encoder.getDistance())/2
 

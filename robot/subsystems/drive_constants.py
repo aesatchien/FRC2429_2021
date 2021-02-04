@@ -166,7 +166,17 @@ def get_pathweaver_paths():  # use this to fill the drop down for file selection
     path_names = [Path(file).name for file in path_files]
     return path_names
 
-def generate_trajectory(path_name, velocity=k_max_speed_meters_per_second, reset_pose=True, save=False):
+
+def generate_trajectory(path_name:str, velocity=k_max_speed_meters_per_second, save=False) -> object:
+    """
+    Generate a wpilib trajectory from a pathweaver path.  Accepts regular and reversed paths.
+
+    :param path_name: name of pathweaver file to be imported
+    :param velocity: Maximum robot velocity for the generated trajectory
+    :param save: Option to save generated trajectory to disk as 'test.json'
+    :return: generated trajectory
+
+    """
     pathweaver_y_offfset = 4.572
     p = Path('pathweaver/paths/' + path_name)
     if p.is_file():
@@ -186,11 +196,15 @@ def generate_trajectory(path_name, velocity=k_max_speed_meters_per_second, reset
         config = wpimath.trajectory.TrajectoryConfig(velocity, k_max_acceleration_meters_per_second_squared)
         config.setKinematics(drive_kinematics)
         config.addConstraint(autonomous_voltage_constraint)
+        # check to see if the path is to be reversed it is marked in the th column of the pathweaver file
+        reverse_array = [row[5] for row in lines[1:]]
+        if any(entry == 'true' for entry in reverse_array):
+            config.setReversed(True)
         pw_trajectory = wpimath.trajectory.TrajectoryGenerator.generateTrajectory(cvector_list, config)
         if save:
             wpimath.trajectory.TrajectoryUtil.toPathweaverJson(pw_trajectory, 'pathweaver\\test.json')
     else:
-        pw_trajectory = None  # do something else
+        pw_trajectory = None  # do something else? generate an empty trajectory?
     return pw_trajectory
 
 

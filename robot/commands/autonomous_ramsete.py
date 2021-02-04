@@ -75,19 +75,23 @@ class AutonomousRamsete(Command):
         self.velocity = float(self.robot.oi.velocity_chooser.getSelected())  # get the velocity from the GUI
         self.trajectory = drive_constants.generate_trajectory(trajectory_choice, self.velocity, save=False)
         self.course = trajectory_choice
-
+        self.start_pose = geo.Pose2d(self.trajectory.sample(0).pose.X(),self.trajectory.sample(0).pose.Y(), self.robot.drivetrain.get_rotation2d())
         self.robot.drivetrain.drive.feed()  # this initialization is taking some time now
 
         # Note - we are setting to pose to have the robot physically in the start position - usually absolute matters
 
         if 'slalom' in trajectory_choice:
-            self.start_pose = geo.Pose2d(1.3, 0.66, geo.Rotation2d(0))
+            pass
+            #self.start_pose = geo.Pose2d(1.3, 0.66, geo.Rotation2d(0))
         elif 'barrel' in trajectory_choice:
-            self.start_pose = geo.Pose2d(1.3, 2.40, geo.Rotation2d(0))  # may want to rotate this
+            pass
+            # self.start_pose = geo.Pose2d(1.3, 2.40, geo.Rotation2d(0))  # may want to rotate this
         elif 'bounce' in trajectory_choice:
-            self.start_pose = geo.Pose2d(1.3, 2.62, geo.Rotation2d(0))
+            pass
+            # self.start_pose = geo.Pose2d(1.3, 2.62, geo.Rotation2d(0))
         elif 'student' in trajectory_choice:
-            self.start_pose = geo.Pose2d(0, 0, geo.Rotation2d(0))  # student should put barrel, slalom or bounce in name
+            pass
+            # self.start_pose = geo.Pose2d(0, 0, geo.Rotation2d(0))  # student should put barrel, slalom or bounce in name
         elif 'loop' in trajectory_choice:
             self.course = 'loop'
             self.trajectory = drive_constants.get_loop_trajectory(self.velocity)
@@ -105,7 +109,8 @@ class AutonomousRamsete(Command):
             self.trajectory = drive_constants.get_test_trajectory(self.velocity)
             self.start_pose = geo.Pose2d(0, 0, geo.Rotation2d(0))
         else:
-            self.start_pose = geo.Pose2d(0, 0, geo.Rotation2d(0))
+            pass
+            #self.start_pose = geo.Pose2d(0, 0, geo.Rotation2d(0))
 
         self.robot.drivetrain.reset_odometry(self.start_pose)
         initial_state = self.trajectory.sample(0)
