@@ -1,25 +1,16 @@
 # a group of commands strung together autonomously
 from wpilib.command import CommandGroup
-from commands.autonomous_rotate import AutonomousRotate
-from commands.autonomous_drive_pid import AutonomousDrivePID
-
+from commands.autonomous_ramsete_simple import AutonomousRamseteSimple
 
 class AutonomousBounce(CommandGroup):
     """ allows for stringing together autonomous commands """
 
     def __init__(self, robot, timeout=None):
         CommandGroup.__init__(self, name='auto_bounce')
-        # slalom
-        relative_angles = False
-        if relative_angles:
-            self.addSequential(AutonomousDrivePID(robot, setpoint=0.8, timeout=3))  # initial move
-            self.addSequential(AutonomousRotate(robot, setpoint=-55, timeout=3))  # first turn
-
-        else:  # use absolute heading
-            # slalom with absolute angles E=0, S=90, W=180, N=-90 or 270
-            diagonal_distance = 1.8
-            self.addSequential(AutonomousDrivePID(robot, setpoint=1, timeout=3))  # initial move
-            self.addSequential(AutonomousRotate(robot, setpoint=-90, absolute=True, timeout=3))  # first turn
-            self.addSequential(AutonomousDrivePID(robot, setpoint=4, timeout=3))  # drive to top
+        # bounce
+        self.addSequential(AutonomousRamseteSimple(robot, path='bounce_pw1', relative=True, reset_telemetry=True))  # initial move forwards
+        self.addSequential(AutonomousRamseteSimple(robot, path='bounce_pw2', relative=False, reset_telemetry=False))  # second move reverse
+        self.addSequential(AutonomousRamseteSimple(robot, path='bounce_pw3', relative=False, reset_telemetry=False))  # third more forwards
+        self.addSequential(AutonomousRamseteSimple(robot, path='bounce_pw4', relative=False, reset_telemetry=False))  # fourth move backwards
 
 

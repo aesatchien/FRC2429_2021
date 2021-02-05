@@ -45,9 +45,9 @@ class OI(object):
         self.buttonX.whenPressed( AutonomousRotate(self.robot, setpoint=-60, timeout=4, source='dashboard', absolute=True) )
         self.buttonY.whenPressed( AutonomousDrivePID(self.robot, setpoint=2, timeout=4, source='dashboard') )
 
-        # g h j on the keyboard
+        # g h j k on the keyboard
         self.buttonLB.whenPressed( AutonomousSlalom(self.robot)  )
-        self.buttonRB.whenPressed( AutonomousBarrel(self.robot) )
+        self.buttonRB.whenPressed( AutonomousBounce(self.robot) )
         self.buttonBack.whenPressed( AutonomousRamsete(self.robot) )
         self.buttonStart.whenPressed(AutonomousVelocityPID(self.robot))
 
