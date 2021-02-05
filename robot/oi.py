@@ -12,7 +12,7 @@ from commands.autonomous_drive_timed import AutonomousDriveTimed
 from commands.autonomous_ramsete import AutonomousRamsete
 from commands.autonomous_home_slalom import AutonomousSlalom
 from commands.autonomous__home_barrel import AutonomousBarrel
-from commands.autonomous__home_bounce import AutonomousBounce
+from commands.autonomous_home_bounce import AutonomousBounce
 from commands.autonomous_drive_pid import AutonomousDrivePID
 from commands.autonomous_velocity_pid import AutonomousVelocityPID
 
