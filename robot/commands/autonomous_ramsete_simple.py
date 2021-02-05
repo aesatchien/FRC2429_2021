@@ -22,9 +22,11 @@ class AutonomousRamseteSimple(Command):
     kd_vel = 0
     velocity = drive_constants.k_max_speed_meters_per_second
     write_telemetry = False
+    time_offset = 0  # if we are stringing commands together, keep a running clock
+    telemetry = []
 
     def __init__(self, robot, path:str, relative=False, reset_telemetry=True, timeout=50):
-        Command.__init__(self, name='auto_ramsete_simple')
+        Command.__init__(self, name='aut_ram_simple')
         self.robot = robot
         self.requires(robot.drivetrain)
         self.setTimeout(timeout)
@@ -33,9 +35,8 @@ class AutonomousRamseteSimple(Command):
         self.previous_speeds = None
         self.use_PID = True
         self.counter = 0
-        self.telemetry = []
-        self.trajectory = None
 
+        self.trajectory = None
         self.relative = relative
         self.path = path
         self.reset_telemetry = reset_telemetry
@@ -51,6 +52,10 @@ class AutonomousRamseteSimple(Command):
         self.previous_time = -1
         if self.reset_telemetry:  # don't reset telemetry if we want to chain trajectories together
             self.telemetry = []
+            self.time_offset = 0
+        else:
+            self.time_offset = SmartDashboard.getNumber('z_ram_time_offset', self.time_offset)
+
         self.init_time = round(Timer.getFPGATimestamp() - self.robot.enabled_time, 1)
 
         self.robot.drivetrain.drive.feed() # this initialization is taking some time now
@@ -94,7 +99,8 @@ class AutonomousRamseteSimple(Command):
                      f" (b={self.beta}, z={self.zeta}, kp_vel={self.kp_vel}) at {self.start_time} s **")
         SmartDashboard.putString("alert", f"** Started {self.getName()} at {self.start_time} s **")
 
-        print('Time\tTr Vel\tTr Rot\tlspd\trspd\tram ang\tram vx\tram vy\tlffw\trffw\tlpid\trpid')
+        if self.reset_telemetry:
+            print('Time\tTr Vel\tTr Rot\tlspd\trspd\tram ang\tram vx\tram vy\tlffw\trffw\tlpid\trpid')
 
     def execute(self) -> None:
 
@@ -136,7 +142,7 @@ class AutonomousRamseteSimple(Command):
         self.robot.drivetrain.drive.feed()  # should this be in tank drive?
 
         if self.counter % 5 == 0:  # ten times per second update the telemetry array
-            telemetry_data = {'TIME':current_time, 'RBT_X':pose.X(), 'RBT_Y':pose.Y(), 'RBT_TH':pose.rotation().radians(),
+            telemetry_data = {'TIME':current_time+self.time_offset, 'RBT_X':pose.X(), 'RBT_Y':pose.Y(), 'RBT_TH':pose.rotation().radians(),
                             'RBT_VEL':self.robot.drivetrain.get_average_encoder_rate(),
                             'RBT_RVEL':self.robot.drivetrain.r_encoder.getRate(), 'RBT_LVEL':self.robot.drivetrain.l_encoder.getRate(),
                             'TRAJ_X':sample.pose.X(), 'TRAJ_Y':sample.pose.Y(), 'TRAJ_TH':sample.pose.rotation().radians(), 'TRAJ_VEL':sample.velocity,
@@ -144,7 +150,7 @@ class AutonomousRamseteSimple(Command):
                             'RAM_OM':ramsete.omega, 'LFF':left_feed_forward, 'RFF':right_feed_forward, 'LPID': left_output_pid, 'RPID':right_output_pid}
             self.telemetry.append(telemetry_data)
         if self.counter % 50 == 0: # once per second send data to the console
-            out_string = f'{current_time:2.2f}\t{self.trajectory.sample(current_time).velocity:2.1f}\t{self.trajectory.sample(current_time).pose.rotation().radians():2.2f}\t'
+            out_string = f'{current_time+self.time_offset:2.2f}\t{self.trajectory.sample(current_time).velocity:2.1f}\t{self.trajectory.sample(current_time).pose.rotation().radians():2.2f}\t'
             out_string += f'{left_speed_setpoint:2.2f}\t{right_speed_setpoint:2.2f}\t{ramsete.omega:2.2f}\t{ramsete.vx:2.2f}\t{ramsete.vy:2.2f}\t'
             out_string += f'{left_feed_forward:2.2f}\t{right_feed_forward:2.2f}\t{left_output_pid:2.2f}\t{right_output_pid:2.2f}'
             print(out_string)
@@ -156,10 +162,13 @@ class AutonomousRamseteSimple(Command):
     def end(self, message='Ended'):
         """Called once after isFinished returns true"""
         end_time = round(Timer.getFPGATimestamp() - self.robot.enabled_time, 1)
-        print(f"** {message} {self.getName()} at {end_time} s after {round(end_time-self.start_time,1)} s **")
+        elapsed_time = end_time-self.start_time
+        print(f"** {message} {self.getName()} at {end_time} s after {round(elapsed_time,1)} s **")
         SmartDashboard.putString("alert", f"** Ended {self.getName()} at {end_time} s after {round(end_time-self.start_time,1)} s **")
         self.robot.drivetrain.stop()
-
+        # self.time_offset = elapsed_time  # maintain running time in string of commands - why doesn't this work?  should be global
+        SmartDashboard.putNumber('z_ram_time_offset', self.time_offset + elapsed_time) # temporary fix
+        # ToDo: update this so it only happens at the end of a list of commands.  May need a new variable.
         self.write_telemetry = SmartDashboard.getBoolean("ramsete_write", self.write_telemetry)
         if self.write_telemetry:
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
