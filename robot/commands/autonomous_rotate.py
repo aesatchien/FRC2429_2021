@@ -37,7 +37,7 @@ class AutonomousRotate(Command):
         SmartDashboard.putString("alert", f"** Started {self.getName()} with setpoint {self.setpoint} at {self.start_time} s **")
 
         if self.source == 'dashboard':
-            self.setpoint = SmartDashboard.getNumber('angle', 1)
+            self.setpoint = SmartDashboard.getNumber('z_angle', 1)
         # may want to break if no valid setpoint is passed
 
         self.start_angle = self.robot.drivetrain.navx.getAngle()

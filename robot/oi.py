@@ -89,8 +89,8 @@ class OI(object):
     def initialize_dashboard(self):
         # dummy setpoints to speed up testing from the dashboard
 
-        SmartDashboard.putNumber('distance', 2.0)
-        SmartDashboard.putNumber('angle', 60)
+        SmartDashboard.putNumber('z_distance', 2.0)
+        SmartDashboard.putNumber('z_angle', 60)
 
         self.drive_fwd_command =  AutonomousDriveTimed(self.robot, timeout=1)
         self.rotate_command = AutonomousRotate(self.robot, setpoint=45, timeout=3, source='dashboard')

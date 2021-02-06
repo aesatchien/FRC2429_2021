@@ -21,7 +21,7 @@ class AutonomousDrivePID(Command):
 
         # allow setpoint to be controlled by the dashboard
         if source == 'dashboard':
-            setpoint = SmartDashboard.getNumber('distance', 1)
+            setpoint = SmartDashboard.getNumber('z_distance', 1)
             self.k_dash = True
         else:
             if setpoint is None:
@@ -60,7 +60,7 @@ class AutonomousDrivePID(Command):
 
         # allow setpoint to be controlled by the dashboard
         if self.source == 'dashboard':
-            setpoint = SmartDashboard.getNumber('distance', 1)
+            setpoint = SmartDashboard.getNumber('z_distance', 1)
             self.setpoint_sign = math.copysign(1, setpoint)
             self.setpoint = (math.fabs(setpoint))  # correction for overshoot
 
