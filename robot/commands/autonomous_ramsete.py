@@ -73,9 +73,10 @@ class AutonomousRamsete(Command):
         #ToDo - make this selectable, probably from the dash, add the other trajectories (done)
         trajectory_choice = self.robot.oi.path_chooser.getSelected()  # get path from the GUI
         self.velocity = float(self.robot.oi.velocity_chooser.getSelected())  # get the velocity from the GUI
-        self.trajectory = drive_constants.generate_trajectory(trajectory_choice, self.velocity, save=False)
-        self.course = trajectory_choice
-        self.start_pose = geo.Pose2d(self.trajectory.sample(0).pose.X(),self.trajectory.sample(0).pose.Y(), self.robot.drivetrain.get_rotation2d())
+        if 'z_' not in trajectory_choice:  # let me try a few of the other methods if the path starts with z_
+            self.trajectory = drive_constants.generate_trajectory(trajectory_choice, self.velocity, save=False)
+            self.course = trajectory_choice
+            self.start_pose = geo.Pose2d(self.trajectory.sample(0).pose.X(),self.trajectory.sample(0).pose.Y(), self.robot.drivetrain.get_rotation2d())
         self.robot.drivetrain.drive.feed()  # this initialization is taking some time now
 
         # Note - we are setting to pose to have the robot physically in the start position - usually absolute matters
@@ -173,9 +174,9 @@ class AutonomousRamsete(Command):
                             'RAM_OM':ramsete.omega, 'LFF':left_feed_forward, 'RFF':right_feed_forward, 'LPID': left_output_pid, 'RPID':right_output_pid}
             self.telemetry.append(telemetry_data)
         if self.counter % 50 == 0: # once per second send data to the console
-            out_string = f'{current_time:2.2f}\t{self.trajectory.sample(current_time).velocity:2.1f}\t{self.trajectory.sample(current_time).pose.rotation().radians():2.2f}\t'
-            out_string += f'{left_speed_setpoint:2.2f}\t{right_speed_setpoint:2.2f}\t{ramsete.omega:2.2f}\t{ramsete.vx:2.2f}\t{ramsete.vy:2.2f}\t'
-            out_string += f'{left_feed_forward:2.2f}\t{right_feed_forward:2.2f}\t{left_output_pid:2.2f}\t{right_output_pid:2.2f}'
+            out_string = f'{current_time:4.2f}\t{self.trajectory.sample(current_time).velocity:4.1f}\t{self.trajectory.sample(current_time).pose.rotation().radians():4.2f}\t'
+            out_string += f'{left_speed_setpoint:4.2f}\t{right_speed_setpoint:4.2f}\t{ramsete.omega:4.2f}\t{ramsete.vx:4.2f}\t{ramsete.vy:4.2f}\t'
+            out_string += f'{left_feed_forward:4.2f}\t{right_feed_forward:4.2f}\t{left_output_pid:4.2f}\t{right_output_pid:4.2f}'
             print(out_string)
         self.counter += 1
 

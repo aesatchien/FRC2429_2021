@@ -84,14 +84,14 @@ def get_test_trajectory(velocity=k_max_speed_meters_per_second):
 # minimum slalom test - nice thing about having the points means you can change the speeds for the
 # trajectory config and then you can go faster and faster.  but it's better to use the pathweaver once you have the speeds you want
 def get_point_trajectory(velocity=k_max_speed_meters_per_second):
-    start_pose = geo.Pose2d(0, 0, geo.Rotation2d(0))
-    end_pose = geo.Pose2d(0, 1.7, geo.Rotation2d(3.14))
-    midpoints = [geo.Translation2d(0.32, 0.01), geo.Translation2d(1.25, 0.47), geo.Translation2d(2.16, 1.71),
-                    geo.Translation2d(4.74, 1.91), geo.Translation2d(5.74, 1.06), geo.Translation2d(6.06, 0.31),
-                    geo.Translation2d(7.41, 0.21), geo.Translation2d(7.52, 1.50), geo.Translation2d(6.97, 1.82),
-                    geo.Translation2d(6.10, 1.48), geo.Translation2d(5.87, 0.84), geo.Translation2d(5.30, 0.17),
-                    geo.Translation2d(3.77, -0.05), geo.Translation2d(1.81, 0.33), geo.Translation2d(1.12, 1.36),
-                     geo.Translation2d(-0.15, 1.76)]
+    start_pose = geo.Pose2d(1.1, 0.9, geo.Rotation2d(0))
+    end_pose = geo.Pose2d(1.1, 2.6, geo.Rotation2d(3.14))
+    midpoints = [geo.Translation2d(1.10, 0.91), geo.Translation2d(2.10, 1.37), geo.Translation2d(2.65, 2.61),
+                geo.Translation2d(3.21, 2.81), geo.Translation2d(3.77, 1.96), geo.Translation2d(5.72, 1.21),
+                geo.Translation2d(6.42, 1.11), geo.Translation2d(7.11, 2.40), geo.Translation2d(8.27, 2.72),
+                geo.Translation2d(8.67, 2.38), geo.Translation2d(8.36, 1.74), geo.Translation2d(7.48, 1.07),
+                geo.Translation2d(7.06, 0.85), geo.Translation2d(6.39, 1.23), geo.Translation2d(5.05, 2.26),
+                geo.Translation2d(3.26, 2.59), geo.Translation2d(2.65, 2.66)]
     slalom_point_trajectory = wpimath.trajectory.TrajectoryGenerator.generateTrajectory(start_pose, midpoints, end_pose, make_config(velocity))
     return slalom_point_trajectory
 
