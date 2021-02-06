@@ -2,7 +2,7 @@
 # ToDo: make sure velocity controllers are actually helping and optimize the B, Z and kp gains
 from wpilib.command import Command
 import wpilib.controller
-import wpimath.kinematics
+import wpilib
 from wpilib import Timer, SmartDashboard
 import wpimath.geometry as geo
 
@@ -22,11 +22,11 @@ class AutonomousRamseteSimple(Command):
     kd_vel = 0
     velocity = drive_constants.k_max_speed_meters_per_second
     write_telemetry = False
-    time_offset = 0  # if we are stringing commands together, keep a running clock
+    time_offset = [0]  # if we are stringing commands together, keep a running clock
     telemetry = []
 
     def __init__(self, robot, path:str, relative=False, reset_telemetry=True, timeout=50):
-        Command.__init__(self, name='aut_ram_simple')
+        Command.__init__(self, name='auto_rams_simple')
         self.robot = robot
         self.requires(robot.drivetrain)
         self.setTimeout(timeout)
@@ -50,11 +50,6 @@ class AutonomousRamseteSimple(Command):
         """Called just before this Command runs the first time."""
 
         self.previous_time = -1
-        if self.reset_telemetry:  # don't reset telemetry if we want to chain trajectories together
-            self.telemetry = []
-            self.time_offset = 0
-        else:
-            self.time_offset = SmartDashboard.getNumber('z_ram_time_offset', self.time_offset)
 
         self.init_time = round(Timer.getFPGATimestamp() - self.robot.enabled_time, 1)
 
@@ -99,8 +94,16 @@ class AutonomousRamseteSimple(Command):
                      f" (b={self.beta}, z={self.zeta}, kp_vel={self.kp_vel}) at {self.start_time} s **")
         SmartDashboard.putString("alert", f"** Started {self.getName()} at {self.start_time} s **")
 
-        if self.reset_telemetry:
+        if self.reset_telemetry:  # don't reset telemetry if we want to chain trajectories together
             print('Time\tTr Vel\tTr Rot\tlspd\trspd\tram ang\tram vx\tram vy\tlffw\trffw\tlpid\trpid')
+            # AutonomousRamseteSimple.telemetry = []  # something fundamental is wrong here - can't use self.telemetry = []
+            self.telemetry.clear()  # Aha.  important not to set it to a new value (=[]) , because then it makes an instance
+            self.time_offset.clear()   # again, don't assign a value to reset it,  this is clunky way to avoid saying AutonomousRamseteSimple.time_offset
+            self.time_offset.append(0)
+        else:
+            pass
+            # self.time_offset = SmartDashboard.getNumber('z_ram_time_offset', self.time_offset)
+            # print(f'Keeping old telemetry, length {len(self.telemetry)}')
 
     def execute(self) -> None:
 
@@ -142,7 +145,7 @@ class AutonomousRamseteSimple(Command):
         self.robot.drivetrain.drive.feed()  # should this be in tank drive?
 
         if self.counter % 5 == 0:  # ten times per second update the telemetry array
-            telemetry_data = {'TIME':current_time+self.time_offset, 'RBT_X':pose.X(), 'RBT_Y':pose.Y(), 'RBT_TH':pose.rotation().radians(),
+            telemetry_data = {'TIME':current_time+self.time_offset[-1], 'RBT_X':pose.X(), 'RBT_Y':pose.Y(), 'RBT_TH':pose.rotation().radians(),
                             'RBT_VEL':self.robot.drivetrain.get_average_encoder_rate(),
                             'RBT_RVEL':self.robot.drivetrain.r_encoder.getRate(), 'RBT_LVEL':self.robot.drivetrain.l_encoder.getRate(),
                             'TRAJ_X':sample.pose.X(), 'TRAJ_Y':sample.pose.Y(), 'TRAJ_TH':sample.pose.rotation().radians(), 'TRAJ_VEL':sample.velocity,
@@ -150,7 +153,7 @@ class AutonomousRamseteSimple(Command):
                             'RAM_OM':ramsete.omega, 'LFF':left_feed_forward, 'RFF':right_feed_forward, 'LPID': left_output_pid, 'RPID':right_output_pid}
             self.telemetry.append(telemetry_data)
         if self.counter % 50 == 0: # once per second send data to the console
-            out_string = f'{current_time+self.time_offset:2.2f}\t{self.trajectory.sample(current_time).velocity:2.1f}\t{self.trajectory.sample(current_time).pose.rotation().radians():2.2f}\t'
+            out_string = f'{current_time+self.time_offset[-1]:2.2f}\t{self.trajectory.sample(current_time).velocity:2.1f}\t{self.trajectory.sample(current_time).pose.rotation().radians():2.2f}\t'
             out_string += f'{left_speed_setpoint:2.2f}\t{right_speed_setpoint:2.2f}\t{ramsete.omega:2.2f}\t{ramsete.vx:2.2f}\t{ramsete.vy:2.2f}\t'
             out_string += f'{left_feed_forward:2.2f}\t{right_feed_forward:2.2f}\t{left_output_pid:2.2f}\t{right_output_pid:2.2f}'
             print(out_string)
@@ -162,12 +165,11 @@ class AutonomousRamseteSimple(Command):
     def end(self, message='Ended'):
         """Called once after isFinished returns true"""
         end_time = round(Timer.getFPGATimestamp() - self.robot.enabled_time, 1)
-        elapsed_time = end_time-self.start_time
+        elapsed_time = end_time-self.start_time + self.time_offset[-1]
         print(f"** {message} {self.getName()} at {end_time} s after {round(elapsed_time,1)} s **")
         SmartDashboard.putString("alert", f"** Ended {self.getName()} at {end_time} s after {round(end_time-self.start_time,1)} s **")
         self.robot.drivetrain.stop()
-        # self.time_offset = elapsed_time  # maintain running time in string of commands - why doesn't this work?  should be global
-        SmartDashboard.putNumber('z_ram_time_offset', self.time_offset + elapsed_time) # temporary fix
+        self.time_offset.append(self.time_offset[-1] + end_time-self.start_time)  # maintain running time in string of commands BUT don't reassign or it makes an instance
         # ToDo: update this so it only happens at the end of a list of commands.  May need a new variable.
         self.write_telemetry = SmartDashboard.getBoolean("ramsete_write", self.write_telemetry)
         if self.write_telemetry:
@@ -180,7 +182,7 @@ class AutonomousRamseteSimple(Command):
                 pickle.dump(out_dict, fp)
             print(f'*** Wrote ramsete command data to {file_name} ***')
         else:
-            print(f'*** Skipping saving of telemetry to disk ***')
+            print(f'*** Skipping saving of {len(self.telemetry)} telemetry points to disk  ***')
 
     def interrupted(self):
         self.end(message='Interrupted')

@@ -13,4 +13,3 @@ class AutonomousBounce(CommandGroup):
         self.addSequential(AutonomousRamseteSimple(robot, path='bounce_pw3', relative=False, reset_telemetry=False))  # third more forwards
         self.addSequential(AutonomousRamseteSimple(robot, path='bounce_pw4', relative=False, reset_telemetry=False))  # fourth move backwards
 
-

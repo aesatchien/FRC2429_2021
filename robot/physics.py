@@ -75,7 +75,7 @@ class PhysicsEngine:
         else: # at home autonomous challenge for 2021
             self.x_limit, self.y_limit = 9.114, 4.572  # meters for a 30x15' DO NOT INCLUDE BORDER.  To that with the imgui.ini.
                     # Set our position on the field
-            position = 'slalom'  # set this to put the robot on the field
+            position = 'bounce'  # set this to put the robot on the field
             if position == 'slalom':
                 self.x, self.y = 1.1, 0.68
             elif position  == 'barrel':
