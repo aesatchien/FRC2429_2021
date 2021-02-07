@@ -79,7 +79,10 @@ class AutonomousRamseteSimple(Command):
             self.start_pose = geo.Pose2d(self.trajectory.sample(0).pose.X(),self.trajectory.sample(0).pose.Y(),
                                          self.robot.drivetrain.get_rotation2d())
         else:
-            self.start_pose = self.robot.drivetrain.get_pose()
+            #self.start_pose = self.robot.drivetrain.get_pose()
+            field_x = SmartDashboard.getNumber('field_x', self.trajectory.sample(0).pose.X())
+            field_y = SmartDashboard.getNumber('field_y', self.trajectory.sample(0).pose.Y())
+            self.start_pose = geo.Pose2d(field_x, field_y, self.robot.drivetrain.get_rotation2d())
         self.robot.drivetrain.reset_odometry(self.start_pose)
 
         self.robot.drivetrain.drive.feed()  # this initialization is taking some time now
@@ -123,8 +126,15 @@ class AutonomousRamseteSimple(Command):
         right_speed_setpoint = target_wheel_speeds.right
 
         if self.use_PID:
+            v_limit = 10
             left_feed_forward = self.feed_forward.calculate(left_speed_setpoint, (left_speed_setpoint - self.previous_speeds.left)/dt)
+            left_feed_forward = v_limit if left_feed_forward > v_limit else left_feed_forward
+            left_feed_forward = -v_limit if left_feed_forward < -v_limit else left_feed_forward
+
             right_feed_forward = self.feed_forward.calculate(right_speed_setpoint, (right_speed_setpoint - self.previous_speeds.right)/dt)
+            right_feed_forward = v_limit if right_feed_forward > v_limit else right_feed_forward
+            right_feed_forward = -v_limit if right_feed_forward < -v_limit else right_feed_forward
+
             #ws_left, ws_right = self.robot.drivetrain.get_wheel_speeds().left, self.robot.drivetrain.get_wheel_speeds().right
             ws_left, ws_right = self.robot.drivetrain.l_encoder.getRate(), self.robot.drivetrain.r_encoder.getRate()
             left_output_pid = self.left_controller.calculate(ws_left, left_speed_setpoint)

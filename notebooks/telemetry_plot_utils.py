@@ -23,6 +23,8 @@ def get_data(file_name=None, x_offset=0, y_offset=0):
     #print(files)
     if file_name is None:  # get the latest file
         telemetry = load_file(files[-1])
+    elif type(file_name) == int:
+        telemetry = load_file(files[file_name])
     else:  # try and match the filename passed in
         matches = [file for file in files if file_name in file]
         telemetry = load_file(matches[-1])
@@ -165,6 +167,7 @@ def velocity_plot(df):
 
     ax.set_ylabel('velocity (m/s)', fontsize=14)
     ax2.set_ylabel('motor output (V)', fontsize=14)
+    ax2.set_ylim(-12,12)
     ax2.set_xlabel('time in command (s)', fontsize=14)
     ax.get_xaxis().set_visible(False)
 
