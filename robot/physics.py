@@ -75,7 +75,7 @@ class PhysicsEngine:
         else: # at home autonomous challenge for 2021
             self.x_limit, self.y_limit = 9.114, 4.572  # meters for a 30x15' DO NOT INCLUDE BORDER.  To that with the imgui.ini.
                     # Set our position on the field
-            position = 'bounce'  # set this to put the robot on the field
+            position = 'slalom'  # set this to put the robot on the field
             if position == 'slalom':
                 self.x, self.y = 1.1, 0.68
             elif position  == 'barrel':
@@ -103,7 +103,7 @@ class PhysicsEngine:
             110 * units.lbs,                    # robot mass
             drive_constants.k_gear_ratio,         # drivetrain gear ratio
             2,                                  # motors per side
-            27 * units.inch,                    # robot wheelbase
+            27 * units.inch,                    # robot wheelbase, 27 in = 0.69 meters
             27 * units.inch + bumper_width * 2, # robot width
             32 * units.inch + bumper_width * 2, # robot length
             8 * units.inch,                     # wheel diameter
@@ -129,7 +129,7 @@ class PhysicsEngine:
         pose = self.physics_controller.move_robot(transform)  # includes inertia
 
         # keep us on the simulated field - reverse the transform if we try to go out of bounds
-        sim_padding = 0.25  # let us go a bit outside but not get lost
+        sim_padding = 1 # 0.25  # let us go a bit outside but not get lost
         bad_move = False  # see if we are out of bounds or hitting a barrier
         if (pose.translation().x < -sim_padding or pose.translation().x > self.x_limit + sim_padding or
                 pose.translation().y < -sim_padding or pose.translation().y > self.y_limit + sim_padding):

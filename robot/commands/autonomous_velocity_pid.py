@@ -10,7 +10,7 @@ import subsystems.drive_constants as drive_constants
 
 class AutonomousVelocityPID(Command):
     """Testing the velocity controllers before constructing the ramsete command """
-    def __init__(self, robot, left_speed_setpoint=2.0, right_speed_setpoint=1.5, timeout=4):
+    def __init__(self, robot, left_speed_setpoint=3.0, right_speed_setpoint=3, timeout=11):
         Command.__init__(self, name='auto_velocity')
         self.robot = robot
         self.requires(robot.drivetrain)

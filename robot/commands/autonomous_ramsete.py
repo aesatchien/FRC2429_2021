@@ -70,13 +70,15 @@ class AutonomousRamsete(Command):
         self.right_controller.reset()
 
 
-        #ToDo - make this selectable, probably from the dash, add the other trajectories (done)
+        #ToDo - make this selectable, probably from the dash, add the other trajectories (done) - will have to fix for real robot
         trajectory_choice = self.robot.oi.path_chooser.getSelected()  # get path from the GUI
         self.velocity = float(self.robot.oi.velocity_chooser.getSelected())  # get the velocity from the GUI
         if 'z_' not in trajectory_choice:  # let me try a few of the other methods if the path starts with z_
             self.trajectory = drive_constants.generate_trajectory(trajectory_choice, self.velocity, save=False)
             self.course = trajectory_choice
-            self.start_pose = geo.Pose2d(self.trajectory.sample(0).pose.X(),self.trajectory.sample(0).pose.Y(), self.robot.drivetrain.get_rotation2d())
+            field_x = SmartDashboard.getNumber('field_x', self.trajectory.sample(0).pose.X())
+            field_y = SmartDashboard.getNumber('field_y', self.trajectory.sample(0).pose.Y())
+            self.start_pose = geo.Pose2d(field_x, field_y, self.robot.drivetrain.get_rotation2d())
         self.robot.drivetrain.drive.feed()  # this initialization is taking some time now
 
         # Note - we are setting to pose to have the robot physically in the start position - usually absolute matters

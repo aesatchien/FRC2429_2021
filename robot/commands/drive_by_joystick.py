@@ -14,7 +14,7 @@ class DriveByJoystick(Command):
     def initialize(self):
         """Called just before this Command runs the first time."""
         self.start_time = round(Timer.getFPGATimestamp() - self.robot.enabled_time, 1)
-        print("\n" + f"** Started {self.getName()} at {self.start_time} s **", flush=True)
+        # print("\n" + f"** Started {self.getName()} at {self.start_time} s **", flush=True)
 
     def execute(self):
         """Called repeatedly when this Command is scheduled to run"""
@@ -29,7 +29,7 @@ class DriveByJoystick(Command):
     def end(self, message='Ended'):
         """Called once after isFinished returns true"""
         self.robot.drivetrain.drive.arcadeDrive(0,0)
-        print(f"** {message} {self.getName()} at {round(Timer.getFPGATimestamp() - self.robot.enabled_time, 1)} s **", flush=True)
+        # print(f"** {message} {self.getName()} at {round(Timer.getFPGATimestamp() - self.robot.enabled_time, 1)} s **", flush=True)
 
     def interrupted(self):
         """Called when another command which requires one or more of the same subsystems is scheduled to run."""

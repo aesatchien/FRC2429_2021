@@ -6,6 +6,11 @@ from wpilib import Timer
 from commandbased import CommandBasedRobot
 from wpilib.command import Scheduler
 from commands.autonomous_ramsete import AutonomousRamsete
+from commands.frc_characterication import FRCCharacterization
+
+# characterization stuff
+import math
+import networktables
 
 # 2429-specific imports - need to import every subsystem you instantiate
 from subsystems.drivetrain_sim import DriveTrainSim
@@ -14,6 +19,14 @@ from oi import OI
 
 class Robot(CommandBasedRobot):
     """Main robot class"""
+
+    # used for frc_characterization
+    entries = []   # data for the frc-configuration tool
+    counter = 0
+    autoSpeedEntry = networktables.NetworkTablesInstance.getDefault().getEntry("/robot/autospeed")
+    telemetryEntry = networktables.NetworkTablesInstance.getDefault().getEntry("/robot/telemetry")
+    rotateEntry = networktables.NetworkTablesInstance.getDefault().getEntry("/robot/rotate")
+    characterize = False
 
     def robotInit(self):
         """Robot-wide initialization code should go here"""
@@ -37,19 +50,18 @@ class Robot(CommandBasedRobot):
     def autonomousInit(self):
         """Called when autonomous mode is enabled"""
         self.enabled_time = Timer.getFPGATimestamp()
-        self.autonomousCommand = AutonomousRamsete(self)
-        self.autonomousCommand.start()
+        if self.characterize:
+            self.init_characterization()
+        else:
+            self.autonomousCommand = FRCCharacterization(self, button=self.oi.buttonA, timeout=60)
+            self.autonomousCommand = AutonomousRamsete(self)
+            self.autonomousCommand.start()
 
     def autonomousPeriodic(self):
-        Scheduler.getInstance().run()
-
-        '''        elapsed_time = Timer.getFPGATimestamp() - self.enabled_time
-        if elapsed_time < 2.0:
-            self.drivetrain.drive.arcadeDrive(1.0, -0.3)
-        elif elapsed_time < 4.0:
-            self.drivetrain.drive.arcadeDrive(1.0, 0.9)
+        if self.characterize:
+            self.update_characterization()
         else:
-            self.drivetrain.drive.arcadeDrive(0, 0)'''
+            Scheduler.getInstance().run()
 
     def teleopInit(self):
         """Called when teleop mode is enabled"""
@@ -67,6 +79,8 @@ class Robot(CommandBasedRobot):
 
     def disabledInit(self):
         self.reset()
+        if self.characterize:
+            self.clear_characterization()
 
     def disabledPeriodic(self):
         """This function is called periodically while disabled."""
@@ -78,6 +92,47 @@ class Robot(CommandBasedRobot):
 
     def reset(self):
         pass
+
+    # items for frc-characterization tool
+
+    def init_characterization(self):
+        self.prior_autospeed = 0
+        self.data = ''
+        networktables.NetworkTablesInstance.getDefault().setUpdateRate(0.010)
+        self.counter = 0
+
+    def update_characterization(self):
+        now = Timer.getFPGATimestamp()
+        left_position = self.drivetrain.l_encoder.getDistance()
+        left_rate = self.drivetrain.l_encoder.getRate()
+        right_position = self.drivetrain.r_encoder.getDistance()
+        right_rate = self.drivetrain.r_encoder.getRate()
+        battery = 11
+        motor_volts = battery * math.fabs(self.prior_autospeed)
+        left_motor_volts = motor_volts
+        right_motor_volts = motor_volts
+        autospeed = self.autoSpeedEntry.getDouble(0)
+        self.prior_autospeed = autospeed
+
+        factor = -1.0 if self.rotateEntry.getBoolean(False) else 1.0
+        self.drivetrain.tank_drive_volts(12 * factor * autospeed, - 12 * autospeed)
+        self.drivetrain.drive.feed()
+
+        vals = [now, battery, autospeed, left_motor_volts, right_motor_volts, left_position, right_position, left_rate,
+                right_rate, self.drivetrain.navx.getRotation2d().radians()]
+        for i in vals:
+            self.entries.append(i)
+        self.counter += 1
+
+    def clear_characterization(self):
+        elapsed_time = Timer.getFPGATimestamp() - self.enabled_time
+        self.drivetrain.tank_drive_volts(0, 0)
+        self.data = str(self.entries)
+        self.data = self.data[1:-2] + ', '
+        self.telemetryEntry.setString(self.data)
+        self.entries.clear()
+        print(f'** collected {self.counter} data points in {elapsed_time} s **')
+        self.data = ''
 
 if __name__ == "__main__":
     wpilib.run(Robot)

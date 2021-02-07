@@ -15,6 +15,7 @@ from commands.autonomous__home_barrel import AutonomousBarrel
 from commands.autonomous_home_bounce import AutonomousBounce
 from commands.autonomous_drive_pid import AutonomousDrivePID
 from commands.autonomous_velocity_pid import AutonomousVelocityPID
+from commands.frc_characterication import FRCCharacterization
 
 import subsystems.drive_constants as drive_constants
 
@@ -41,6 +42,7 @@ class OI(object):
 
         # also bound to asdf on the 2021 keyboard
         self.buttonA.whenPressed( AutonomousDriveTimed(self.robot, timeout=1.5) )
+        self.buttonA.whenPressed(FRCCharacterization(self.robot, timeout=60, button=self.buttonA))
         self.buttonB.whenPressed( AutonomousRotate(self.robot, setpoint=60, timeout=4, source='dashboard') )
         self.buttonX.whenPressed( AutonomousRotate(self.robot, setpoint=-60, timeout=4, source='dashboard', absolute=True) )
         self.buttonY.whenPressed( AutonomousDrivePID(self.robot, setpoint=2, timeout=4, source='dashboard') )
@@ -130,7 +132,7 @@ class OI(object):
         wpilib.SmartDashboard.putData('path velocity', self.velocity_chooser)
         velocities = [0.5, 0.75, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5]
         for ix, position in enumerate(velocities):
-            if ix == 2: # 1.5 will be the default
+            if ix == 3: # 1.5 will be the default
                 self.velocity_chooser.setDefaultOption(str(position), position)
             else:
                 self.velocity_chooser.addOption(str(position), position)
