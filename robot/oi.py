@@ -121,7 +121,7 @@ class OI(object):
         #           'slalom_pw2_1.25', 'slalom_pw1_1.80', 'barrel_pw1_0.75', 'barrel_pw1_1.25', 'bounce_pw1_0.75', 'bounce_pw1_1.25', 'student_pw0_0p75',
         #           'student_pw1_0p75','student_pw0_1p25', 'student_pw1_1p25']
         #choices = drive_constants.get_pathweaver_files() + ['z_loop', 'z_poses', 'z_points', 'z_test']
-        choices = drive_constants.get_pathweaver_paths() + ['z_loop', 'z_poses', 'z_points', 'z_test']
+        choices = drive_constants.get_pathweaver_paths(simulation=self.robot.isSimulation()) + ['z_loop', 'z_poses', 'z_points', 'z_test']
         for ix, position in enumerate(choices):
             if ix == 0:
                 self.path_chooser.setDefaultOption(position, position)
