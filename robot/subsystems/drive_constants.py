@@ -165,14 +165,15 @@ def get_pathweaver_files():
     file_names = [Path(file).name[:-12] + '_' + Path(file).parent.parent.name for file in path_files]
     return file_names
 
-def get_pathweaver_paths():  # use this to fill the drop down for file selection
-    path_files = glob.glob('pathweaver/paths/*', recursive=True)
-    print(f'** Pathwaver files: {path_files} **')
+def get_pathweaver_paths(simulation=True):  # use this to fill the drop down for file selection
+    location = 'pathweaver/paths/*' if simulation else '/home/lvuser/py/pathweaver/paths/*'
+    path_files = glob.glob(location, recursive=True)
+    print(f'** Pathweaver files: {path_files} **')
     path_names = [Path(file).name for file in path_files]
     return path_names
 
 
-def generate_trajectory(path_name:str, velocity=k_max_speed_meters_per_second, save=False) -> object:
+def generate_trajectory(path_name:str, velocity=k_max_speed_meters_per_second, simulation=True, save=False) -> object:
     """
     Generate a wpilib trajectory from a pathweaver path.  Accepts regular and reversed paths.
 
@@ -182,6 +183,7 @@ def generate_trajectory(path_name:str, velocity=k_max_speed_meters_per_second, s
     :return: generated trajectory
 
     """
+    location = 'pathweaver/paths/' if simulation else '/home/lvuser/py/pathweaver/paths/'
     pathweaver_y_offfset = 4.572
     p = Path('pathweaver/paths/' + path_name)
     if p.is_file():

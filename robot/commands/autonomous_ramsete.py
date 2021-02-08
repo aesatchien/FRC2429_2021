@@ -74,7 +74,7 @@ class AutonomousRamsete(Command):
         trajectory_choice = self.robot.oi.path_chooser.getSelected()  # get path from the GUI
         self.velocity = float(self.robot.oi.velocity_chooser.getSelected())  # get the velocity from the GUI
         if 'z_' not in trajectory_choice:  # let me try a few of the other methods if the path starts with z_
-            self.trajectory = drive_constants.generate_trajectory(trajectory_choice, self.velocity, save=False)
+            self.trajectory = drive_constants.generate_trajectory(trajectory_choice, self.velocity, simulation=self.robot.isSimulation(), save=False)
             self.course = trajectory_choice
             field_x = SmartDashboard.getNumber('field_x', self.trajectory.sample(0).pose.X())
             field_y = SmartDashboard.getNumber('field_y', self.trajectory.sample(0).pose.Y())

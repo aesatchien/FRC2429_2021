@@ -72,7 +72,7 @@ class AutonomousRamseteSimple(Command):
         #ToDo - make this selectable, probably from the dash, add the other trajectories (done)
         trajectory_choice = self.path  # path is passed in on constructor this time
         self.velocity = float(self.robot.oi.velocity_chooser.getSelected())  # get the velocity from the GUI
-        self.trajectory = drive_constants.generate_trajectory(trajectory_choice, self.velocity, save=False)
+        self.trajectory = drive_constants.generate_trajectory(trajectory_choice, self.velocity, simulation=self.robot.isSimulation(), save=False)
         self.course = trajectory_choice
         # Note - we are setting to pose to have the robot physically in the start position - usually absolute matters
         if self.relative:  # figure out if we want to start where we are or where the trajectory says we should be
