@@ -167,6 +167,7 @@ def get_pathweaver_files():
 
 def get_pathweaver_paths():  # use this to fill the drop down for file selection
     path_files = glob.glob('pathweaver/paths/*', recursive=True)
+    print(f'** Pathwaver files: {path_files} **')
     path_names = [Path(file).name for file in path_files]
     return path_names
 

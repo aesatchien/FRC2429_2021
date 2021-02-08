@@ -33,7 +33,7 @@ class Robot(CommandBasedRobot):
         super().__init__()
 
         if self.isReal():  # use the real drive train
-            from subsystems.drivetrain_transition import DriveTrain  # now nobody needs to install actual hardware libs
+            from subsystems.drivetrain import DriveTrain  # now nobody needs to install actual hardware libs
             self.drivetrain = DriveTrain(self)
         else:  # use the simulated drive train
             self.drivetrain = DriveTrainSim(self)

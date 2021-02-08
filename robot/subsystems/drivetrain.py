@@ -18,6 +18,7 @@ class DriveTrain(Subsystem):
         self.robot = robot
         self.counter = 0  # used for updating the log
         self.x, self.y = 0, 0
+        self.error_dict = {}
 
         # initialize sensors
         self.navx = navx.AHRS.create_spi()
