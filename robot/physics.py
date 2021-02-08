@@ -129,7 +129,7 @@ class PhysicsEngine:
         pose = self.physics_controller.move_robot(transform)  # includes inertia
 
         # keep us on the simulated field - reverse the transform if we try to go out of bounds
-        sim_padding = 0.25 # 0.25  # let us go a bit outside but not get lost
+        sim_padding = 10.25 # 0.25  # let us go a bit outside but not get lost
         bad_move = False  # see if we are out of bounds or hitting a barrier
         if (pose.translation().x < -sim_padding or pose.translation().x > self.x_limit + sim_padding or
                 pose.translation().y < -sim_padding or pose.translation().y > self.y_limit + sim_padding):

@@ -26,14 +26,14 @@ class Robot(CommandBasedRobot):
     autoSpeedEntry = networktables.NetworkTablesInstance.getDefault().getEntry("/robot/autospeed")
     telemetryEntry = networktables.NetworkTablesInstance.getDefault().getEntry("/robot/telemetry")
     rotateEntry = networktables.NetworkTablesInstance.getDefault().getEntry("/robot/rotate")
-    characterize = False
+    characterize = True
 
     def robotInit(self):
         """Robot-wide initialization code should go here"""
         super().__init__()
 
         if self.isReal():  # use the real drive train
-            from subsystems.drivetrain import DriveTrain  # now nobody needs to install actual hardware libs
+            from subsystems.drivetrain_transition import DriveTrain  # now nobody needs to install actual hardware libs
             self.drivetrain = DriveTrain(self)
         else:  # use the simulated drive train
             self.drivetrain = DriveTrainSim(self)
@@ -93,8 +93,7 @@ class Robot(CommandBasedRobot):
     def reset(self):
         pass
 
-    # items for frc-characterization tool
-
+    # ---------------   FRC-CHARACTERIZATION TOOL FUNCTIONS  --------------------
     def init_characterization(self):
         self.prior_autospeed = 0
         self.data = ''
@@ -115,7 +114,7 @@ class Robot(CommandBasedRobot):
         self.prior_autospeed = autospeed
 
         factor = -1.0 if self.rotateEntry.getBoolean(False) else 1.0
-        self.drivetrain.tank_drive_volts(12 * factor * autospeed, - 12 * autospeed)
+        self.drivetrain.drive.tankDrive(factor * autospeed, autospeed, False)
         self.drivetrain.drive.feed()
 
         vals = [now, battery, autospeed, left_motor_volts, right_motor_volts, left_position, right_position, left_rate,

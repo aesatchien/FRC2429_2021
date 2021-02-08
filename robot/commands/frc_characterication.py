@@ -6,6 +6,8 @@ import networktables
 class FRCCharacterization(Command):
     """
     Interact with the frc-characterization tool provided by wpilib.  This is almost all pre-determined.
+    Can't actually get this to work since the tool is looking for autonomous and disables settings.  Not sure if i can
+    trick it at some point to pull all this out of the main robot.py file.
     """
 
     entries = []   # data for the frc-configuration tool
@@ -49,7 +51,7 @@ class FRCCharacterization(Command):
         self.prior_autospeed = autospeed
 
         factor = -1.0 if self.rotateEntry.getBoolean(False) else 1.0
-        self.robot.drivetrain.tank_drive_volts(12 * factor * autospeed, - 12 * autospeed)
+        self.robot.drivetrain.tank_drive_volts(factor * autospeed, -1 * autospeed)
         self.robot.drivetrain.drive.feed()
 
         vals = [now, battery, autospeed, left_motor_volts, right_motor_volts, left_position, right_position, left_rate,
