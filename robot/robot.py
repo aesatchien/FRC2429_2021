@@ -26,7 +26,7 @@ class Robot(CommandBasedRobot):
     autoSpeedEntry = networktables.NetworkTablesInstance.getDefault().getEntry("/robot/autospeed")
     telemetryEntry = networktables.NetworkTablesInstance.getDefault().getEntry("/robot/telemetry")
     rotateEntry = networktables.NetworkTablesInstance.getDefault().getEntry("/robot/rotate")
-    characterize = True
+    characterize = False
 
     def robotInit(self):
         """Robot-wide initialization code should go here"""
@@ -53,7 +53,7 @@ class Robot(CommandBasedRobot):
         if self.characterize:
             self.init_characterization()
         else:
-            self.autonomousCommand = FRCCharacterization(self, button=self.oi.buttonA, timeout=60)
+            #self.autonomousCommand = FRCCharacterization(self, button=self.oi.buttonA, timeout=60)
             self.autonomousCommand = AutonomousRamsete(self)
             self.autonomousCommand.start()
 

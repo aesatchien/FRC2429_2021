@@ -168,7 +168,7 @@ def get_pathweaver_files():
 def get_pathweaver_paths(simulation=True):  # use this to fill the drop down for file selection
     location = 'pathweaver/paths/*' if simulation else '/home/lvuser/py/pathweaver/paths/*'
     path_files = glob.glob(location, recursive=True)
-    print(f'** Pathweaver files: {path_files} **')
+    #print(f'** Pathweaver files: {path_files} **')
     path_names = [Path(file).name for file in path_files]
     return path_names
 
