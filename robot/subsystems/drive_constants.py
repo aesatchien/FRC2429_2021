@@ -54,15 +54,13 @@ ramsete_B = 2  # default 2.  like a proportional, higher is more aggressive
 ramsete_Zeta = 0.9  #  default 0.7.  like a damping term, needs to be between 0 and 1
 
 
-# --------------  DRIVETRAIN OBJECTS FOR TRAJECTORy TRACKING  -------------
+# --------------  DRIVETRAIN OBJECTS FOR TRAJECTORY TRACKING  -------------
 
 # Create a voltage constraint to ensure we don't accelerate too fast
 feed_forward = wpilib.controller.SimpleMotorFeedforwardMeters(ks_volts, kv_volt_seconds_per_meter, ka_volt_seconds_squared_per_meter)
 autonomous_voltage_constraint = DifferentialDriveVoltageConstraint(feed_forward, drive_kinematics, 10)
 
 # Create config for trajectories
-
-
 config = wpimath.trajectory.TrajectoryConfig(k_max_speed_meters_per_second, k_max_acceleration_meters_per_second_squared)
 config.setKinematics(drive_kinematics)
 config.addConstraint(autonomous_voltage_constraint)
@@ -76,7 +74,6 @@ def make_config(velocity=k_max_speed_meters_per_second):
 
 
 # --------------  SAMPLE TRAJECTORIES  -------------
-#ToDo - maybe make these functions return the start pose as well
 # example trajectory to test
 def get_test_trajectory(velocity=k_max_speed_meters_per_second):
     start_pose = geo.Pose2d(0, 0, geo.Rotation2d(0))
@@ -185,7 +182,7 @@ def generate_trajectory(path_name:str, velocity=k_max_speed_meters_per_second, s
     """
     location = 'pathweaver/paths/' if simulation else '/home/lvuser/py/pathweaver/paths/'
     pathweaver_y_offfset = 4.572
-    p = Path('pathweaver/paths/' + path_name)
+    p = Path(location + path_name)
     if p.is_file():
 
         # pandas approach - best not to put this on the robot

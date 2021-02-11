@@ -13,7 +13,7 @@ import networktables
 
 # 2429-specific imports - need to import every subsystem you instantiate
 from subsystems.drivetrain_sim import DriveTrainSim  # simulation only, no SparkMax devices
-from subsystems.drivetrain import DriveTrain  # uses SparkMax but still works with simulation
+from subsystems.drivetrain import DriveTrain  # uses SparkMax, trying to get to work with simulation
 
 from oi import OI
 
@@ -103,7 +103,7 @@ class Robot(CommandBasedRobot):
         left_rate = self.drivetrain.l_encoder.getRate()
         right_position = self.drivetrain.r_encoder.getDistance()
         right_rate = self.drivetrain.r_encoder.getRate()
-        battery = 11
+        battery = 11  #ToDo - get a real vs simulated value for this
         motor_volts = battery * math.fabs(self.prior_autospeed)
         left_motor_volts = motor_volts
         right_motor_volts = motor_volts
