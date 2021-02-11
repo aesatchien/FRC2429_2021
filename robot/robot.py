@@ -6,15 +6,15 @@ from wpilib import Timer
 from commandbased import CommandBasedRobot
 from wpilib.command import Scheduler
 from commands.autonomous_ramsete import AutonomousRamsete
-from commands.frc_characterication import FRCCharacterization
 
 # characterization stuff
 import math
 import networktables
 
 # 2429-specific imports - need to import every subsystem you instantiate
-from subsystems.drivetrain_sim import DriveTrainSim
-# ToDo: make a real drivetrain
+from subsystems.drivetrain_sim import DriveTrainSim  # simulation only, no SparkMax devices
+from subsystems.drivetrain import DriveTrain  # uses SparkMax but still works with simulation
+
 from oi import OI
 
 class Robot(CommandBasedRobot):
@@ -33,12 +33,9 @@ class Robot(CommandBasedRobot):
         super().__init__()
 
         if self.isReal():  # use the real drive train
-            from subsystems.drivetrain import DriveTrain  # now nobody needs to install actual hardware libs
             self.drivetrain = DriveTrain(self)
         else:  # use the simulated drive train
             self.drivetrain = DriveTrainSim(self)
-
-        #self.drivetrain = DriveTrainSim(self)  # delete this later, the if statement messes up the IDE searches
 
         # oi MUST be created after all other subsystems since it uses them
         self.oi = OI(self)

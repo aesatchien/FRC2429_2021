@@ -18,7 +18,9 @@ class DriveByJoystick(Command):
 
     def execute(self):
         """Called repeatedly when this Command is scheduled to run"""
-        self.robot.drivetrain.drive.arcadeDrive(-self.robot.oi.stick.getRawAxis(1), 0.75*self.robot.oi.stick.getRawAxis(4))
+        self.robot.drivetrain.arcade_drive(-self.robot.oi.stick.getRawAxis(1), 0.75*self.robot.oi.stick.getRawAxis(4))
+        #self.robot.drivetrain.tank_drive_volts(5,5)
+
 
     def isFinished(self):
         """Make this return true when this Command no longer needs to run execute()"""

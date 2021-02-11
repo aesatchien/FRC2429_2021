@@ -9,7 +9,7 @@ import wpimath.geometry as geo
 import subsystems.drive_constants as drive_constants
 from commands.drive_by_joystick import DriveByJoystick
 import navx
-
+import rev
 
 class DriveTrainSim(Subsystem):
     # ----------------- INITIALIZATION -----------------------
@@ -27,6 +27,16 @@ class DriveTrainSim(Subsystem):
         self.spark_neo_left_rear = wpilib.Jaguar(2)
         self.spark_neo_right_front = wpilib.Jaguar(3)
         self.spark_neo_right_rear = wpilib.Jaguar(4)
+
+        motor_type = rev.MotorType.kBrushless
+        self.spark_neo_right_front1 = rev.CANSparkMax(1, motor_type)
+        self.spark_neo_right_rear1 = rev.CANSparkMax(2, motor_type)
+        self.spark_neo_left_front1 = rev.CANSparkMax(3, motor_type)
+        self.spark_neo_left_rear1 = rev.CANSparkMax(4, motor_type)
+        self.sparkneo_encoder_1 = rev.CANSparkMax.getEncoder(self.spark_neo_left_front1)
+        self.sparkneo_encoder_2 = rev.CANSparkMax.getEncoder(self.spark_neo_left_rear1)
+        self.sparkneo_encoder_3 = rev.CANSparkMax.getEncoder(self.spark_neo_right_front1)
+        self.sparkneo_encoder_4 = rev.CANSparkMax.getEncoder(self.spark_neo_right_rear1)
 
         # create drivetrain from motors
         self.speedgroup_left = SpeedControllerGroup(self.spark_neo_left_front, self.spark_neo_left_rear)
@@ -63,11 +73,18 @@ class DriveTrainSim(Subsystem):
         return self.odometry.getPose()
 
     def get_wheel_speeds(self):
-        wpimath.kinematics.DifferentialDriveWheelSpeeds(self.l_encoder.getRate(), self.r_encoder.getRate())
+        return wpimath.kinematics.DifferentialDriveWheelSpeeds(self.l_encoder.getRate(), self.r_encoder.getRate())
 
     def reset_encoders(self):
         self.l_encoder.reset()
         self.r_encoder.reset()
+
+    def get_rate(self, encoder): # spark maxes and regular encoders use different calls... annoying
+        return encoder.getRate()
+    def get_position(self, encoder):
+        return encoder.getDistance()
+    def set_position(self, encoder, position):
+        encoder.setDistance(position)
 
     def reset_odometry(self, pose):
         self.reset_encoders()

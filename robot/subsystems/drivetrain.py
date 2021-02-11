@@ -1,4 +1,4 @@
-#drivetrain to use if we are in simulation mode
+# drivetrain to use both in sim and robot mode - sim handles the Sparkmax now
 
 import wpimath.kinematics
 import wpilib.drive
@@ -24,61 +24,51 @@ class DriveTrain(Subsystem):
         self.navx = navx.AHRS.create_spi()
 
         # initialize motors and encoders
-        if self.robot.isReal():
-            motor_type = rev.MotorType.kBrushless
-            self.spark_neo_right_front = rev.CANSparkMax(1, motor_type)
-            self.spark_neo_right_rear = rev.CANSparkMax(2, motor_type)
-            self.spark_neo_left_front = rev.CANSparkMax(3, motor_type)
-            self.spark_neo_left_rear = rev.CANSparkMax(4, motor_type)
-            self.controllers = [self.spark_neo_left_front, self.spark_neo_left_rear,
-                                self.spark_neo_right_front, self.spark_neo_right_rear]
-
-            self.spark_PID_controller_right_front = self.spark_neo_right_front.getPIDController()
-            self.spark_PID_controller_right_rear = self.spark_neo_right_rear.getPIDController()
-            self.spark_PID_controller_left_front = self.spark_neo_left_front.getPIDController()
-            self.spark_PID_controller_left_rear = self.spark_neo_left_rear.getPIDController()
-            self.pid_controllers = [self.spark_PID_controller_left_front, self.spark_PID_controller_left_rear,
-                                    self.spark_PID_controller_right_front, self.spark_PID_controller_right_rear]
-
-            # swap encoders to get sign right
-            # changing them up for mecanum vs WCD
-            self.sparkneo_encoder_1 = rev.CANSparkMax.getEncoder(self.spark_neo_left_front)
-            self.sparkneo_encoder_2 = rev.CANSparkMax.getEncoder(self.spark_neo_left_rear)
-            self.sparkneo_encoder_3 = rev.CANSparkMax.getEncoder(self.spark_neo_right_front)
-            self.sparkneo_encoder_4 = rev.CANSparkMax.getEncoder(self.spark_neo_right_rear)
-            self.encoders = [self.sparkneo_encoder_1, self.sparkneo_encoder_2, self.sparkneo_encoder_3, self.sparkneo_encoder_4]
-            # copy these so the sim and the real reference the same encoders
-            self.l_encoder = self.sparkneo_encoder_1
-            self.r_encoder = self.sparkneo_encoder_3
-            # Configure encoders and controllers
-            # should be wheel_diameter * pi / gear_ratio - and for the old double reduction gear box
-            # the gear ratio was 4.17:1.  With the shifter (low gear) I think it was a 12.26.
-            # the new 2020 gearbox is 9.52
-            gear_ratio = 9.52
-            #gear_ratio = 12.75
-            conversion_factor = 8.0 * 0.0254 * 3.1416 / gear_ratio  # do this in meters from now on
-            for ix, encoder in enumerate(self.encoders):
-                self.error_dict.update({'conv_'+ str(ix): encoder.setPositionConversionFactor(conversion_factor)})
-        else:
-            self.spark_neo_left_front = wpilib.Jaguar(1)
-            self.spark_neo_left_rear = wpilib.Jaguar(2)
-            self.spark_neo_right_front = wpilib.Jaguar(3)
-            self.spark_neo_right_rear = wpilib.Jaguar(4)
-
-            # initialize encoders - doing this after motors because they may be part of the motor controller
-            self.l_encoder = wpilib.Encoder(0, 1, True)
-            self.r_encoder = wpilib.Encoder(2, 3, True)
-            self.l_encoder.setDistancePerPulse(drive_constants.k_encoder_distance_per_pulse_m)
-            self.r_encoder.setDistancePerPulse(drive_constants.k_encoder_distance_per_pulse_m)
+        motor_type = rev.MotorType.kBrushless
+        self.spark_neo_right_front = rev.CANSparkMax(1, motor_type)
+        self.spark_neo_right_rear = rev.CANSparkMax(2, motor_type)
+        self.spark_neo_left_front = rev.CANSparkMax(3, motor_type)
+        self.spark_neo_left_rear = rev.CANSparkMax(4, motor_type)
+        self.controllers = [self.spark_neo_left_front, self.spark_neo_left_rear,
+                            self.spark_neo_right_front, self.spark_neo_right_rear]
 
 
-        # --------------  SAME FOR REAL AND SIMULATED ROBOTS  ---------------------
+        self.spark_PID_controller_right_front = self.spark_neo_right_front.getPIDController()
+        self.spark_PID_controller_right_rear = self.spark_neo_right_rear.getPIDController()
+        self.spark_PID_controller_left_front = self.spark_neo_left_front.getPIDController()
+        self.spark_PID_controller_left_rear = self.spark_neo_left_rear.getPIDController()
+        self.pid_controllers = [self.spark_PID_controller_left_front, self.spark_PID_controller_left_rear,
+                                self.spark_PID_controller_right_front, self.spark_PID_controller_right_rear]
+
+        # swap encoders to get sign right
+        # changing them up for mecanum vs WCD
+        self.sparkneo_encoder_1 = rev.CANSparkMax.getEncoder(self.spark_neo_left_front)
+        self.sparkneo_encoder_2 = rev.CANSparkMax.getEncoder(self.spark_neo_left_rear)
+        self.sparkneo_encoder_3 = rev.CANSparkMax.getEncoder(self.spark_neo_right_front)
+        self.sparkneo_encoder_4 = rev.CANSparkMax.getEncoder(self.spark_neo_right_rear)
+        self.encoders = [self.sparkneo_encoder_1, self.sparkneo_encoder_2, self.sparkneo_encoder_3, self.sparkneo_encoder_4]
+        # copy these so the sim and the real reference the same encoders
+        self.l_encoder = self.sparkneo_encoder_3
+        self.r_encoder = self.sparkneo_encoder_1
+        # Configure encoders and controllers
+        # should be wheel_diameter * pi / gear_ratio - and for the old double reduction gear box
+        # the gear ratio was 4.17:1.  With the shifter (low gear) I think it was a 12.26.
+        # the new 2020 gearbox is 9.52
+        gear_ratio = 9.52
+        #gear_ratio = 12.75
+        conversion_factor = 8.0 * 0.0254 * 3.1416 / gear_ratio  # do this in meters from now on
+        for ix, encoder in enumerate(self.encoders):
+            self.error_dict.update({'conv_'+ str(ix): encoder.setPositionConversionFactor(conversion_factor)})
+
         # create drivetrain from motors
         self.speedgroup_left = SpeedControllerGroup(self.spark_neo_left_front, self.spark_neo_left_rear)
         self.speedgroup_right = SpeedControllerGroup(self.spark_neo_right_front, self.spark_neo_right_rear)
         self.drive = wpilib.drive.DifferentialDrive(self.speedgroup_left, self.speedgroup_right)
         # self.drive = wpilib.drive.DifferentialDrive(self.spark_neo_left_front, self.spark_neo_right_front)
         self.drive.setMaxOutput(1.0)
+        self.drive.setSafetyEnabled(True)
+        self.drive.setExpiration(0.1)
+
 
         # odometry for tracking the robot pose
         self.odometry = wpimath.kinematics.DifferentialDriveOdometry(geo.Rotation2d.fromDegrees( -self.navx.getAngle() ))
@@ -90,7 +80,9 @@ class DriveTrain(Subsystem):
     # ----------------- DRIVE METHODS -----------------------
     def arcade_drive(self, thrust, twist):
         """ wrapper for the current drive mode, really should just be called drive or move """
-        self.drive.arcadeDrive(xSpeed=thrust, zRotation=twist, squareInputs=True)
+        #self.drive.arcadeDrive(xSpeed=thrust, zRotation=twist, squareInputs=True)
+        [controller.setVoltage(thrust) for controller in self.controllers]
+        self.drive.feed()
 
     def stop(self):
         """ stop the robot """
@@ -102,11 +94,18 @@ class DriveTrain(Subsystem):
         return self.odometry.getPose()
 
     def get_wheel_speeds(self):
-        wpimath.kinematics.DifferentialDriveWheelSpeeds(self.l_encoder.getRate(), self.r_encoder.getRate())
+        return wpimath.kinematics.DifferentialDriveWheelSpeeds(self.l_encoder.getVelocity(), self.r_encoder.getVelocity())
 
     def reset_encoders(self):
-        self.l_encoder.reset()
-        self.r_encoder.reset()
+        self.l_encoder.setPosition(0)
+        self.r_encoder.setPosition(0)
+
+    def get_rate(self, encoder): # spark maxes and regular encoders use different calls... annoying
+        return encoder.getVelocity()
+    def get_position(self, encoder):
+        return encoder.getPosition()
+    def set_position(self, encoder, position):
+        encoder.setPosition(position)
 
     def reset_odometry(self, pose):
         self.reset_encoders()
@@ -115,15 +114,16 @@ class DriveTrain(Subsystem):
     def tank_drive_volts(self, left_volts, right_volts):
         self.speedgroup_left.setVoltage(left_volts)
         self.speedgroup_right.setVoltage(right_volts)
+        self.drive.feed()
 
     def get_rotation2d(self):
         return geo.Rotation2d.fromDegrees(-self.navx.getAngle())
 
     def get_average_encoder_distance(self):
-        return (self.l_encoder.getDistance() + self.r_encoder.getDistance())/2
+        return (self.l_encoder.getPosition() + self.r_encoder.getPosition())/2
 
     def get_average_encoder_rate(self):
-        return (self.l_encoder.getRate() + self.r_encoder.getRate())/2
+        return (self.l_encoder.getVelocity() + self.r_encoder.getVelocity())/2
 
     def zero_heading(self):
         self.navx.reset()
@@ -132,7 +132,7 @@ class DriveTrain(Subsystem):
     def periodic(self) -> None:
         """Perform odometry and update dash with telemetry"""
         self.counter += 1
-        self.odometry.update(geo.Rotation2d.fromDegrees(-self.navx.getAngle()), self.l_encoder.getDistance(), self.r_encoder.getDistance())
+        self.odometry.update(geo.Rotation2d.fromDegrees(-self.navx.getAngle()), self.l_encoder.getPosition(), self.r_encoder.getPosition())
 
         if self.counter % 10 == 0:
             # start keeping track of where the robot is with an x and y position (only good for WCD)'

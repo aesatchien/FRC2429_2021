@@ -136,7 +136,7 @@ class AutonomousRamseteSimple(Command):
             right_feed_forward = -v_limit if right_feed_forward < -v_limit else right_feed_forward
 
             #ws_left, ws_right = self.robot.drivetrain.get_wheel_speeds().left, self.robot.drivetrain.get_wheel_speeds().right
-            ws_left, ws_right = self.robot.drivetrain.l_encoder.getRate(), self.robot.drivetrain.r_encoder.getRate()
+            ws_left, ws_right = self.robot.drivetrain.get_rate(self.robot.drivetrain.l_encoder), self.robot.drivetrain.get_rate(self.robot.drivetrain.r_encoder)
             left_output_pid = self.left_controller.calculate(ws_left, left_speed_setpoint)
             right_output_pid = self.right_controller.calculate(ws_right, right_speed_setpoint)
             # 100% sure that these signs are right - see plots.   Want minus the PID and plus the feedfwd
@@ -155,7 +155,7 @@ class AutonomousRamseteSimple(Command):
         if self.counter % 5 == 0:  # ten times per second update the telemetry array
             telemetry_data = {'TIME':current_time+self.time_offset, 'RBT_X':pose.X(), 'RBT_Y':pose.Y(), 'RBT_TH':pose.rotation().radians(),
                             'RBT_VEL':self.robot.drivetrain.get_average_encoder_rate(),
-                            'RBT_RVEL':self.robot.drivetrain.r_encoder.getRate(), 'RBT_LVEL':self.robot.drivetrain.l_encoder.getRate(),
+                            'RBT_RVEL':ws_right, 'RBT_LVEL':ws_left,
                             'TRAJ_X':sample.pose.X(), 'TRAJ_Y':sample.pose.Y(), 'TRAJ_TH':sample.pose.rotation().radians(), 'TRAJ_VEL':sample.velocity,
                             'RAM_VELX':ramsete.vx, 'RAM_LVEL_SP':left_speed_setpoint, 'RAM_RVEL_SP':right_speed_setpoint,
                             'RAM_OM':ramsete.omega, 'LFF':left_feed_forward, 'RFF':right_feed_forward, 'LPID': left_output_pid, 'RPID':right_output_pid}
