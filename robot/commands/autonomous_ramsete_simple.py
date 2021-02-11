@@ -2,7 +2,7 @@
 # ToDo: make sure velocity controllers are actually helping and optimize the B, Z and kp gains
 from wpilib.command import Command
 import wpilib.controller
-import wpilib
+import wpimath.kinematics
 from wpilib import Timer, SmartDashboard
 import wpimath.geometry as geo
 
@@ -89,7 +89,7 @@ class AutonomousRamseteSimple(Command):
 
         initial_state = self.trajectory.sample(0)
         # these are all meters in 2021
-        self.previous_speeds = self.kinematics.toWheelSpeeds(wpilib.kinematics.ChassisSpeeds(
+        self.previous_speeds = self.kinematics.toWheelSpeeds(wpimath.kinematics.ChassisSpeeds(
             initial_state.velocity, 0, initial_state.curvature*initial_state.velocity))
 
         self.start_time = round(Timer.getFPGATimestamp() - self.robot.enabled_time, 1)

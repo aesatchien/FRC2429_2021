@@ -118,7 +118,7 @@ class AutonomousRamsete(Command):
         self.robot.drivetrain.reset_odometry(self.start_pose)
         initial_state = self.trajectory.sample(0)
         # these are all meters in 2021
-        self.previous_speeds = self.kinematics.toWheelSpeeds(wpilib.kinematics.ChassisSpeeds(
+        self.previous_speeds = self.kinematics.toWheelSpeeds(wpimath.kinematics.ChassisSpeeds(
             initial_state.velocity, 0, initial_state.curvature*initial_state.velocity))
 
         self.start_time = round(Timer.getFPGATimestamp() - self.robot.enabled_time, 1)
