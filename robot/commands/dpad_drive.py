@@ -13,6 +13,8 @@ class DpadDrive(Command):
         self.requires(robot.drivetrain)
         self.robot = robot
         self.button = button
+        self.mode = None
+        self.scale = 0.3
 
     def initialize(self):
         """Called just before this Command runs the first time."""
@@ -28,14 +30,15 @@ class DpadDrive(Command):
         """
         # easy to correct for heading drift - we know we're trying to drive straight if we keep previous angle heading ...
         angle = self.button.angle() * math.pi / 180.
-        thrust, twist = math.cos(angle), 0.75*math.sin(angle)
+        thrust, twist = self.scale*math.cos(angle), self.scale*0.75*math.sin(angle)
 
 
         if self.robot.isReal():
             if self.mode == 'velocity':
                 self.robot.drivetrain.mecanum_velocity_cartesian(thrust=thrust, strafe=0, z_rotation=twist)
             else:
-                self.robot.drivetrain.smooth_drive(thrust=thrust, strafe=0, twist=twist)
+                #self.robot.drivetrain.smooth_drive(thrust=thrust, strafe=0, twist=twist)
+                self.robot.drivetrain.arcade_drive(thrust=thrust, twist=twist)
         else:
             # simulation
             self.robot.drivetrain.arcade_drive(thrust, twist)
@@ -47,7 +50,7 @@ class DpadDrive(Command):
     def end(self, message='Ended'):
         """Called once after isFinished returns true"""
         self.robot.drivetrain.stop()
-        print(f"** {message} {self.getName()} at {round(Timer.getFPGATimestamp() - self.robot.enabled_time, 1)} s **")
+        print(f"** {message} {self.getName()} at {round(Timer.getFPGATimestamp() - self.start_time, 1)} s **")
     def interrupted(self):
         """Called when another command which requires one or more of the same subsystems is scheduled to run."""
         self.end(message='Interrupted')
