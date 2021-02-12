@@ -80,9 +80,9 @@ class DriveTrain(Subsystem):
     # ----------------- DRIVE METHODS -----------------------
     def arcade_drive(self, thrust, twist):
         """ wrapper for the current drive mode, really should just be called drive or move """
-        #self.drive.arcadeDrive(xSpeed=thrust, zRotation=twist, squareInputs=True)
-        [controller.setVoltage(thrust) for controller in self.controllers]
-        self.drive.feed()
+        self.drive.arcadeDrive(xSpeed=thrust, zRotation=twist, squareInputs=True)
+        #[controller.setVoltage(thrust) for controller in self.controllers]
+        #self.drive.feed()
 
     def stop(self):
         """ stop the robot """
