@@ -142,5 +142,7 @@ class DriveTrain(Subsystem):
         if self.counter % 100 == 0:
             pass
             # self.display_PIDs()
-            # SmartDashboard.putString("alert", f"Position: ({round(self.x, 1)},{round(self.y, 1)})  Time: {round(Timer.getFPGATimestamp() - self.robot.enabled_time, 1)}")
+            msg = f"Positions: ({self.l_encoder.getPosition():2.1f},{self.r_encoder.getPosition():2.1f})"
+            msg = msg + f" Rates: ({self.l_encoder.getVelocity():2.1f},{self.r_encoder.getVelocity():2.1f})  Time: {Timer.getFPGATimestamp() - self.robot.enabled_time:2.1f}"
+            SmartDashboard.putString("alert", msg)
             # print(self.get_wheel_speeds(), self.l_encoder.getRate(), self.r_encoder.getRate())

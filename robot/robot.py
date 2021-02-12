@@ -63,6 +63,7 @@ class Robot(CommandBasedRobot):
     def teleopInit(self):
         """Called when teleop mode is enabled"""
         self.enabled_time = Timer.getFPGATimestamp()
+        self.reset()
         if self.autonomousCommand is not None:
             self.autonomousCommand.cancel()
 
@@ -88,7 +89,7 @@ class Robot(CommandBasedRobot):
         pass
 
     def reset(self):
-        pass
+        self.drivetrain.reset_encoders()
 
     # ---------------   FRC-CHARACTERIZATION TOOL FUNCTIONS  --------------------
     def init_characterization(self):
