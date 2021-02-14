@@ -54,11 +54,16 @@ class DriveTrain(Subsystem):
         # should be wheel_diameter * pi / gear_ratio - and for the old double reduction gear box
         # the gear ratio was 4.17:1.  With the shifter (low gear) I think it was a 12.26.
         # the new 2020 gearbox is 9.52
-        gear_ratio = 9.52
+        gear_ratio = 4.17  # pretty fast
         #gear_ratio = 12.75
         conversion_factor = 8.0 * 0.0254 * 3.1416 / gear_ratio  # do this in meters from now on
-        for ix, encoder in enumerate(self.encoders):
-            self.error_dict.update({'conv_'+ str(ix): encoder.setPositionConversionFactor(conversion_factor)})
+        for ix, encoder in enumerate(self.encoders): 
+            self.error_dict.update({'conv_pos_'+ str(ix): encoder.setPositionConversionFactor(conversion_factor)})
+            self.error_dict.update({'conv_vel_' + str(ix): encoder.setVelocityConversionFactor(conversion_factor/60.0)})  # native is rpm
+        burn_flash = False
+        if burn_flash:
+            for ix, controller in enumerate(self.controllers):
+                self.error_dict.update({'burn_'+ str(ix): controller.burnFlash()})
 
         # create drivetrain from motors
         self.speedgroup_left = SpeedControllerGroup(self.spark_neo_left_front, self.spark_neo_left_rear)
@@ -142,7 +147,7 @@ class DriveTrain(Subsystem):
         if self.counter % 100 == 0:
             pass
             # self.display_PIDs()
-            msg = f"Positions: ({self.l_encoder.getPosition():2.1f},{self.r_encoder.getPosition():2.1f})"
-            msg = msg + f" Rates: ({self.l_encoder.getVelocity():2.1f},{self.r_encoder.getVelocity():2.1f})  Time: {Timer.getFPGATimestamp() - self.robot.enabled_time:2.1f}"
+            msg = f"Positions: ({self.l_encoder.getPosition():2.2f}, {self.r_encoder.getPosition():2.12})"
+            msg = msg + f" Rates: ({self.l_encoder.getVelocity():2.2f}, {self.r_encoder.getVelocity():2.2f})  Time: {Timer.getFPGATimestamp() - self.robot.enabled_time:2.1f}"
             SmartDashboard.putString("alert", msg)
             # print(self.get_wheel_speeds(), self.l_encoder.getRate(), self.r_encoder.getRate())

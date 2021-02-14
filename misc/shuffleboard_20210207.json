@@ -304,14 +304,27 @@
               "Layout/Label position": "BOTTOM",
               "_children": []
             }
+          },
+          "10,0": {
+            "size": [
+              2,
+              4
+            ],
+            "content": {
+              "_type": "Subsystem Layout",
+              "_source0": "network_table:///LiveWindow/drivetrain",
+              "_title": "drivetrain",
+              "Layout/Label position": "BOTTOM",
+              "_children": []
+            }
           }
         }
       }
     }
   ],
   "windowGeometry": {
-    "x": 312.0,
-    "y": 206.0,
+    "x": 424.0,
+    "y": 48.0,
     "width": 1398.0,
     "height": 789.0
   }
