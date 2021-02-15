@@ -27,7 +27,7 @@ class PhysicsEngine:
         realistic, but it's good enough to illustrate the point
     """
 
-    sparkmax = True
+    sparkmax = False
 
     def __init__(self, physics_controller: PhysicsInterface):
 
