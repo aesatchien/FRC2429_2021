@@ -54,7 +54,7 @@ class DriveTrain(Subsystem):
         # should be wheel_diameter * pi / gear_ratio - and for the old double reduction gear box
         # the gear ratio was 4.17:1.  With the shifter (low gear) I think it was a 12.26.
         # the new 2020 gearbox is 9.52
-        gear_ratio = 4.17  # pretty fast
+        gear_ratio = 4.17  # pretty fast WCD gearbox
         #gear_ratio = 12.75
         conversion_factor = 8.0 * 0.0254 * 3.1416 / gear_ratio  # do this in meters from now on
         for ix, encoder in enumerate(self.encoders): 

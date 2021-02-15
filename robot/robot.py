@@ -35,7 +35,7 @@ class Robot(CommandBasedRobot):
         if self.isReal():  # use the real drive train
             self.drivetrain = DriveTrain(self)
         else:  # use the simulated drive train
-            self.drivetrain = DriveTrain(self)
+            self.drivetrain = DriveTrainSim(self)
 
         # oi MUST be created after all other subsystems since it uses them
         self.oi = OI(self)
