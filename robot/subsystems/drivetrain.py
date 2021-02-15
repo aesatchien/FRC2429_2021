@@ -60,6 +60,11 @@ class DriveTrain(Subsystem):
         for ix, encoder in enumerate(self.encoders):
             self.error_dict.update({'conv_'+ str(ix): encoder.setPositionConversionFactor(conversion_factor)})
 
+        # TODO - figure out if I want to invert the motors or the encoders
+        #inverted = False  # needs this to be True for the toughbox
+        #self.spark_neo_left_front.setInverted(inverted)  # inverting a controller
+        #self.sparkneo_encoder_3.setInverted(True)  # inverting an encoder
+
         # create drivetrain from motors
         self.speedgroup_left = SpeedControllerGroup(self.spark_neo_left_front, self.spark_neo_left_rear)
         self.speedgroup_right = SpeedControllerGroup(self.spark_neo_right_front, self.spark_neo_right_rear)
@@ -145,4 +150,5 @@ class DriveTrain(Subsystem):
             msg = f"Positions: ({self.l_encoder.getPosition():2.1f},{self.r_encoder.getPosition():2.1f})"
             msg = msg + f" Rates: ({self.l_encoder.getVelocity():2.1f},{self.r_encoder.getVelocity():2.1f})  Time: {Timer.getFPGATimestamp() - self.robot.enabled_time:2.1f}"
             SmartDashboard.putString("alert", msg)
+            SmartDashboard.putString("sparks", str(self.error_dict))
             # print(self.get_wheel_speeds(), self.l_encoder.getRate(), self.r_encoder.getRate())
