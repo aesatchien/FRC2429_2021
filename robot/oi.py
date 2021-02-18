@@ -16,6 +16,9 @@ from commands.autonomous_home_bounce import AutonomousBounce
 from commands.autonomous_drive_pid import AutonomousDrivePID
 from commands.autonomous_velocity_pid import AutonomousVelocityPID
 from commands.frc_characterication import FRCCharacterization
+from commands.shooter_enable import ShooterEnable
+from commands.shooter_adjust import ShooterAdjust
+from commands.shooter_shoot import ShooterShoot
 
 import subsystems.drive_constants as drive_constants
 
@@ -42,16 +45,18 @@ class OI(object):
 
         # also bound to asdf on the 2021 keyboard
         self.buttonA.whenPressed( AutonomousDriveTimed(self.robot, timeout=1.5) )
-        self.buttonA.whenPressed(FRCCharacterization(self.robot, timeout=60, button=self.buttonA))
-        self.buttonB.whenPressed( AutonomousRotate(self.robot, setpoint=60, timeout=4, source='dashboard') )
         self.buttonX.whenPressed( AutonomousRotate(self.robot, setpoint=-60, timeout=4, source='dashboard', absolute=True) )
         self.buttonY.whenPressed( AutonomousDrivePID(self.robot, setpoint=2, timeout=4, source='dashboard') )
 
         # g h j k on the keyboard
         self.buttonLB.whenPressed( AutonomousSlalom(self.robot)  )
-        self.buttonRB.whenPressed( AutonomousBounce(self.robot) )
         self.buttonBack.whenPressed( AutonomousRamsete(self.robot) )
         self.buttonStart.whenPressed(AutonomousVelocityPID(self.robot))
+
+        #new assigns JG 2/17/2021
+        self.buttonRB.whenPressed(ShooterEnable(self.robot, velocity = 1))
+        self.axisButtonLT.whenPressed(ShooterAdjust(self.robot, button=self.axisButtonLT))
+        self.axisButtonRT.whenPressed(ShooterShoot(self.robot, button=self.axisButtonRT))
 
     def initialize_joystics(self):
         """
@@ -68,8 +73,11 @@ class OI(object):
         self.buttonRB = JoystickButton(self.stick, 6)
         self.buttonBack = JoystickButton(self.stick, 7)
         self.buttonStart = JoystickButton(self.stick, 8)
-        self.dpad = Dpad(self.stick)
+        self.axisButtonLT = AxisButton(self.stick, 2)
+        self.axisButtonRT = AxisButton(self.stick, 3)
 
+        self.dpad = Dpad(self.stick)
+        
         # add/change bindings if we are using more than one joystick
         if self.competition_mode:
             self.co_stick = wpilib.Joystick(1)
