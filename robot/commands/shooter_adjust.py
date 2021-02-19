@@ -1,5 +1,6 @@
 from wpilib.command import Command
 from wpilib import Timer
+import wpilib.controller
 
 class ShooterAdjust(Command):
  
@@ -10,7 +11,7 @@ class ShooterAdjust(Command):
         self.timeout = timeout
         self.button = button
         self.max_power = 0.75
-        self.enabled = False
+
 
     def initialize(self):
         """Called just before this Command runs the first time."""
@@ -18,8 +19,8 @@ class ShooterAdjust(Command):
         print("\n" + f"** Started {self.getName()} at {self.start_time} s **", flush=True) 
 
     def execute(self):
-        self.power = self.button * self.max_power
-
+       pass
+    
     def end(self):
         """Called once after isFinished returns true"""
         print("\n" + f"** Ended {self.getName()} at {round(Timer.getFPGATimestamp() - self.robot.enabled_time, 1)} s **")

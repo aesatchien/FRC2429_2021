@@ -1,6 +1,6 @@
 from wpilib.command import Command
 from wpilib import Timer
-
+import wpilib.controller
 
 class ShooterEnable(Command):
 
@@ -9,7 +9,22 @@ class ShooterEnable(Command):
         self.robot = robot
         self.timeout = timeout
         self.button = button
-        self.velocity = 0.5
+        
+        #pid variables
+        self.P = 1
+        self.I = 1
+        self.D = 1
+        self.period = 0.01
+        self.tolererance = 0.1
+        self.setpoint = 0.5 #desired velocity
+        self.error = 0
+
+        #pid controllers
+        self.flywheel_PID_controller = wpilib.controller.PIDController(self.P, self.I, self.D, self.period)
+        self.flywheel_PID_controller.setSetpoint(self.setpoint) #desired velocity
+        self.flywheel_PID_controller.setTolerance(self.tolererance)
+        self.flywheel_PID_controller.reset()
+        
 
     def initialize(self):
         """Called just before this Command runs the first time."""
@@ -18,11 +33,18 @@ class ShooterEnable(Command):
     
 
     def execute(self):
-        self.robot.shooter.set_feed_motor(self.velocity)
+        self.error = self.robot.shooter.get_velocity() - self.setpoint
+        output = self.flywheel_PID_controller.calculate(self.error)
+        self.robot.shooter.set_feed_motor(output)
+
+        if(self.flywheel_PID_controller.atSetpoint()):
+            self.robot.shooter.is_enabled(True)
+
 
     def end(self):
         """Called once after isFinished returns true"""
         print("\n" + f"** Ended {self.getName()} at {round(Timer.getFPGATimestamp() - self.robot.enabled_time, 1)} s **")
+
 
     def interrupted(self):
         """Called when another command which requires one or more of the same subsystems is scheduled to run."""

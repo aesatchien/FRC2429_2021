@@ -10,7 +10,6 @@ class ShooterShoot(Command):
         self.timeout = timeout
         self.button = button
         self.feed_power = 0.5
-        
 
     def initialize(self):
         """Called just before this Command runs the first time."""
@@ -20,8 +19,6 @@ class ShooterShoot(Command):
     def execute(self):
         if self.robot.shooter.is_enabled():
             self.robot.shooter.set_feed_motor(self.feed_power)
-        else:
-            self.robot.shooter.set_flywheel(0)
 
     def end(self):
         """Called once after isFinished returns true"""
