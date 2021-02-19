@@ -33,10 +33,8 @@ class ShooterEnable(Command):
     
 
     def execute(self):
-        self.error = self.robot.shooter.get_velocity() - self.setpoint
-        output = self.flywheel_PID_controller.calculate(self.error)
-        self.robot.shooter.set_feed_motor(output)
-
+        output = self.flywheel_PID_controller.calculate(self.robot.shooter.get_velocity(), self.setpoint)
+        self.robot.shooter.set_flywheel(output)
         if(self.flywheel_PID_controller.atSetpoint()):
             self.robot.shooter.is_enabled(True)
 
