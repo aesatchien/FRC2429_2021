@@ -16,6 +16,7 @@ from commands.autonomous_home_bounce import AutonomousBounce
 from commands.autonomous_drive_pid import AutonomousDrivePID
 from commands.autonomous_velocity_pid import AutonomousVelocityPID
 from commands.frc_characterication import FRCCharacterization
+from commands.shooter_toggle_flywheel import ShooterToggleFlywheel
 
 import subsystems.drive_constants as drive_constants
 
@@ -41,8 +42,10 @@ class OI(object):
         self.dpad.whenPressed(DpadDrive(self.robot, button=self.dpad))
 
         # also bound to asdf on the 2021 keyboard
-        self.buttonA.whenPressed( AutonomousDriveTimed(self.robot, timeout=1.5) )
-        self.buttonA.whenPressed(FRCCharacterization(self.robot, timeout=60, button=self.buttonA))
+        #self.buttonA.whenPressed( AutonomousDriveTimed(self.robot, timeout=1.5) )
+        self.buttonA.whenPressed(ShooterToggleFlywheel(self.robot))
+
+        #self.buttonA.whenPressed(FRCCharacterization(self.robot, timeout=60, button=self.buttonA))
         self.buttonB.whenPressed( AutonomousRotate(self.robot, setpoint=60, timeout=4, source='dashboard') )
         self.buttonX.whenPressed( AutonomousRotate(self.robot, setpoint=-60, timeout=4, source='dashboard', absolute=True) )
         self.buttonY.whenPressed( AutonomousDrivePID(self.robot, setpoint=2, timeout=4, source='dashboard') )

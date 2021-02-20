@@ -14,6 +14,7 @@ import networktables
 # 2429-specific imports - need to import every subsystem you instantiate
 from subsystems.drivetrain_sim import DriveTrainSim  # simulation only, no SparkMax devices
 from subsystems.drivetrain import DriveTrain  # uses SparkMax, trying to get to work with simulation
+from subsystems.shooter import Shooter
 
 from oi import OI
 
@@ -36,6 +37,8 @@ class Robot(CommandBasedRobot):
             self.drivetrain = DriveTrain(self)
         else:  # use the simulated drive train
             self.drivetrain = DriveTrainSim(self)
+
+        self.shooter = Shooter(self)
 
         # oi MUST be created after all other subsystems since it uses them
         self.oi = OI(self)
