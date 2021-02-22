@@ -103,11 +103,14 @@ class Robot(CommandBasedRobot):
 
     def update_characterization(self):
         now = Timer.getFPGATimestamp()
-        left_position = self.drivetrain.l_encoder.getDistance()
-        left_rate = self.drivetrain.l_encoder.getRate()
-        right_position = self.drivetrain.r_encoder.getDistance()
-        right_rate = self.drivetrain.r_encoder.getRate()
-        battery = 11  #ToDo - get a real vs simulated value for this
+        left_position = self.drivetrain.get_position(self.drivetrain.l_encoder)
+        left_rate = self.drivetrain.get_rate(self.drivetrain.l_encoder)
+        right_position = self.drivetrain.get_position(self.drivetrain.r_encoder)
+        right_rate = self.drivetrain.get_rate(self.drivetrain.r_encoder)
+        if self.isReal():
+            battery = 2*wpilib.RobotController.getVoltage6V()  # no battery voltage in python controller?
+        else:
+            battery = 11  #ToDo - get a real vs simulated value for this
         motor_volts = battery * math.fabs(self.prior_autospeed)
         left_motor_volts = motor_volts
         right_motor_volts = motor_volts
