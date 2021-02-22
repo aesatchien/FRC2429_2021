@@ -54,7 +54,7 @@
               "_title": "ramsete_write"
             }
           },
-          "5,2": {
+          "4,2": {
             "size": [
               1,
               1
@@ -65,7 +65,7 @@
               "_title": "field_x"
             }
           },
-          "4,2": {
+          "5,2": {
             "size": [
               1,
               1
@@ -185,6 +185,17 @@
               "_source0": "network_table:///SmartDashboard/drive_pose",
               "_title": "drive_pose"
             }
+          },
+          "4,0": {
+            "size": [
+              3,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/alert",
+              "_title": "alert"
+            }
           }
         }
       }
@@ -288,6 +299,11 @@
                   "_title": "DigitalInput[1]/Value",
                   "Colors/Color when true": "#7CFC00FF",
                   "Colors/Color when false": "#8B0000FF"
+                },
+                {
+                  "_type": "Encoder",
+                  "_source0": "network_table:///LiveWindow/Ungrouped/Encoder[2147483647]",
+                  "_title": "LiveWindow/Ungrouped/Encoder[2147483647]"
                 }
               ]
             }
@@ -317,14 +333,27 @@
               "Layout/Label position": "BOTTOM",
               "_children": []
             }
+          },
+          "12,0": {
+            "size": [
+              2,
+              4
+            ],
+            "content": {
+              "_type": "Subsystem Layout",
+              "_source0": "network_table:///LiveWindow/shooter",
+              "_title": "shooter",
+              "Layout/Label position": "BOTTOM",
+              "_children": []
+            }
           }
         }
       }
     }
   ],
   "windowGeometry": {
-    "x": 424.0,
-    "y": 48.0,
+    "x": 973.0,
+    "y": 530.0,
     "width": 1398.0,
     "height": 789.0
   }

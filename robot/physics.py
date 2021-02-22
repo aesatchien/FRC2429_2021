@@ -191,8 +191,8 @@ class PhysicsEngine:
 
         self.counter += 1
         if self.counter % 5 == 0:
-            SmartDashboard.putNumber('field_x', self.x)
-            SmartDashboard.putNumber('field_y', self.y)
+            SmartDashboard.putNumber('field_x', round(self.x, 2))
+            SmartDashboard.putNumber('field_y', round(self.y, 2))
         if self.counter % 50 == 0:
             self.obstacles = SmartDashboard.getData('obstacles').getSelected()  # read the obstacles from the dash
 
