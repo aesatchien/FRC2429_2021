@@ -11,12 +11,11 @@ from commands.autonomous_rotate import AutonomousRotate
 from commands.autonomous_drive_timed import AutonomousDriveTimed
 from commands.autonomous_ramsete import AutonomousRamsete
 from commands.autonomous_home_slalom import AutonomousSlalom
-from commands.autonomous__home_barrel import AutonomousBarrel
 from commands.autonomous_home_bounce import AutonomousBounce
 from commands.autonomous_drive_pid import AutonomousDrivePID
 from commands.autonomous_velocity_pid import AutonomousVelocityPID
-from commands.frc_characterication import FRCCharacterization
 from commands.shooter_toggle_flywheel import ShooterToggleFlywheel
+from commands.shooter_hood import ShooterHood
 
 import subsystems.drive_constants as drive_constants
 
@@ -44,10 +43,12 @@ class OI(object):
         # also bound to asdf on the 2021 keyboard
         #self.buttonA.whenPressed( AutonomousDriveTimed(self.robot, timeout=1.5) )
         self.buttonA.whenPressed(ShooterToggleFlywheel(self.robot))
-
         #self.buttonA.whenPressed(FRCCharacterization(self.robot, timeout=60, button=self.buttonA))
-        self.buttonB.whenPressed( AutonomousRotate(self.robot, setpoint=60, timeout=4, source='dashboard') )
-        self.buttonX.whenPressed( AutonomousRotate(self.robot, setpoint=-60, timeout=4, source='dashboard', absolute=True) )
+        #self.buttonB.whenPressed( AutonomousRotate(self.robot, setpoint=60, timeout=4, source='dashboard') )
+        #self.buttonX.whenPressed( AutonomousRotate(self.robot, setpoint=-60, timeout=4, source='dashboard', absolute=True) )
+        self.buttonB.whenPressed( ShooterHood(self.robot, button=self.buttonB, power=-0.5) )
+        self.buttonX.whenPressed( ShooterHood(self.robot, button=self.buttonX, power=0.5) )
+
         self.buttonY.whenPressed( AutonomousDrivePID(self.robot, setpoint=2, timeout=4, source='dashboard') )
 
         # g h j k on the keyboard

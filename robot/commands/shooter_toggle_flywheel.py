@@ -43,7 +43,7 @@ class ShooterToggleFlywheel(Command):
 
     def end(self, message='Ended'):
         """Called once after isFinished returns true"""
-        # print(f"** {message} {self.getName()} at {round(Timer.getFPGATimestamp() - self.start_time, 1)} s **")
+        # print(f"** {message} {self.getName()} at {round(Timer.getFPGATimestamp() - self.robot.enabled_time, 1)} s **")
         pass  # no need to clutter up the console with the messages
 
     def interrupted(self):

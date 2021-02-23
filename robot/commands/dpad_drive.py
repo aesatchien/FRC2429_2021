@@ -50,7 +50,7 @@ class DpadDrive(Command):
     def end(self, message='Ended'):
         """Called once after isFinished returns true"""
         self.robot.drivetrain.stop()
-        print(f"** {message} {self.getName()} at {round(Timer.getFPGATimestamp() - self.start_time, 1)} s **")
+        print(f"** {message} {self.getName()} at {round(Timer.getFPGATimestamp() - self.robot.enabled_time, 1)} s **")
     def interrupted(self):
         """Called when another command which requires one or more of the same subsystems is scheduled to run."""
         self.end(message='Interrupted')
