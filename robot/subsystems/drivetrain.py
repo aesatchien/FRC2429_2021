@@ -68,7 +68,8 @@ class DriveTrain(Subsystem):
         # TODO - figure out if I want to invert the motors or the encoders
         #inverted = False  # needs this to be True for the toughbox
         #self.spark_neo_left_front.setInverted(inverted)  # inverting a controller
-        #self.sparkneo_encoder_3.setInverted(True)  # inverting an encoder
+        #self.r_encoder.setInverted(True)  # inverting an encoder
+
 
         # create drivetrain from motors
         self.speedgroup_left = SpeedControllerGroup(self.spark_neo_left_front, self.spark_neo_left_rear)

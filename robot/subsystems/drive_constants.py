@@ -29,9 +29,7 @@ k_encoder_CPR = 1024 # encoder counts per revolution
 # encoder_distance_per_pulse_m = wheel_diameter_m * math.pi / (encoder_CPR * gear_ratio)
 k_encoder_distance_per_pulse_m = k_wheel_diameter_m * math.pi / (k_encoder_CPR)
 
-# set up the wpilib kinematics model
-k_track_width_meters = 0.41  # 0.69 was from the model, 0.396 was from the characterization
-drive_kinematics = wpimath.kinematics.DifferentialDriveKinematics(k_track_width_meters)
+
 
 # get these from robot characterization tools - using simulated values for now
 # ToDo: characterize this on the real robot
@@ -39,9 +37,24 @@ drive_kinematics = wpimath.kinematics.DifferentialDriveKinematics(k_track_width_
 # frc-characterization got 1.2, 1.82, 1.19, track 0.399 w/ R^2=1 when multiplying by 12V
 # frc-characterization got 1.39, 1.79, 1.16, track 0.41 w/ R^2=1 when just using tank drive as specified in the tool
 
-ks_volts = 1.39 # 1.14 # determined as the minimum to start the simulation robot moving, or -b/m (vel=0 of the vel=mV+b)
-kv_volt_seconds_per_meter = 1.79  # 2.15  # determined as 1/slope of the vel vs volts equation
-ka_volt_seconds_squared_per_meter = 1.16  # 0.0  # not sure if we have one in our sim or how to calculate it
+sim_values = [1.39, 1.79, 1.16, 0.41]  # ks, kv, ka, track
+real_values = [0.41, 0.779, 0.235, 1.13]
+
+real = True
+if real:
+    ks_volts = 0.41  # 1.14 # determined as the minimum to start the simulation robot moving, or -b/m (vel=0 of the vel=mV+b)
+    kv_volt_seconds_per_meter = 0.779  # 2.15  # determined as 1/slope of the vel vs volts equation
+    ka_volt_seconds_squared_per_meter = 0.235  # 0.0  # not sure if we have one in our sim or how to calculate it
+    # set up the wpilib kinematics model
+    k_track_width_meters = 0.41  # 0.69 was from the model, 0.396 was from the characterization
+else:
+    ks_volts = 1.39 # 1.14 # determined as the minimum to start the simulation robot moving, or -b/m (vel=0 of the vel=mV+b)
+    kv_volt_seconds_per_meter = 1.79  # 2.15  # determined as 1/slope of the vel vs volts equation
+    ka_volt_seconds_squared_per_meter = 1.16  # 0.0  # not sure if we have one in our sim or how to calculate it
+    # set up the wpilib kinematics model
+    k_track_width_meters = 01.13  # 0.69 was from the model, 0.396 was from the characterization
+
+drive_kinematics = wpimath.kinematics.DifferentialDriveKinematics(k_track_width_meters)
 kp_drive_vel = 0.2  # this is kp for the PID on each side on top of the feed forward (really sensitive - still needs work)
 
 

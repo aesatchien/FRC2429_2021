@@ -196,6 +196,17 @@
               "_source0": "network_table:///SmartDashboard/alert",
               "_title": "alert"
             }
+          },
+          "0,0": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/sparks",
+              "_title": "sparks"
+            }
           }
         }
       }
@@ -304,6 +315,18 @@
                   "_type": "Encoder",
                   "_source0": "network_table:///LiveWindow/Ungrouped/Encoder[2147483647]",
                   "_title": "LiveWindow/Ungrouped/Encoder[2147483647]"
+                },
+                {
+                  "_type": "Speed Controller",
+                  "_source0": "network_table:///LiveWindow/Ungrouped/Spark[2]",
+                  "_title": "LiveWindow/Ungrouped/Spark[2]",
+                  "Visuals/Orientation": "HORIZONTAL"
+                },
+                {
+                  "_type": "Speed Controller",
+                  "_source0": "network_table:///LiveWindow/Ungrouped/Spark[1]",
+                  "_title": "LiveWindow/Ungrouped/Spark[1]",
+                  "Visuals/Orientation": "HORIZONTAL"
                 }
               ]
             }
@@ -352,8 +375,8 @@
     }
   ],
   "windowGeometry": {
-    "x": 973.0,
-    "y": 530.0,
+    "x": 525.0,
+    "y": 14.0,
     "width": 1398.0,
     "height": 789.0
   }
