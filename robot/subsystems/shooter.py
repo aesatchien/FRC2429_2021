@@ -68,9 +68,11 @@ class Shooter(Subsystem):
         self.counter += 1
 
         if self.counter % 5 == 0:
+            pass
             # ten per second updates
-            self.error = self.get_angle() - self.hood_setpoint
-            output = self.hood_controller.calculate(self.error)
-            self.change_elevation(output)
+            #self.error = self.get_angle() - self.hood_setpoint
+            #output = self.hood_controller.calculate(self.error)
+            #self.change_elevation(output)
         if self.counter % 50 == 0:
-            print(f'{self.error} {self.hood_setpoint} {self.get_angle()}')
+            pass
+            #  print(f'{self.error} {self.hood_setpoint} {self.get_angle()}')
