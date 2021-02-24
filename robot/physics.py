@@ -198,13 +198,14 @@ class PhysicsEngine:
 
 # ---------------- HOOD ELEVATOR UPDATES ---------------------------
         # update 'position' (use tm_diff so the rate is constant) - this is for simulating an elevator, arm etc w/ limit switches
-        self.hood_position += self.hood_motor.getSpeed() * tm_diff * 30
+        self.hood_position += self.hood_motor.getSpeed() * tm_diff * 30 - 0.05 # inserting gravity!
 
         # update limit switches based on position
         if self.hood_position <= 30:
             switch1 = True
             switch2 = False
-
+            if self.hood_position < 29.5:  # don't let gravity sag too much
+                self.hood_position = 29.5
         elif self.hood_position > 50:
             switch1 = False
             switch2 = True

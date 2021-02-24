@@ -22,7 +22,7 @@ class Shooter(Subsystem):
         self.hood_encoder = Encoder(4, 5)  # generic encoder - we'll have to install one on the 775 motor
         self.hood_encoder.setDistancePerPulse(1/1024)
         self.hood_controller = wpilib.controller.PIDController(Kp=0.1, Ki=0, Kd=0.0)
-        self.hood_setpoint = 45
+        self.hood_setpoint = 40
         self.flywheel_encoder = self.sparkmax_flywheel.getEncoder()  # built-in to the sparkmax/neo
         self.flywheel_controller = self.sparkmax_flywheel.getPIDController()  # built-in PID controller in the sparkmax
 
@@ -70,9 +70,11 @@ class Shooter(Subsystem):
         if self.counter % 5 == 0:
             pass
             # ten per second updates
-            #self.error = self.get_angle() - self.hood_setpoint
-            #output = self.hood_controller.calculate(self.error)
-            #self.change_elevation(output)
+            maintain_elevation = False
+            if maintain_elevation:
+                self.error = self.get_angle() - self.hood_setpoint
+                output = self.hood_controller.calculate(self.error)
+                self.change_elevation(output)
         if self.counter % 50 == 0:
             pass
             #  print(f'{self.error} {self.hood_setpoint} {self.get_angle()}')
