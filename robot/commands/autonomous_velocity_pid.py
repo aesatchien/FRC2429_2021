@@ -64,7 +64,7 @@ class AutonomousVelocityPID(Command):
         left_feed_forward = self.feed_forward.calculate(self.left_speed_setpoint)
         right_feed_forward = self.feed_forward.calculate(self.right_speed_setpoint)
 
-        ws_left, ws_right = self.robot.drivetrain.l_encoder.getRate(), self.robot.drivetrain.r_encoder.getRate()
+        ws_left, ws_right = self.robot.drivetrain.get_rate(self.robot.drivetrain.l_encoder), self.robot.drivetrain.get_rate(self.robot.drivetrain.r_encoder)
         left_output = left_feed_forward + self.left_controller.calculate(ws_left, self.left_speed_setpoint)
         right_output = right_feed_forward + self.left_controller.calculate(ws_right, self.right_speed_setpoint)
 
