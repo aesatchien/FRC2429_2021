@@ -136,17 +136,20 @@ class AutonomousRamseteSimple(Command):
             right_feed_forward = -v_limit if right_feed_forward < -v_limit else right_feed_forward
 
             #ws_left, ws_right = self.robot.drivetrain.get_wheel_speeds().left, self.robot.drivetrain.get_wheel_speeds().right
-            ws_left, ws_right = self.robot.drivetrain.get_rate(self.robot.drivetrain.l_encoder), self.robot.drivetrain.get_rate(self.robot.drivetrain.r_encoder)
+            # key is here - report a positive value from the right encoder to be consistent with the pathweaver model
+            ws_left, ws_right = self.robot.drivetrain.get_rate(self.robot.drivetrain.l_encoder), -self.robot.drivetrain.get_rate(self.robot.drivetrain.r_encoder)
             left_output_pid = self.left_controller.calculate(ws_left, left_speed_setpoint)
             right_output_pid = self.right_controller.calculate(ws_right, right_speed_setpoint)
-            # 100% sure that these signs are right - see plots.   Want minus the PID and plus the feedfwd
-            left_output = -left_output_pid + left_feed_forward
-            right_output = -right_output_pid + right_feed_forward
+            # Consistent
+            pid_sign = 1
+            left_output = pid_sign*left_output_pid + left_feed_forward
+            right_output = pid_sign*right_output_pid + right_feed_forward
 
         else:  # ToDo - fix this to just be the feed forwards and test it
             left_output = left_speed_setpoint
             right_output = right_speed_setpoint
 
+        # have to invert the power to the right side
         self.robot.drivetrain.tank_drive_volts(left_output, -right_output)
         self.previous_speeds = target_wheel_speeds
         self.previous_time = current_time

@@ -131,7 +131,7 @@ class DriveTrain(Subsystem):
         return geo.Rotation2d.fromDegrees(-self.navx.getAngle())
 
     def get_average_encoder_distance(self):
-        return (self.l_encoder.getPosition() + self.r_encoder.getPosition())/2
+        return (self.l_encoder.getPosition() - self.r_encoder.getPosition())/2
 
     def get_average_encoder_rate(self):
         return (self.l_encoder.getVelocity() + self.r_encoder.getVelocity())/2
@@ -143,7 +143,7 @@ class DriveTrain(Subsystem):
     def periodic(self) -> None:
         """Perform odometry and update dash with telemetry"""
         self.counter += 1
-        self.odometry.update(geo.Rotation2d.fromDegrees(-self.navx.getAngle()), self.l_encoder.getPosition(), self.r_encoder.getPosition())
+        self.odometry.update(geo.Rotation2d.fromDegrees(-self.navx.getAngle()), self.l_encoder.getPosition(), -self.r_encoder.getPosition())
 
         if self.counter % 10 == 0:
             # start keeping track of where the robot is with an x and y position (only good for WCD)'

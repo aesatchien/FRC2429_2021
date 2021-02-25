@@ -46,13 +46,13 @@ if real:
     kv_volt_seconds_per_meter = 0.779  # 2.15  # determined as 1/slope of the vel vs volts equation
     ka_volt_seconds_squared_per_meter = 0.235  # 0.0  # not sure if we have one in our sim or how to calculate it
     # set up the wpilib kinematics model
-    k_track_width_meters = 0.41  # 0.69 was from the model, 0.396 was from the characterization
+    k_track_width_meters = 1.13  # 0.69 was from the model, 0.396 was from the characterization
 else:
     ks_volts = 1.39 # 1.14 # determined as the minimum to start the simulation robot moving, or -b/m (vel=0 of the vel=mV+b)
     kv_volt_seconds_per_meter = 1.79  # 2.15  # determined as 1/slope of the vel vs volts equation
     ka_volt_seconds_squared_per_meter = 1.16  # 0.0  # not sure if we have one in our sim or how to calculate it
     # set up the wpilib kinematics model
-    k_track_width_meters = 01.13  # 0.69 was from the model, 0.396 was from the characterization
+    k_track_width_meters = 0.41  # 0.69 was from the model, 0.396 was from the characterization
 
 drive_kinematics = wpimath.kinematics.DifferentialDriveKinematics(k_track_width_meters)
 kp_drive_vel = 0.2  # this is kp for the PID on each side on top of the feed forward (really sensitive - still needs work)

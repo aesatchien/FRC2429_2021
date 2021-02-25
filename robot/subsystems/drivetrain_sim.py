@@ -93,6 +93,7 @@ class DriveTrainSim(Subsystem):
     def tank_drive_volts(self, left_volts, right_volts):
         self.speedgroup_left.setVoltage(left_volts)
         self.speedgroup_right.setVoltage(right_volts)
+        self.drive.feed()
 
     def get_rotation2d(self):
         return geo.Rotation2d.fromDegrees(-self.navx.getAngle())
