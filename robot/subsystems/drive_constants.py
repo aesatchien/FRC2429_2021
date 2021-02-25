@@ -40,7 +40,7 @@ k_encoder_distance_per_pulse_m = k_wheel_diameter_m * math.pi / (k_encoder_CPR)
 sim_values = [1.39, 1.79, 1.16, 0.41]  # ks, kv, ka, track
 real_values = [0.41, 0.779, 0.235, 1.13]
 
-real = True
+real = False
 if real:
     ks_volts = 0.41  # 1.14 # determined as the minimum to start the simulation robot moving, or -b/m (vel=0 of the vel=mV+b)
     kv_volt_seconds_per_meter = 0.779  # 2.15  # determined as 1/slope of the vel vs volts equation
