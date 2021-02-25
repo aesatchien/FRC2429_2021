@@ -53,8 +53,9 @@ class PhysicsEngine:
         else:  # use the generic wpilib motors and encoders
             self.l_motor = simlib.PWMSim(1)
             self.r_motor = simlib.PWMSim(3)
-            self.r_encoder = simlib.EncoderSim.createForChannel(0)
-            self.l_encoder = simlib.EncoderSim.createForChannel(2)
+            self.l_encoder = simlib.EncoderSim.createForChannel(0)
+            self.r_encoder = simlib.EncoderSim.createForChannel(2)
+
             # update units from drive constants
             self.l_encoder.setDistancePerPulse(drive_constants.k_encoder_distance_per_pulse_m)
             self.r_encoder.setDistancePerPulse(drive_constants.k_encoder_distance_per_pulse_m)
@@ -138,7 +139,7 @@ class PhysicsEngine:
             r_motor = self.r_spark_output.get()
         else:
             l_motor = self.l_motor.getSpeed()  # these are PWM speeds of -1 to 1
-            r_motor = self.r_motor.getSpeed()
+            r_motor = self.r_motor.getSpeed()   #  going forward, left should be positive and right is negative
 
         # get a new location based on motor movement
         transform = self.drivetrain.calculate(l_motor, r_motor, tm_diff)
@@ -183,9 +184,9 @@ class PhysicsEngine:
             self.r_spark_velocity.set(0.31 * (self.drivetrain.r_position - self.r_distance_old) / tm_diff)
         else:
             self.l_encoder.setDistance(self.l_encoder.getDistance() + (self.drivetrain.l_position-self.l_distance_old) * 0.3105)
-            self.r_encoder.setDistance(self.r_encoder.getDistance() + (self.drivetrain.r_position-self.r_distance_old) * 0.3105)
+            self.r_encoder.setDistance(self.r_encoder.getDistance() - (self.drivetrain.r_position-self.r_distance_old) * 0.3105)  # negative going forward
             self.l_encoder.setRate(0.31*(self.drivetrain.l_position -self.l_distance_old)/tm_diff)
-            self.r_encoder.setRate(0.31*(self.drivetrain.r_position -self.r_distance_old)/tm_diff)
+            self.r_encoder.setRate(-0.31*(self.drivetrain.r_position -self.r_distance_old)/tm_diff)  # needs to be negitive going fwd
 
         self.l_distance_old = self.drivetrain.l_position
         self.r_distance_old = self.drivetrain.r_position

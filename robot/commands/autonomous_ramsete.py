@@ -153,16 +153,16 @@ class AutonomousRamsete(Command):
             left_feed_forward = v_limit if left_feed_forward > v_limit else left_feed_forward
             left_feed_forward = -v_limit if left_feed_forward < -v_limit else left_feed_forward
 
-            right_feed_forward = self.feed_forward.calculate(right_speed_setpoint, (right_speed_setpoint - self.previous_speeds.right)/dt)
+            right_feed_forward = -self.feed_forward.calculate(right_speed_setpoint, (right_speed_setpoint - self.previous_speeds.right)/dt)
             right_feed_forward = v_limit if right_feed_forward > v_limit else right_feed_forward
             right_feed_forward = -v_limit if right_feed_forward < -v_limit else right_feed_forward
 
             #ws_left, ws_right = self.robot.drivetrain.get_wheel_speeds().left, self.robot.drivetrain.get_wheel_speeds().right
             ws_left, ws_right = self.robot.drivetrain.get_rate(self.robot.drivetrain.l_encoder), self.robot.drivetrain.get_rate(self.robot.drivetrain.r_encoder)
             left_output_pid = self.left_controller.calculate(ws_left, left_speed_setpoint)
-            right_output_pid = self.right_controller.calculate(ws_right, right_speed_setpoint)
-            # 100% sure that these signs are right - see plots.   Want minus the PID and plus the feedfwd
-            pid_sign = -1
+            right_output_pid = self.right_controller.calculate(-ws_right, -right_speed_setpoint)
+            # 100% sure that these signs are right - see plots.   Lots of issues here.  Need to sort out where you correct for encoder signs.
+            pid_sign = 1
             left_output = pid_sign*left_output_pid + left_feed_forward
             right_output = pid_sign*right_output_pid + right_feed_forward
 
@@ -170,7 +170,7 @@ class AutonomousRamsete(Command):
             left_output = left_speed_setpoint
             right_output = right_speed_setpoint
 
-        self.robot.drivetrain.tank_drive_volts(left_output, -right_output)
+        self.robot.drivetrain.tank_drive_volts(left_output, right_output)
         self.previous_speeds = target_wheel_speeds
         self.previous_time = current_time
         self.robot.drivetrain.drive.feed()  # should this be in tank drive?

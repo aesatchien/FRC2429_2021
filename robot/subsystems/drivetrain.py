@@ -25,10 +25,10 @@ class DriveTrain(Subsystem):
 
         # initialize motors and encoders
         motor_type = rev.MotorType.kBrushless
-        self.spark_neo_right_front = rev.CANSparkMax(1, motor_type)
-        self.spark_neo_right_rear = rev.CANSparkMax(2, motor_type)
-        self.spark_neo_left_front = rev.CANSparkMax(3, motor_type)
-        self.spark_neo_left_rear = rev.CANSparkMax(4, motor_type)
+        self.spark_neo_left_front = rev.CANSparkMax(1, motor_type)
+        self.spark_neo_left_rear = rev.CANSparkMax(2, motor_type)
+        self.spark_neo_right_front = rev.CANSparkMax(3, motor_type)
+        self.spark_neo_right_rear = rev.CANSparkMax(4, motor_type)
         self.controllers = [self.spark_neo_left_front, self.spark_neo_left_rear,
                             self.spark_neo_right_front, self.spark_neo_right_rear]
 
@@ -48,8 +48,8 @@ class DriveTrain(Subsystem):
         self.sparkneo_encoder_4 = rev.CANSparkMax.getEncoder(self.spark_neo_right_rear)
         self.encoders = [self.sparkneo_encoder_1, self.sparkneo_encoder_2, self.sparkneo_encoder_3, self.sparkneo_encoder_4]
         # copy these so the sim and the real reference the same encoders
-        self.l_encoder = self.sparkneo_encoder_3
-        self.r_encoder = self.sparkneo_encoder_1
+        self.l_encoder = self.sparkneo_encoder_1
+        self.r_encoder = self.sparkneo_encoder_3
         # Configure encoders and controllers
         # should be wheel_diameter * pi / gear_ratio - and for the old double reduction gear box
         # the gear ratio was 4.17:1.  With the shifter (low gear) I think it was a 12.26.

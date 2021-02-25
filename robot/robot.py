@@ -27,7 +27,7 @@ class Robot(CommandBasedRobot):
     autoSpeedEntry = networktables.NetworkTablesInstance.getDefault().getEntry("/robot/autospeed")
     telemetryEntry = networktables.NetworkTablesInstance.getDefault().getEntry("/robot/telemetry")
     rotateEntry = networktables.NetworkTablesInstance.getDefault().getEntry("/robot/rotate")
-    characterize = False
+    characterize = True
 
     def robotInit(self):
         """Robot-wide initialization code should go here"""

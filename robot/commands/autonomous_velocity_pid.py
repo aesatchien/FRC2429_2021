@@ -10,12 +10,12 @@ import subsystems.drive_constants as drive_constants
 
 class AutonomousVelocityPID(Command):
     """Testing the velocity controllers before constructing the ramsete command """
-    def __init__(self, robot, left_speed_setpoint=3.0, right_speed_setpoint=3, timeout=11):
+    def __init__(self, robot, left_speed_setpoint=3.0, right_speed_setpoint=-3, timeout=11):
         Command.__init__(self, name='auto_velocity')
         self.robot = robot
         self.requires(robot.drivetrain)
         self.setTimeout(timeout)
-        self.use_dash = False
+        self.use_dash = True
 
         # initialize the feed forward so we can use velocities
         self.feed_forward = wpilib.controller.SimpleMotorFeedforwardMeters(
@@ -68,7 +68,7 @@ class AutonomousVelocityPID(Command):
         left_output = left_feed_forward + self.left_controller.calculate(ws_left, self.left_speed_setpoint)
         right_output = right_feed_forward + self.left_controller.calculate(ws_right, self.right_speed_setpoint)
 
-        self.robot.drivetrain.tank_drive_volts(left_output, - right_output)
+        self.robot.drivetrain.tank_drive_volts(left_output, right_output)
         self.robot.drivetrain.drive.feed()
 
     def isFinished(self) -> bool:

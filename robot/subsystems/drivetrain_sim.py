@@ -29,10 +29,10 @@ class DriveTrainSim(Subsystem):
         self.spark_neo_right_rear = wpilib.Jaguar(4)
 
         motor_type = rev.MotorType.kBrushless
-        self.spark_neo_right_front1 = rev.CANSparkMax(1, motor_type)
-        self.spark_neo_right_rear1 = rev.CANSparkMax(2, motor_type)
-        self.spark_neo_left_front1 = rev.CANSparkMax(3, motor_type)
-        self.spark_neo_left_rear1 = rev.CANSparkMax(4, motor_type)
+        self.spark_neo_left_front1 = rev.CANSparkMax(1, motor_type)
+        self.spark_neo_left_rear1 = rev.CANSparkMax(2, motor_type)
+        self.spark_neo_right_front1 = rev.CANSparkMax(3, motor_type)
+        self.spark_neo_right_rear1 = rev.CANSparkMax(4, motor_type)
         self.sparkneo_encoder_1 = rev.CANSparkMax.getEncoder(self.spark_neo_left_front1)
         self.sparkneo_encoder_2 = rev.CANSparkMax.getEncoder(self.spark_neo_left_rear1)
         self.sparkneo_encoder_3 = rev.CANSparkMax.getEncoder(self.spark_neo_right_front1)
@@ -98,7 +98,7 @@ class DriveTrainSim(Subsystem):
         return geo.Rotation2d.fromDegrees(-self.navx.getAngle())
 
     def get_average_encoder_distance(self):
-        return (self.l_encoder.getDistance() + self.r_encoder.getDistance())/2
+        return (self.l_encoder.getDistance() - self.r_encoder.getDistance())/2  #  used in PID drive straight
 
     def get_average_encoder_rate(self):
         return (self.l_encoder.getRate() + self.r_encoder.getRate())/2
@@ -110,7 +110,7 @@ class DriveTrainSim(Subsystem):
     def periodic(self) -> None:
         """Perform odometry and update dash with telemetry"""
         self.counter += 1
-        self.odometry.update(geo.Rotation2d.fromDegrees(-self.navx.getAngle()), self.l_encoder.getDistance(), self.r_encoder.getDistance())
+        self.odometry.update(geo.Rotation2d.fromDegrees(-self.navx.getAngle()), self.l_encoder.getDistance(), -self.r_encoder.getDistance())
 
         if self.counter % 10 == 0:
             # start keeping track of where the robot is with an x and y position (only good for WCD)'
