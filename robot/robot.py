@@ -15,7 +15,6 @@ import networktables
 from subsystems.drivetrain_sim import DriveTrainSim  # simulation only, no SparkMax devices
 from subsystems.drivetrain import DriveTrain  # uses SparkMax, trying to get to work with simulation
 from subsystems.shooter import Shooter
-
 from oi import OI
 
 class Robot(CommandBasedRobot):
@@ -27,7 +26,7 @@ class Robot(CommandBasedRobot):
     autoSpeedEntry = networktables.NetworkTablesInstance.getDefault().getEntry("/robot/autospeed")
     telemetryEntry = networktables.NetworkTablesInstance.getDefault().getEntry("/robot/telemetry")
     rotateEntry = networktables.NetworkTablesInstance.getDefault().getEntry("/robot/rotate")
-    characterize = True
+    characterize = False
 
     def robotInit(self):
         """Robot-wide initialization code should go here"""
