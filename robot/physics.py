@@ -79,7 +79,7 @@ class PhysicsEngine:
         # --------  INITIALIZE FIELD SETTINGS  ---------------
 
         # keep us on the field - set x,y limits for driving
-        field_size = 'home'
+        field_size = 'competition'
         if field_size == 'competition':
             self.x_limit, self.y_limit = 15.97+0.5, 8.21+0.5  # meters for a 52.4x26.9' field PLUS 0.5 meter border
             self.x, self.y = 2, 8.21/2
@@ -117,7 +117,7 @@ class PhysicsEngine:
             27 * units.inch,                    # robot wheelbase, 27 in = 0.69 meters
             27 * units.inch + bumper_width * 2, # robot width
             32 * units.inch + bumper_width * 2, # robot length
-            8 * units.inch,                     # wheel diameter
+            drive_constants.k_wheel_diameter_in * units.inch,                     # wheel diameter
         )
         # fmt: on
 

@@ -11,6 +11,9 @@ class DriveByJoystick(Command):
         self.requires(robot.drivetrain)
         self.robot = robot
 
+        self.max_thrust = 0.5
+        self.max_twist = 0.75
+
     def initialize(self):
         """Called just before this Command runs the first time."""
         self.start_time = round(Timer.getFPGATimestamp() - self.robot.enabled_time, 1)
@@ -18,7 +21,7 @@ class DriveByJoystick(Command):
 
     def execute(self):
         """Called repeatedly when this Command is scheduled to run"""
-        self.robot.drivetrain.arcade_drive(-self.robot.oi.stick.getRawAxis(1), 0.75*self.robot.oi.stick.getRawAxis(4))
+        self.robot.drivetrain.arcade_drive(-self.max_thrust*self.robot.oi.stick.getRawAxis(1), self.max_twist*self.robot.oi.stick.getRawAxis(4))
         #self.robot.drivetrain.tank_drive_volts(5,5)
 
 

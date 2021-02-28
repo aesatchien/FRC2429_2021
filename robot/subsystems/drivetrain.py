@@ -53,10 +53,11 @@ class DriveTrain(Subsystem):
         # Configure encoders and controllers
         # should be wheel_diameter * pi / gear_ratio - and for the old double reduction gear box
         # the gear ratio was 4.17:1.  With the shifter (low gear) I think it was a 12.26.
-        # the new 2020 gearbox is 9.52
-        gear_ratio = 4.17  # pretty fast WCD gearbox
+        # the new 2020 gearbox is 9.52'
         #gear_ratio = 12.75
-        conversion_factor = 8.0 * 0.0254 * 3.1416 / gear_ratio  # do this in meters from now on
+        #gear_ratio = 4.17  # pretty fast WCD gearbox
+        #conversion_factor = 6.0 * 0.0254 * 3.1416 / gear_ratio  # do this in meters from now on
+        conversion_factor = drive_constants.k_sparkmax_conversion_factor_meters
         for ix, encoder in enumerate(self.encoders): 
             self.error_dict.update({'conv_pos_'+ str(ix): encoder.setPositionConversionFactor(conversion_factor)})
             self.error_dict.update({'conv_vel_' + str(ix): encoder.setVelocityConversionFactor(conversion_factor/60.0)})  # native is rpm
@@ -138,6 +139,10 @@ class DriveTrain(Subsystem):
 
     def zero_heading(self):
         self.navx.reset()
+
+    def reset(self):
+        self.zero_heading()
+        self.reset_encoders()
 
 
     def periodic(self) -> None:

@@ -26,7 +26,7 @@ class Robot(CommandBasedRobot):
     autoSpeedEntry = networktables.NetworkTablesInstance.getDefault().getEntry("/robot/autospeed")
     telemetryEntry = networktables.NetworkTablesInstance.getDefault().getEntry("/robot/telemetry")
     rotateEntry = networktables.NetworkTablesInstance.getDefault().getEntry("/robot/rotate")
-    characterize = False
+    characterize = True
 
     def robotInit(self):
         """Robot-wide initialization code should go here"""
@@ -91,7 +91,7 @@ class Robot(CommandBasedRobot):
         pass
 
     def reset(self):
-        self.drivetrain.reset_encoders()
+        self.drivetrain.reset()
 
     # ---------------   FRC-CHARACTERIZATION TOOL FUNCTIONS  --------------------
     def init_characterization(self):

@@ -14,22 +14,8 @@ from wpimath.trajectory.constraint import DifferentialDriveVoltageConstraint
 #import pandas as pd
 
 # drivetrain constants
-k_wheel_diameter_in = 8  # wheel diameter in inches
-k_wheel_diameter_m = 8 * 0.0254  # wheel diameter in meters
-
-# Configure encoders and controllers
-# should be wheel_diameter * pi / gear_ratio - and for the old double reduction gear box the gear ratio was 4.17:1.
-# With the shifter (low gear) I think it was a 12.26.  Then new 2020 WCD gearbox is 9.52, and the tuffbox is 12.75
-k_gear_ratio = 9.52
-k_sparkmax_conversion_factor_inches = k_wheel_diameter_in * math.pi / k_gear_ratio
-k_sparkmax_conversion_factor_meters = k_wheel_diameter_m * math.pi / k_gear_ratio
-
-# pretend encoders for simulation
-k_encoder_CPR = 1024 # encoder counts per revolution
-# encoder_distance_per_pulse_m = wheel_diameter_m * math.pi / (encoder_CPR * gear_ratio)
-k_encoder_distance_per_pulse_m = k_wheel_diameter_m * math.pi / (k_encoder_CPR)
-
-
+k_wheel_diameter_in = 6  # wheel diameter in inches
+k_wheel_diameter_m = 6 * 0.0254  # wheel diameter in meters
 
 # get these from robot characterization tools - using simulated values for now
 # ToDo: characterize this on the real robot
@@ -37,8 +23,10 @@ k_encoder_distance_per_pulse_m = k_wheel_diameter_m * math.pi / (k_encoder_CPR)
 # frc-characterization got 1.2, 1.82, 1.19, track 0.399 w/ R^2=1 when multiplying by 12V
 # frc-characterization got 1.39, 1.79, 1.16, track 0.41 w/ R^2=1 when just using tank drive as specified in the tool
 
-sim_values = [1.39, 1.79, 1.16, 0.41]  # ks, kv, ka, track
-real_values = [0.41, 0.779, 0.235, 1.13]  # best estimate from practice robot, early February
+sim_values_original = [1.39, 1.79, 1.16, 0.41]  # ks, kv, ka, track  for 8" wheels and 9.52 gear ratio
+sim_values_current = [1.42, 0.811, 2.54, 0.40]  # ks, kv, ka, track  for 8" wheels and 9.52 gear ratio
+real_values_8in = [0.41, 0.779, 0.235, 1.13]  # best estimate from practice robot, early February
+real_values_6in = [0.41, 0.779, 0.235, 1.13]  # best estimate from practice robot, early February
 
 # ToDo: change this whole file to a class file
 ks_volts, kv_volt_seconds_per_meter = 0, 0
@@ -50,12 +38,27 @@ if real:
     kv_volt_seconds_per_meter = 0.779  #
     ka_volt_seconds_squared_per_meter = 0.235  # 0.0  #
     k_track_width_meters = 1.13  #
+    k_gear_ratio = 4.17
 else:
     ks_volts = 1.39  # determined as the minimum to start the robot moving
-    kv_volt_seconds_per_meter = 1.79  # determined as 1/slope of the vel vs volts equation
-    ka_volt_seconds_squared_per_meter = 1.16  # not sure if we have one in our sim or how to calculate it
+    kv_volt_seconds_per_meter = 2.38  # determined as 1/slope of the vel vs volts equation
+    ka_volt_seconds_squared_per_meter = 0.867  # not sure if we have one in our sim or how to calculate it
     # set up the wpilib kinematics model
-    k_track_width_meters = 0.41  # 0.69 was from the model, 0.396 was from the characterization
+    k_track_width_meters = 0.40  # 0.69 was from the model, 0.396 was from the characterization
+    k_gear_ratio = 9.52  # the other gear ratio has too much acceleration
+
+
+# Configure encoders and controllers
+# should be wheel_diameter * pi / gear_ratio - and for the old double reduction gear box the gear ratio was 4.17:1.
+# With the shifter (low gear) I think it was a 12.26.  Then new 2020 WCD gearbox is 9.52, and the tuffbox is 12.75
+k_sparkmax_conversion_factor_inches = k_wheel_diameter_in * math.pi / k_gear_ratio
+k_sparkmax_conversion_factor_meters = k_wheel_diameter_m * math.pi / k_gear_ratio
+
+# pretend encoders for simulation
+k_encoder_CPR = 1024 # encoder counts per revolution
+# encoder_distance_per_pulse_m = wheel_diameter_m * math.pi / (encoder_CPR * gear_ratio)
+k_encoder_distance_per_pulse_m = k_wheel_diameter_m * math.pi / (k_encoder_CPR)
+
 
 # need to implement this somehow, probably once we have a class set up
 def set_robot_parameters(robot_real=False):

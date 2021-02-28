@@ -107,6 +107,8 @@ class DriveTrainSim(Subsystem):
     def zero_heading(self):
         self.navx.reset()
 
+    def reset(self):
+        pass
 
     def periodic(self) -> None:
         """Perform odometry and update dash with telemetry"""
