@@ -40,7 +40,7 @@ class OI(object):
         # *** NOTE - THESE CAN FAIL IN COMPETITION IF YOU ARE RELYING ON A BUTTON TO BE HELD DOWN! ***
         self.dpad.whenPressed(DpadDrive(self.robot, button=self.dpad))
 
-        # also bound to asdf on the 2021 keyboard
+        # also bound to a s d f on the 2021 keyboard
         #self.buttonA.whenPressed( AutonomousDriveTimed(self.robot, timeout=1.5) )
         self.buttonA.whenPressed(ShooterToggleFlywheel(self.robot))
         #self.buttonA.whenPressed(FRCCharacterization(self.robot, timeout=60, button=self.buttonA))
@@ -48,14 +48,13 @@ class OI(object):
         #self.buttonX.whenPressed( AutonomousRotate(self.robot, setpoint=-60, timeout=4, source='dashboard', absolute=True) )
         self.buttonB.whenPressed( ShooterHood(self.robot, button=self.buttonB, power=-0.5) )
         self.buttonX.whenPressed( ShooterHood(self.robot, button=self.buttonX, power=0.5) )
-
-        self.buttonY.whenPressed( AutonomousDrivePID(self.robot, setpoint=2, timeout=4, source='dashboard') )
+        # self.buttonY.whenPressed( AutonomousDrivePID(self.robot, setpoint=2, timeout=4, source='dashboard') )
 
         # g h j k on the keyboard
-        self.buttonLB.whenPressed( AutonomousSlalom(self.robot)  )
-        self.buttonRB.whenPressed( AutonomousBounce(self.robot) )
+        # self.buttonLB.whenPressed( AutonomousSlalom(self.robot)  )
+        # self.buttonRB.whenPressed( AutonomousBounce(self.robot) )
         self.buttonBack.whenPressed( AutonomousRamsete(self.robot) )
-        self.buttonStart.whenPressed(AutonomousVelocityPID(self.robot))
+        # self.buttonStart.whenPressed(AutonomousVelocityPID(self.robot))
 
     def initialize_joystics(self):
         """
@@ -136,7 +135,7 @@ class OI(object):
         wpilib.SmartDashboard.putData('path velocity', self.velocity_chooser)
         velocities = [0.5, 0.75, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5]
         for ix, position in enumerate(velocities):
-            if ix == 4: # 1.5 will be the default
+            if ix == 0: # 1.5 will be the default
                 self.velocity_chooser.setDefaultOption(str(position), position)
             else:
                 self.velocity_chooser.addOption(str(position), position)

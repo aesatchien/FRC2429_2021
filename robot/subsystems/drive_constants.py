@@ -26,13 +26,13 @@ k_wheel_diameter_m = 6 * 0.0254  # wheel diameter in meters
 sim_values_original = [1.39, 1.79, 1.16, 0.41]  # ks, kv, ka, track  for 8" wheels and 9.52 gear ratio
 sim_values_current = [1.42, 0.811, 2.54, 0.40]  # ks, kv, ka, track  for 8" wheels and 9.52 gear ratio
 real_values_8in = [0.41, 0.779, 0.235, 1.13]  # best estimate from practice robot, early February
-real_values_6in = [0.41, 0.779, 0.235, 1.13]  # best estimate from practice robot, early February
+real_values_6in = [0.324, 1.15, 0.0959, 1.13]  # best estimate from practice robot, early February
 
 # ToDo: change this whole file to a class file
 ks_volts, kv_volt_seconds_per_meter = 0, 0
 ka_volt_seconds_squared_per_meter, k_track_width_meters = 0, 0
 
-real = False
+real = True
 if real:
     ks_volts = 0.41  #
     kv_volt_seconds_per_meter = 0.779  #

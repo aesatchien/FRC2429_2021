@@ -30,7 +30,7 @@ class DpadDrive(Command):
         """
         # easy to correct for heading drift - we know we're trying to drive straight if we keep previous angle heading ...
         angle = self.button.angle() * math.pi / 180.
-        thrust, twist = self.scale*math.cos(angle), self.scale*0.75*math.sin(angle)
+        thrust, twist = self.scale*math.cos(angle), 1*math.sin(angle)
 
 
         if self.robot.isReal():
