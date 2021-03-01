@@ -32,7 +32,7 @@ real_values_6in = [0.324, 1.15, 0.0959, 1.13]  # best estimate from practice rob
 ks_volts, kv_volt_seconds_per_meter = 0, 0
 ka_volt_seconds_squared_per_meter, k_track_width_meters = 0, 0
 
-real = True
+real = False
 if real:
     ks_volts = 0.41  #
     kv_volt_seconds_per_meter = 0.779  #

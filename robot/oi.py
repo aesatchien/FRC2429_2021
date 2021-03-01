@@ -135,7 +135,7 @@ class OI(object):
         wpilib.SmartDashboard.putData('path velocity', self.velocity_chooser)
         velocities = [0.5, 0.75, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5]
         for ix, position in enumerate(velocities):
-            if ix == 0: # 1.5 will be the default
+            if ix == 4: # 1.5 will be the default
                 self.velocity_chooser.setDefaultOption(str(position), position)
             else:
                 self.velocity_chooser.addOption(str(position), position)
