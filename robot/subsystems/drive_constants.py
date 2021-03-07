@@ -14,8 +14,8 @@ from wpimath.trajectory.constraint import DifferentialDriveVoltageConstraint
 #import pandas as pd
 
 # drivetrain constants
-k_wheel_diameter_in = 6  # wheel diameter in inches
-k_wheel_diameter_m = 6 * 0.0254  # wheel diameter in meters
+k_wheel_diameter_in = 4  # wheel diameter in inches
+k_wheel_diameter_m = 4 * 0.0254  # wheel diameter in meters
 
 # get these from robot characterization tools - using simulated values for now
 # ToDo: characterize this on the real robot
@@ -27,17 +27,18 @@ sim_values_original = [1.39, 1.79, 1.16, 0.41]  # ks, kv, ka, track  for 8" whee
 sim_values_current = [1.42, 0.811, 2.54, 0.40]  # ks, kv, ka, track  for 8" wheels and 9.52 gear ratio
 real_values_8in = [0.41, 0.779, 0.235, 1.13]  # best estimate from practice robot, early February
 real_values_6in = [0.324, 1.15, 0.0959, 1.13]  # best estimate from practice robot, early February
+real_values_4in = [0.381, 1.55, 0.279, 0.71]  # best estimate from practice robot, early February
 
 # ToDo: change this whole file to a class file
 ks_volts, kv_volt_seconds_per_meter = 0, 0
 ka_volt_seconds_squared_per_meter, k_track_width_meters = 0, 0
 
-real = False
+real = True
 if real:
-    ks_volts = 0.41  #
-    kv_volt_seconds_per_meter = 0.779  #
-    ka_volt_seconds_squared_per_meter = 0.235  # 0.0  #
-    k_track_width_meters = 1.13  #
+    ks_volts = 0.381  #
+    kv_volt_seconds_per_meter = 1.55  #
+    ka_volt_seconds_squared_per_meter = 0.279  # 0.0  #
+    k_track_width_meters = 0.71  #
     k_gear_ratio = 4.17
 else:
     ks_volts = 1.39  # determined as the minimum to start the robot moving

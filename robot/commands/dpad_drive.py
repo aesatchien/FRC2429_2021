@@ -15,6 +15,7 @@ class DpadDrive(Command):
         self.button = button
         self.mode = None
         self.scale = 0.3
+        self.twist_scale = 0.3
 
     def initialize(self):
         """Called just before this Command runs the first time."""
@@ -30,7 +31,7 @@ class DpadDrive(Command):
         """
         # easy to correct for heading drift - we know we're trying to drive straight if we keep previous angle heading ...
         angle = self.button.angle() * math.pi / 180.
-        thrust, twist = self.scale*math.cos(angle), 1*math.sin(angle)
+        thrust, twist = self.scale*math.cos(angle), self.twist_scale*math.sin(angle)
 
 
         if self.robot.isReal():
