@@ -11,11 +11,12 @@ import wpimath.geometry as geo
 import wpimath.trajectory
 from wpimath.trajectory.constraint import DifferentialDriveVoltageConstraint
 
-#import pandas as pd
-
 # drivetrain constants
 k_wheel_diameter_in = 4  # wheel diameter in inches
 k_wheel_diameter_m = 4 * 0.0254  # wheel diameter in meters
+k_robot_length = 30 * 0.0254
+k_robot_width = 24* 0.0254
+k_robot_wheelbase = 18 * 0.5 * 0.0254
 
 # get these from robot characterization tools - using simulated values for now
 # ToDo: characterize this on the real robot
@@ -23,31 +24,26 @@ k_wheel_diameter_m = 4 * 0.0254  # wheel diameter in meters
 # frc-characterization got 1.2, 1.82, 1.19, track 0.399 w/ R^2=1 when multiplying by 12V
 # frc-characterization got 1.39, 1.79, 1.16, track 0.41 w/ R^2=1 when just using tank drive as specified in the tool
 
-sim_values_original = [1.39, 1.79, 1.16, 0.41]  # ks, kv, ka, track  for 8" wheels and 9.52 gear ratio
-sim_values_current = [1.42, 0.811, 2.54, 0.40]  # ks, kv, ka, track  for 8" wheels and 9.52 gear ratio
+# bunch of historical values
+sim_values_8 = [1.39, 1.79, 1.16, 0.41]  # ks, kv, ka, track  for 8" wheels and 9.52 gear ratio
+sim_values_6 = [1.42, 0.811, 2.54, 0.40]  # ks, kv, ka, track  for 6" wheels and 9.52 gear ratio
+sim_values_4 = [1.39, 1.56, 0.355, 0.40]  # ks, kv, ka, track  for 4" wheels and 9.52 gear ratio
 real_values_8in = [0.41, 0.779, 0.235, 1.13]  # best estimate from practice robot, early February
 real_values_6in = [0.324, 1.15, 0.0959, 1.13]  # best estimate from practice robot, early February
-real_values_4in = [0.381, 1.55, 0.279, 0.71]  # best estimate from practice robot, early February
+real_values_4in_wcd = [0.381, 1.55, 0.279, 0.71]  # best estimate from practice robot, early February
+
+robot_characterization = {'KS':0.381, 'KV':1.55, 'KA':0.279, 'TRACKWIDTH':0.71}
 
 # ToDo: change this whole file to a class file
 ks_volts, kv_volt_seconds_per_meter = 0, 0
 ka_volt_seconds_squared_per_meter, k_track_width_meters = 0, 0
 
-real = True
-if real:
-    ks_volts = 0.381  #
-    kv_volt_seconds_per_meter = 1.55  #
-    ka_volt_seconds_squared_per_meter = 0.279  # 0.0  #
-    k_track_width_meters = 0.71  #
-    k_gear_ratio = 4.17
-else:
-    ks_volts = 1.39  # determined as the minimum to start the robot moving
-    kv_volt_seconds_per_meter = 2.38  # determined as 1/slope of the vel vs volts equation
-    ka_volt_seconds_squared_per_meter = 0.867  # not sure if we have one in our sim or how to calculate it
-    # set up the wpilib kinematics model
-    k_track_width_meters = 0.40  # 0.69 was from the model, 0.396 was from the characterization
-    k_gear_ratio = 9.52  # the other gear ratio has too much acceleration
-
+# Now we only have one set of constants - the robot needs to match the sim.  But the tank model does not quite deliver, so fudge things to match
+ks_volts = 0.6* robot_characterization['KS']  # frc-characterization consistently measures a larger ks than tankmodel uses, so correct here with factor of 0.67
+kv_volt_seconds_per_meter = 1.15* robot_characterization['KV']  # also a slight correction so it characterizes the same as the drivien robot
+ka_volt_seconds_squared_per_meter = 1.15* robot_characterization['KA']  #
+k_track_width_meters = robot_characterization['TRACKWIDTH']  # best measured from wheel to wheel - physically 24" = 0.61m but characterized as 0.71 (28")
+k_gear_ratio = 4.17
 
 # Configure encoders and controllers
 # should be wheel_diameter * pi / gear_ratio - and for the old double reduction gear box the gear ratio was 4.17:1.
@@ -92,8 +88,9 @@ ramsete_Zeta = 0.9  #  default 0.7.  like a damping term, needs to be between 0 
 # --------------  DRIVETRAIN OBJECTS FOR TRAJECTORY TRACKING  -------------
 
 # Create a voltage constraint to ensure we don't accelerate too fast
+k_max_voltage = 6
 feed_forward = wpilib.controller.SimpleMotorFeedforwardMeters(ks_volts, kv_volt_seconds_per_meter, ka_volt_seconds_squared_per_meter)
-autonomous_voltage_constraint = DifferentialDriveVoltageConstraint(feed_forward, drive_kinematics, 10)
+autonomous_voltage_constraint = DifferentialDriveVoltageConstraint(feed_forward, drive_kinematics, k_max_voltage)
 
 # Create config for trajectories
 config = wpimath.trajectory.TrajectoryConfig(k_max_speed_meters_per_second, k_max_acceleration_meters_per_second_squared)

@@ -106,20 +106,38 @@ class PhysicsEngine:
 
         # --------  INITIALIZE ROBOT MODEL  ---------------
         # Change these parameters to fit your robot!
-        bumper_width = 3.25 * units.inch
+        practice_weight = 20  # lightweight practice bot, WCD
 
-        # fmt: off
+        bumper_width = 3.25 * units.inch
+        """        # this is the theory version - when you don't have a drivetrain to emulate
         self.drivetrain = tankmodel.TankModel.theory(
-            motor_cfgs.MOTOR_CFG_CIM,           # motor configuration
-            110 * units.lbs,                    # robot mass
+            motor_cfgs.MOTOR_CFG_FALCON_500,           # motor configuration
+            practice_weight * units.lbs,          # robot mass
             drive_constants.k_gear_ratio,         # drivetrain gear ratio
             2,                                  # motors per side
-            27 * units.inch,                    # robot wheelbase, 27 in = 0.69 meters
+            18/2 * units.inch,              # robot wheelbase, 27 in = 0.69 meters, but in half for WCD!
             27 * units.inch + bumper_width * 2, # robot width
-            32 * units.inch + bumper_width * 2, # robot length
-            drive_constants.k_wheel_diameter_in * units.inch,                     # wheel diameter
+            29 * units.inch + bumper_width * 2, # robot length
+            drive_constants.k_wheel_diameter_in * units.inch,    # wheel diameter
+        )"""
+
+        # characterized values of the drivetrain - 2021 0306 CJH
+        self.drivetrain = tankmodel.TankModel(
+            motor_config=motor_cfgs.MOTOR_CFG_775PRO,
+            robot_mass=practice_weight * units.lbs,
+            x_wheelbase=drive_constants.k_robot_wheelbase*units.meters,  # need to cut this in half for WCD
+            robot_width=drive_constants.k_robot_width*units.meters,  # measured wheel to wheel
+            robot_length=drive_constants.k_robot_length*units.meters,  # measured across entire frame
+            l_kv=drive_constants.kv_volt_seconds_per_meter*units.volts* units.seconds / units.meter,
+            l_ka=drive_constants.ka_volt_seconds_squared_per_meter*units.volts*units.seconds*units.seconds / units.meter,
+            l_vi=drive_constants.ks_volts*units.volts,
+            r_kv=drive_constants.kv_volt_seconds_per_meter*units.volts* units.seconds / units.meter,
+            r_ka=drive_constants.ka_volt_seconds_squared_per_meter*units.volts*units.seconds*units.seconds / units.meter,
+            r_vi=drive_constants.ks_volts*units.volts,
+            timestep=5*units.ms
         )
-        # fmt: on
+
+
 
     def update_sim(self, now: float, tm_diff: float) -> None:
         """
