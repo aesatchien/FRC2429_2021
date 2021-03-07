@@ -206,9 +206,10 @@ class AutonomousRamsete(Command):
 
         self.write_telemetry = SmartDashboard.getBoolean("ramsete_write", self.write_telemetry)
         if self.write_telemetry:
+            location = Path.cwd() if self.robot.isSimulation() else Path('/home/lvuser/py/')  # it's not called robot on the robot
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
             file_name = timestamp + '_'+ self.course + f'_kpv_{self.kp_vel:2.1f}'.replace('.','p') + f'_vel_{str(self.velocity).replace(".","p")}'   +'.pkl'
-            pickle_file = Path.cwd() / 'sim' / 'data' / file_name
+            pickle_file = location / 'sim' / 'data' / file_name
             with open(pickle_file.absolute(), 'wb') as fp:
                 out_dict = {'TIMESTAMP':timestamp,'DATA':self.telemetry, 'COURSE':self.course, 'VELOCITY':self.velocity,
                             'KP_VEL':self.kp_vel, 'KD_VEL':self.kd_vel, 'BETA':self.beta, 'ZETA':self.zeta}

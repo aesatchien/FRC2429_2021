@@ -212,7 +212,7 @@ def generate_trajectory(path_name:str, velocity=k_max_speed_meters_per_second, s
     :return: generated trajectory
 
     """
-    location = 'pathweaver/paths/' if simulation else '/home/lvuser/py/pathweaver/paths/'
+    location = 'pathweaver/paths/' if simulation else '/home/lvuser/py/pathweaver/paths/'  # it's not called robot on the robot
     pathweaver_y_offfset = 4.572
     p = Path(location + path_name)
     if p.is_file():
