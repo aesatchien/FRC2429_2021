@@ -2,7 +2,7 @@
 
 from wpilib.command import Subsystem
 import wpilib.controller
-from wpilib import Spark, Encoder, DigitalInput
+from wpilib import Spark, Encoder, DigitalInput, Talon
 import rev
 
 class Shooter(Subsystem):
@@ -15,8 +15,8 @@ class Shooter(Subsystem):
 
         # motor controllers
         self.sparkmax_flywheel = rev.CANSparkMax(5, rev.MotorType.kBrushless)
-        self.spark_hood = Spark(5)
-        self.spark_feed = Spark(6)
+        self.spark_hood = Talon(5)
+        self.spark_feed = Talon(6)
 
         # encoders and PID controllers
         self.hood_encoder = Encoder(4, 5)  # generic encoder - we'll have to install one on the 775 motor
@@ -70,7 +70,7 @@ class Shooter(Subsystem):
         if self.counter % 5 == 0:
             # pass
             # ten per second updates
-            maintain_elevation = True
+            maintain_elevation = False
             if maintain_elevation:
                 self.error = self.get_angle() - self.hood_setpoint
                 output = self.hood_controller.calculate(self.error)

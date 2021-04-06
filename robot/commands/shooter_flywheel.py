@@ -12,7 +12,7 @@ class ShooterFlywheel(Command):
     shooter_enabled = False  # use this class variable (not an instance variable)  if you want to make this a toggle
 
 
-    def __init__(self, robot, command=None, velocity=1000):
+    def __init__(self, robot, command=None, velocity=-4000):
         Command.__init__(self, name='shooter_flywheel')
         self.requires(robot.shooter)
         self.robot = robot

@@ -16,6 +16,8 @@ from commands.autonomous_drive_pid import AutonomousDrivePID
 from commands.autonomous_velocity_pid import AutonomousVelocityPID
 from commands.shooter_toggle_flywheel import ShooterToggleFlywheel
 from commands.shooter_hood import ShooterHood
+from commands.shooter_fire import ShooterFire
+from commands.shooter_feed import ShooterFeed
 
 import subsystems.drive_constants as drive_constants
 
@@ -42,13 +44,16 @@ class OI(object):
 
         # also bound to a s d f on the 2021 keyboard
         #self.buttonA.whenPressed( AutonomousDriveTimed(self.robot, timeout=1.5) )
-        self.buttonA.whenPressed(ShooterToggleFlywheel(self.robot))
+        self.buttonB.whenPressed(ShooterToggleFlywheel(self.robot))
         #self.buttonA.whenPressed(FRCCharacterization(self.robot, timeout=60, button=self.buttonA))
         #self.buttonB.whenPressed( AutonomousRotate(self.robot, setpoint=60, timeout=4, source='dashboard') )
         #self.buttonX.whenPressed( AutonomousRotate(self.robot, setpoint=-60, timeout=4, source='dashboard', absolute=True) )
-        self.buttonB.whenPressed( ShooterHood(self.robot, button=self.buttonB, power=-0.5) )
-        self.buttonX.whenPressed( ShooterHood(self.robot, button=self.buttonX, power=0.5) )
+        self.buttonY.whenPressed( ShooterHood(self.robot, button=self.buttonY, power=-0.5) )
+        self.buttonA.whenPressed( ShooterHood(self.robot, button=self.buttonA, power=0.5) )
         # self.buttonY.whenPressed( AutonomousDrivePID(self.robot, setpoint=2, timeout=4, source='dashboard') )
+        self.buttonLB.whenPressed(ShooterFire(self.robot, button=self.buttonLB))
+        self.buttonRB.whenPressed(ShooterFeed(self.robot, button=self.buttonRB, direction="backward"))
+        self.axisButtonRT.whenPressed(ShooterFeed(self.robot, button=self.axisButtonRT, direction="forward"))
 
         # g h j k on the keyboard
         # self.buttonLB.whenPressed( AutonomousSlalom(self.robot)  )
@@ -71,6 +76,8 @@ class OI(object):
         self.buttonRB = JoystickButton(self.stick, 6)
         self.buttonBack = JoystickButton(self.stick, 7)
         self.buttonStart = JoystickButton(self.stick, 8)
+        self.axisButtonLT = AxisButton(self.stick, 2)
+        self.axisButtonRT = AxisButton(self.stick, 3)
         self.dpad = Dpad(self.stick)
 
         # add/change bindings if we are using more than one joystick
@@ -135,7 +142,7 @@ class OI(object):
         wpilib.SmartDashboard.putData('path velocity', self.velocity_chooser)
         velocities = [0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0]
         for ix, position in enumerate(velocities):
-            if ix == 3: # 2 will be the default
+            if ix == 4: # 2.5 will be the default
                 self.velocity_chooser.setDefaultOption(str(position), position)
             else:
                 self.velocity_chooser.addOption(str(position), position)

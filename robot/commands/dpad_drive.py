@@ -15,7 +15,7 @@ class DpadDrive(Command):
         self.button = button
         self.mode = None
         self.scale = 0.3
-        self.twist_scale = 0.3
+        self.twist_scale = 0.35
 
     def initialize(self):
         """Called just before this Command runs the first time."""
