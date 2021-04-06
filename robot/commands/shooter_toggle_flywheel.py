@@ -9,9 +9,9 @@ class ShooterToggleFlywheel(Command):
 
     shooter_enabled = False  # use this class variable (not an instance variable)  if you want to make this a toggle
 
-    def __init__(self, robot, omega=1000):
+    def __init__(self, robot, omega=-4000):
         Command.__init__(self, name='shooter_flywheel')
-        self.requires(robot.shooter)
+        #self.requires(robot.shooter)
         self.robot = robot
         self.omega = omega  # reminder to think in angular velocity at the moment, not linear
 

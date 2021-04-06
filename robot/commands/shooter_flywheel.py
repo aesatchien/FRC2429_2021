@@ -14,7 +14,7 @@ class ShooterFlywheel(Command):
 
     def __init__(self, robot, command=None, velocity=-4000):
         Command.__init__(self, name='shooter_flywheel')
-        self.requires(robot.shooter)
+        #self.requires(robot.shooter)
         self.robot = robot
         self.command = command
         self.velocity = velocity

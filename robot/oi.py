@@ -48,10 +48,11 @@ class OI(object):
         #self.buttonA.whenPressed(FRCCharacterization(self.robot, timeout=60, button=self.buttonA))
         #self.buttonB.whenPressed( AutonomousRotate(self.robot, setpoint=60, timeout=4, source='dashboard') )
         #self.buttonX.whenPressed( AutonomousRotate(self.robot, setpoint=-60, timeout=4, source='dashboard', absolute=True) )
-        self.buttonY.whenPressed( ShooterHood(self.robot, button=self.buttonY, power=-0.5) )
-        self.buttonA.whenPressed( ShooterHood(self.robot, button=self.buttonA, power=0.5) )
+        self.buttonY.whenPressed( ShooterHood(self.robot, button=self.buttonY, power=-0.07) )
+        self.buttonA.whenPressed( ShooterHood(self.robot, button=self.buttonA, power=0.07) )
         # self.buttonY.whenPressed( AutonomousDrivePID(self.robot, setpoint=2, timeout=4, source='dashboard') )
         self.buttonLB.whenPressed(ShooterFire(self.robot, button=self.buttonLB))
+
         self.buttonRB.whenPressed(ShooterFeed(self.robot, button=self.buttonRB, direction="backward"))
         self.axisButtonRT.whenPressed(ShooterFeed(self.robot, button=self.axisButtonRT, direction="forward"))
 

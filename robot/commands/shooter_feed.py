@@ -6,7 +6,7 @@ class ShooterFeed(Command):
     This function shoots a ball -
     """
 
-    def __init__(self, robot, button, direction ):
+    def __init__(self, robot, button, direction):
         Command.__init__(self, name='shooter_feed')
         # self.requires(robot.shooter)
         self.robot = robot
@@ -28,7 +28,11 @@ class ShooterFeed(Command):
         if self.direction == "forward":
             self.robot.shooter.set_feed_motor(self.robot.oi.stick.getRawAxis(3))
         elif self.direction == "backward":
-            self.robot.shooter.set_feed_motor(-.5)
+            self.robot.shooter.set_feed_motor(-0.25)
+        else:
+            pass
+            #self.robot.shooter.set_feed_motor(0.75)
+            #print(self.direction)
 
     def isFinished(self):
         """Make this return true when this Command no longer needs to run execute()"""

@@ -2,7 +2,7 @@
 
 from wpilib.command import Subsystem
 import wpilib.controller
-from wpilib import Spark, Encoder, DigitalInput, Talon
+from wpilib import Spark, Encoder, DigitalInput, Talon, SmartDashboard
 import rev
 
 class Shooter(Subsystem):
@@ -16,7 +16,7 @@ class Shooter(Subsystem):
         # motor controllers
         self.sparkmax_flywheel = rev.CANSparkMax(5, rev.MotorType.kBrushless)
         self.spark_hood = Talon(5)
-        self.spark_feed = Talon(6)
+        self.spark_feed = Talon(7)
 
         # encoders and PID controllers
         self.hood_encoder = Encoder(4, 5)  # generic encoder - we'll have to install one on the 775 motor
@@ -46,10 +46,10 @@ class Shooter(Subsystem):
     def set_hood_motor(self, power):
         self.spark_hood.set(power)
 
-    def change_elevation(self, power):  # open loop approach
-        if power > 0 and not self.limit_high.get():
+    def change_elevation(self, power):  # open loop approach - note they were wired to be false when contacted
+        if power > 0 and self.limit_high.get():
             self.set_hood_motor(power)
-        elif power < 0 and not self.limit_low.get():
+        elif power < 0 and self.limit_low.get():
             self.set_hood_motor(power)
         else:
             self.set_hood_motor(0)
@@ -70,11 +70,14 @@ class Shooter(Subsystem):
         if self.counter % 5 == 0:
             # pass
             # ten per second updates
+            SmartDashboard.putNumber('elevation', self.hood_encoder.getDistance())
             maintain_elevation = False
             if maintain_elevation:
                 self.error = self.get_angle() - self.hood_setpoint
                 output = self.hood_controller.calculate(self.error)
                 self.change_elevation(output)
         if self.counter % 50 == 0:
-            pass
+            SmartDashboard.putBoolean("hood_low", self.limit_low.get())
+            SmartDashboard.putBoolean("hood_high", self.limit_high.get())
+
             #  print(f'{self.error} {self.hood_setpoint} {self.get_angle()}')

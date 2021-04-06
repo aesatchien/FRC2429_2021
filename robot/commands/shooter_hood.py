@@ -8,7 +8,7 @@ class ShooterHood(Command):
     The raises and lowers the hood.
     """
 
-    def __init__(self, robot, power=0, button=None):
+    def __init__(self, robot, power=0.1, button=None):
         Command.__init__(self, name='shooter_hood')
         # self.requires(robot.shooter)
         self.robot = robot

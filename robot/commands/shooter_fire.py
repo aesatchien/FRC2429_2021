@@ -29,7 +29,7 @@ class ShooterFire(Command):
         Called repeatedly when this Command is scheduled to run
         Should not have to change this if it works - just change variables above to tweak speeds and correction
         """
-        if self.hood_controller.atSetpoint():  # probably want to check the flywheel velocity as well
+        if self.robot.shooter.hood_controller.atSetpoint():  # probably want to check the flywheel velocity as well
             self.robot.shooter.set_feed_motor(1)
 
     def isFinished(self):
