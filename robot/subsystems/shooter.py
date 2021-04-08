@@ -11,7 +11,7 @@ class Shooter(Subsystem):
         super().__init__("shooter")
         self.robot = robot
         self.counter = 0  # used for updating the log
-        self.feed_forward = 5.5  # default volts to give the flywheel to get close to setpoint, optional
+        self.feed_forward = 3.5  # default volts to give the flywheel to get close to setpoint, optional
 
         # motor controllers
         self.sparkmax_flywheel = rev.CANSparkMax(5, rev.MotorType.kBrushless)
@@ -32,7 +32,10 @@ class Shooter(Subsystem):
         self.limit_high = DigitalInput(7)
 
     def set_flywheel(self, velocity):
-        self.flywheel_controller.setReference(velocity, rev.ControlType.kVelocity, 0, self.feed_forward)
+        #self.flywheel_controller.setReference(velocity, rev.ControlType.kVelocity, 0, self.feed_forward)
+        self.flywheel_controller.setReference(velocity, rev.ControlType.kSmartVelocity, 0)
+        #self.flywheel_controller.setReference(velocity, rev.ControlType.kVelocity, 0)
+
 
     def stop_flywheel(self):
         self.flywheel_controller.setReference(0, rev.ControlType.kVoltage)
@@ -71,6 +74,8 @@ class Shooter(Subsystem):
             # pass
             # ten per second updates
             SmartDashboard.putNumber('elevation', self.hood_encoder.getDistance())
+            SmartDashboard.putNumber('rpm', self.flywheel_encoder.getVelocity() )
+
             maintain_elevation = False
             if maintain_elevation:
                 self.error = self.get_angle() - self.hood_setpoint

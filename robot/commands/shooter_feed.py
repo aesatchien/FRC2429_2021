@@ -12,6 +12,7 @@ class ShooterFeed(Command):
         self.robot = robot
         self.button = button
         self.direction = direction
+        self.feed_reduction = 1.0
 
     def initialize(self):
         """Called just before this Command runs the first time."""
@@ -26,7 +27,10 @@ class ShooterFeed(Command):
         Should not have to change this if it works - just change variables above to tweak speeds and correction
         """
         if self.direction == "forward":
-            self.robot.shooter.set_feed_motor(self.robot.oi.stick.getRawAxis(3))
+            if self.button == self.robot.oi.buttonRB:
+                self.robot.shooter.set_feed_motor(0.25)
+            else:
+                self.robot.shooter.set_feed_motor(self.feed_reduction*self.robot.oi.stick.getRawAxis(3))
         elif self.direction == "backward":
             self.robot.shooter.set_feed_motor(-0.25)
         else:

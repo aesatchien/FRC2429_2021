@@ -31,9 +31,10 @@ sim_values_4 = [1.39, 1.56, 0.355, 0.40]  # ks, kv, ka, track  for 4" wheels and
 real_values_8in = [0.41, 0.779, 0.235, 1.13]  # best estimate from practice robot, early February
 real_values_6in = [0.324, 1.15, 0.0959, 1.13]  # best estimate from practice robot, early February
 real_values_4in_wcd_practice = [0.381, 1.55, 0.279, 0.71]  # best estimate from practice robot, early February
-real_values_4in_wcd_comp = [0.446, 1.55, 0.279, 0.73]  # best estimate from competition robot, early April
+real_values_4in_wcd_comp = [0.446, 1.55, 0.328, 0.73]  # best estimate from competition robot, early April
+real_values_4in_wcd_comp = [0.446, 1.55, 0.400, 0.73]  # best estimate from competition robot, early April
 
-robot_characterization = {'KS':0.446, 'KV':1.55, 'KA':0.328, 'TRACKWIDTH':0.73}
+robot_characterization = {'KS':0.446, 'KV':1.55, 'KA':0.40, 'TRACKWIDTH':0.73}
 
 # ToDo: change this whole file to a class file
 ks_volts, kv_volt_seconds_per_meter = 0, 0
@@ -93,7 +94,7 @@ ramsete_Zeta = 0.9  #  default 0.7.  like a damping term, needs to be between 0 
 # --------------  DRIVETRAIN OBJECTS FOR TRAJECTORY TRACKING  -------------
 
 # Create a voltage constraint to ensure we don't accelerate too fast
-k_max_voltage = 6
+k_max_voltage = 8
 feed_forward = wpilib.controller.SimpleMotorFeedforwardMeters(ks_volts, kv_volt_seconds_per_meter, ka_volt_seconds_squared_per_meter)
 autonomous_voltage_constraint = DifferentialDriveVoltageConstraint(feed_forward, drive_kinematics, k_max_voltage)
 

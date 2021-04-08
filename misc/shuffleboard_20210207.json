@@ -251,6 +251,54 @@
               "_source0": "network_table:///SmartDashboard/r_vel",
               "_title": "r_vel"
             }
+          },
+          "8,0": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Boolean Box",
+              "_source0": "network_table:///SmartDashboard/hood_low",
+              "_title": "hood_low",
+              "Colors/Color when true": "#7CFC00FF",
+              "Colors/Color when false": "#8B0000FF"
+            }
+          },
+          "9,0": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Boolean Box",
+              "_source0": "network_table:///SmartDashboard/hood_high",
+              "_title": "hood_high",
+              "Colors/Color when true": "#7CFC00FF",
+              "Colors/Color when false": "#8B0000FF"
+            }
+          },
+          "10,0": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/elevation",
+              "_title": "elevation"
+            }
+          },
+          "11,0": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/rpm",
+              "_title": "rpm"
+            }
           }
         }
       }
@@ -416,6 +464,24 @@
                   "_source0": "network_table:///LiveWindow/Ungrouped/Spark[6]",
                   "_title": "Spark[6]",
                   "Visuals/Orientation": "HORIZONTAL"
+                },
+                {
+                  "_type": "Speed Controller",
+                  "_source0": "network_table:///LiveWindow/Ungrouped/Talon[6]",
+                  "_title": "Talon[6]",
+                  "Visuals/Orientation": "HORIZONTAL"
+                },
+                {
+                  "_type": "Speed Controller",
+                  "_source0": "network_table:///LiveWindow/Ungrouped/Talon[5]",
+                  "_title": "Talon[5]",
+                  "Visuals/Orientation": "HORIZONTAL"
+                },
+                {
+                  "_type": "Speed Controller",
+                  "_source0": "network_table:///LiveWindow/Ungrouped/Talon[7]",
+                  "_title": "Talon[7]",
+                  "Visuals/Orientation": "HORIZONTAL"
                 }
               ]
             }
@@ -464,9 +530,9 @@
     }
   ],
   "windowGeometry": {
-    "x": 516.0,
-    "y": 12.0,
-    "width": 1398.0,
-    "height": 789.0
+    "x": 144.0,
+    "y": 37.0,
+    "width": 1777.0,
+    "height": 775.0
   }
 }

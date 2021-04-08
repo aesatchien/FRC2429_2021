@@ -25,10 +25,14 @@ class DriveTrain(Subsystem):
 
         # initialize motors and encoders
         motor_type = rev.MotorType.kBrushless
-        self.spark_neo_left_front = rev.CANSparkMax(1, motor_type)
-        self.spark_neo_left_rear = rev.CANSparkMax(2, motor_type)
-        self.spark_neo_right_front = rev.CANSparkMax(3, motor_type)
-        self.spark_neo_right_rear = rev.CANSparkMax(4, motor_type)
+        #self.spark_neo_left_front = rev.CANSparkMax(1, motor_type)
+        #self.spark_neo_left_rear = rev.CANSparkMax(2, motor_type)
+        #self.spark_neo_right_front = rev.CANSparkMax(3, motor_type)
+        #self.spark_neo_right_rear = rev.CANSparkMax(4, motor_type)
+        self.spark_neo_left_front = rev.CANSparkMax(4, motor_type)
+        self.spark_neo_left_rear = rev.CANSparkMax(3, motor_type)
+        self.spark_neo_right_front = rev.CANSparkMax(2, motor_type)
+        self.spark_neo_right_rear = rev.CANSparkMax(1, motor_type)
         self.controllers = [self.spark_neo_left_front, self.spark_neo_left_rear,
                             self.spark_neo_right_front, self.spark_neo_right_rear]
 

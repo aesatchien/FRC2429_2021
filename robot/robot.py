@@ -6,6 +6,7 @@ from wpilib import Timer
 from commandbased import CommandBasedRobot
 from wpilib.command import Scheduler
 from commands.autonomous_ramsete import AutonomousRamsete
+from commands.autonomous_home_bounce import AutonomousBounce
 
 # characterization stuff
 import math
@@ -26,7 +27,7 @@ class Robot(CommandBasedRobot):
     autoSpeedEntry = networktables.NetworkTablesInstance.getDefault().getEntry("/robot/autospeed")
     telemetryEntry = networktables.NetworkTablesInstance.getDefault().getEntry("/robot/telemetry")
     rotateEntry = networktables.NetworkTablesInstance.getDefault().getEntry("/robot/rotate")
-    characterize = True
+    characterize = False
 
     def robotInit(self):
         """Robot-wide initialization code should go here"""
@@ -53,7 +54,8 @@ class Robot(CommandBasedRobot):
             self.init_characterization()
         else:
             #self.autonomousCommand = FRCCharacterization(self, button=self.oi.buttonA, timeout=60)
-            self.autonomousCommand = AutonomousRamsete(self)
+            #self.autonomousCommand = AutonomousRamsete(self)  # single paths from the drop down
+            self.autonomousCommand = AutonomousBounce(self)  # bounce paths - four of them
             self.autonomousCommand.start()
 
     def autonomousPeriodic(self):
