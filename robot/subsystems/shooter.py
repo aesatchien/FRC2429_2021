@@ -86,7 +86,7 @@ class Shooter(Subsystem):
                 self.hood_scale = 0.2
                 self.hood_offset = 0.0
                 power = self.hood_scale * (self.robot.oi.stick.getRawAxis(2) - 0.5) + self.hood_offset
-                self.robot.shooter.change_elevation(self.power)
+                self.robot.shooter.change_elevation(power)
 
 
             maintain_elevation = False
