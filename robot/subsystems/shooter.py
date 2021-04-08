@@ -32,9 +32,9 @@ class Shooter(Subsystem):
         self.limit_low = DigitalInput(6)
         self.limit_high = DigitalInput(7)
 
-    def initDefaultCommand(self):
-        """ When other commands aren't using the drivetrain, allow arcade drive with the joystick. """
-        self.setDefaultCommand(ShooterHoodAxis(self.robot))
+#    def initDefaultCommand(self):
+#        """ When other commands aren't using the drivetrain, allow arcade drive with the joystick. """
+#        self.setDefaultCommand(ShooterHoodAxis(self.robot))
 
     def set_flywheel(self, velocity):
         #self.flywheel_controller.setReference(velocity, rev.ControlType.kVelocity, 0, self.feed_forward)
@@ -80,6 +80,14 @@ class Shooter(Subsystem):
             # ten per second updates
             SmartDashboard.putNumber('elevation', self.hood_encoder.getDistance())
             SmartDashboard.putNumber('rpm', self.flywheel_encoder.getVelocity() )
+
+            watch_axis = True
+            if watch_axis:
+                self.hood_scale = 0.2
+                self.hood_offset = 0.0
+                power = self.hood_scale * (self.robot.oi.stick.getRawAxis(2) - 0.5) + self.hood_offset
+                self.robot.shooter.change_elevation(self.power)
+
 
             maintain_elevation = False
             if maintain_elevation:
