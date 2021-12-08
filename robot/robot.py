@@ -53,9 +53,12 @@ class Robot(CommandBasedRobot):
         if self.characterize:
             self.init_characterization()
         else:
-            #self.autonomousCommand = FRCCharacterization(self, button=self.oi.buttonA, timeout=60)
-            #self.autonomousCommand = AutonomousRamsete(self)  # single paths from the drop down
-            self.autonomousCommand = AutonomousBounce(self)  # bounce paths - four of them
+            # self.autonomousCommand = FRCCharacterization(self, button=self.oi.buttonA, timeout=60)
+            if self.isReal():
+                self.autonomousCommand = AutonomousBounce(self)  # bounce paths - four of them
+            else:
+                self.autonomousCommand = AutonomousRamsete(self)  # single paths from the drop down
+
             self.autonomousCommand.start()
 
     def autonomousPeriodic(self):
