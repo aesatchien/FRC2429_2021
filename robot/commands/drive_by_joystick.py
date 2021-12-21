@@ -12,7 +12,7 @@ class DriveByJoystick(Command):
         self.robot = robot
 
         self.max_thrust = 0.8
-        self.max_twist = 0.5
+        self.max_twist = 0.6
 
     def initialize(self):
         """Called just before this Command runs the first time."""

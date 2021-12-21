@@ -50,7 +50,7 @@ class OI(object):
         #self.buttonX.whenPressed( AutonomousRotate(self.robot, setpoint=-60, timeout=4, source='dashboard', absolute=True) )
         #self.buttonY.whenPressed( ShooterHood(self.robot, button=self.buttonY, power=-0.07) )
         #self.buttonA.whenPressed( ShooterHood(self.robot, button=self.buttonA, power=0.07) )
-        self.buttonY.whenPressed(ShooterToggleFlywheel(self.robot, omega=-4100))
+        self.buttonY.whenPressed(ShooterToggleFlywheel(self.robot, omega=-4150))
         self.buttonA.whenPressed(ShooterToggleFlywheel(self.robot, omega=-3250))
         self.buttonX.whenPressed(ShooterToggleFlywheel(self.robot, omega=-4800))
         # self.buttonY.whenPressed( AutonomousDrivePID(self.robot, setpoint=2, timeout=4, source='dashboard') )

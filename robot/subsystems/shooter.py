@@ -22,8 +22,9 @@ class Shooter(Subsystem):
         # encoders and PID controllers
         self.hood_encoder = Encoder(4, 5)  # generic encoder - we'll have to install one on the 775 motor
         self.hood_encoder.setDistancePerPulse(1/1024)
-        self.hood_controller = wpilib.controller.PIDController(Kp=0.1, Ki=0, Kd=0.0)
-        self.hood_setpoint = 40
+        self.hood_controller = wpilib.controller.PIDController(Kp=0.005, Ki=0, Kd=0.0)
+        self.hood_setpoint = 5
+        self.hood_controller.setSetpoint(self.hood_setpoint)
         self.flywheel_encoder = self.sparkmax_flywheel.getEncoder()  # built-in to the sparkmax/neo
         self.flywheel_controller = self.sparkmax_flywheel.getPIDController()  # built-in PID controller in the sparkmax
 
@@ -32,9 +33,9 @@ class Shooter(Subsystem):
         self.limit_low = DigitalInput(6)
         self.limit_high = DigitalInput(7)
 
-#    def initDefaultCommand(self):
-#        """ When other commands aren't using the drivetrain, allow arcade drive with the joystick. """
-#        self.setDefaultCommand(ShooterHoodAxis(self.robot))
+    def initDefaultCommand(self):
+        """ When other commands aren't using the drivetrain, allow arcade drive with the joystick. """
+        #self.setDefaultCommand(ShooterHoodAxis(self.robot))
 
     def set_flywheel(self, velocity):
         #self.flywheel_controller.setReference(velocity, rev.ControlType.kVelocity, 0, self.feed_forward)
@@ -52,7 +53,14 @@ class Shooter(Subsystem):
         self.spark_feed.set(0)
 
     def set_hood_motor(self, power):
-        self.spark_hood.set(power)
+        power_limit = 0.2
+        if power > power_limit:
+            new_power = power_limit
+        elif power < -power_limit:
+            new_power = -power_limit
+        else:
+            new_power = power
+        self.spark_hood.set(new_power)
 
     def change_elevation(self, power):  # open loop approach - note they were wired to be false when contacted
         if power > 0 and self.limit_high.get():
@@ -81,7 +89,7 @@ class Shooter(Subsystem):
             SmartDashboard.putNumber('elevation', self.hood_encoder.getDistance())
             SmartDashboard.putNumber('rpm', self.flywheel_encoder.getVelocity() )
 
-            watch_axis = True
+            watch_axis = False
             if watch_axis:
                 self.hood_scale = 0.2
                 self.hood_offset = 0.0
@@ -89,10 +97,12 @@ class Shooter(Subsystem):
                 self.robot.shooter.change_elevation(power)
 
 
-            maintain_elevation = False
+            maintain_elevation = True
             if maintain_elevation:
                 self.error = self.get_angle() - self.hood_setpoint
-                output = self.hood_controller.calculate(self.error)
+                pid_out = self.hood_controller.calculate(self.error)
+                output = 0.03 + pid_out
+                SmartDashboard.putNumber('El PID', pid_out)
                 self.change_elevation(output)
         if self.counter % 50 == 0:
             SmartDashboard.putBoolean("hood_low", self.limit_low.get())
