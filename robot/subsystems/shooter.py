@@ -33,12 +33,9 @@ class Shooter(Subsystem):
         self.limit_low = DigitalInput(6)
         self.limit_high = DigitalInput(7)
 
-<<<<<<< HEAD
     def initDefaultCommand(self):
         """ When other commands aren't using the drivetrain, allow arcade drive with the joystick. """
         #self.setDefaultCommand(ShooterHoodAxis(self.robot))
-=======
->>>>>>> f3cfc75ee9061893c4451762b61c2675f8ee3e52
 
     def set_flywheel(self, velocity):
         #self.flywheel_controller.setReference(velocity, rev.ControlType.kVelocity, 0, self.feed_forward)
