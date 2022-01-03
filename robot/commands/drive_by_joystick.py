@@ -11,7 +11,7 @@ class DriveByJoystick(Command):
         self.requires(robot.drivetrain)
         self.robot = robot
 
-        self.max_thrust = 0.6
+        self.max_thrust = 0.7
         self.max_twist = 0.5
 
     def initialize(self):

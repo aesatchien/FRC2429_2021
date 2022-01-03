@@ -26,7 +26,7 @@ class Robot(CommandBasedRobot):
     autoSpeedEntry = networktables.NetworkTablesInstance.getDefault().getEntry("/robot/autospeed")
     telemetryEntry = networktables.NetworkTablesInstance.getDefault().getEntry("/robot/telemetry")
     rotateEntry = networktables.NetworkTablesInstance.getDefault().getEntry("/robot/rotate")
-    characterize = True
+    characterize = False
 
     def robotInit(self):
         """Robot-wide initialization code should go here"""
@@ -34,8 +34,9 @@ class Robot(CommandBasedRobot):
 
         if self.isReal():  # use the real drive train
             self.drivetrain = DriveTrain(self)
-        else:  # use the simulated drive train
-            self.drivetrain = DriveTrainSim(self)
+        else:  # use the simulated drive train  - as of 2022 0102 the regular drive train is supported
+            # self.drivetrain = DriveTrainSim(self)
+            self.drivetrain = DriveTrain(self)
 
         self.shooter = Shooter(self)
 

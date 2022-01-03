@@ -1,5 +1,6 @@
 # drivetrain to use both in sim and robot mode - sim handles the Sparkmax now
 
+import wpilib
 import wpimath.kinematics
 import wpilib.drive
 from wpilib.command import Subsystem
@@ -22,6 +23,15 @@ class DriveTrain(Subsystem):
 
         # initialize sensors
         self.navx = navx.AHRS.create_spi()
+
+        # add two dummy PWMs so we can track the SparkMax in the sim (see periodic)
+        self.dummy_motor_left = wpilib.Jaguar(1)
+        self.dummy_motor_right = wpilib.Jaguar(3)
+        # initialize dummy encoders - all for the sim
+        self.dummy_l_encoder = wpilib.Encoder(0, 1, True)
+        self.dummy_r_encoder = wpilib.Encoder(2, 3, True)
+        self.dummy_l_encoder.setDistancePerPulse(drive_constants.k_encoder_distance_per_pulse_m)
+        self.dummy_r_encoder.setDistancePerPulse(drive_constants.k_encoder_distance_per_pulse_m)
 
         # initialize motors and encoders
         motor_type = rev.MotorType.kBrushless
@@ -149,6 +159,10 @@ class DriveTrain(Subsystem):
         """Perform odometry and update dash with telemetry"""
         self.counter += 1
         self.odometry.update(geo.Rotation2d.fromDegrees(-self.navx.getAngle()), self.l_encoder.getPosition(), -self.r_encoder.getPosition())
+
+        if self.robot.isSimulation():  # copy the spark output to the dummy PWMs for the sim
+            self.dummy_motor_left.set(self.spark_neo_left_front.get())
+            self.dummy_motor_right.set(self.spark_neo_right_front.get())
 
         if self.counter % 10 == 0:
             # start keeping track of where the robot is with an x and y position (only good for WCD)'

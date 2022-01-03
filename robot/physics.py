@@ -18,7 +18,6 @@ import subsystems.drive_constants as drive_constants
 import wpimath.geometry as geo
 import wpilib.simulation as simlib  # 2021 name for the simulation library
 
-
 class PhysicsEngine:
     """
         Simulates a motor moving something that strikes two limit switches,
@@ -26,7 +25,7 @@ class PhysicsEngine:
         realistic, but it's good enough to illustrate the point
     """
 
-    sparkmax = False
+    sparkmax = True
 
     def __init__(self, physics_controller: PhysicsInterface):
 
@@ -40,26 +39,27 @@ class PhysicsEngine:
         # --------  INITIALIZE HARDWARE  ---------------
 
 
-        if self.sparkmax:  # use the sparkmax drivetrain objects, access their position and velocity attributes
-            self.l_spark = simlib.SimDeviceSim('SPARK MAX [3]')
-            self.r_spark = simlib.SimDeviceSim('SPARK MAX [1]')
-            print(f'** SparkMax allows access to: **\n{self.r_spark.enumerateValues()} ')
-            self.l_spark_position = self.l_spark.getDouble('Position')
-            self.r_spark_position = self.r_spark.getDouble('Position')
-            self.l_spark_velocity = self.l_spark.getDouble('Velocity')
-            self.r_spark_velocity = self.r_spark.getDouble('Velocity')
-            self.l_spark_output = self.l_spark.getDouble('Applied Output')
-            self.r_spark_output = self.r_spark.getDouble('Applied Output')
+        #if self.sparkmax:  # use the sparkmax drivetrain objects, access their position and velocity attributes
+        self.l_spark = simlib.SimDeviceSim('SPARK MAX [1]')
+        self.r_spark = simlib.SimDeviceSim('SPARK MAX [3]')
+        # print(f'** SparkMax allows access to: **\n{self.r_spark.enumerateValues()} ')  # you see all these on 'other devices'
+        # initialize the variables we will track in the sparkmax SimDevices - basically our sparkmax's encoders
+        self.l_spark_position = self.l_spark.getDouble('Position')
+        self.r_spark_position = self.r_spark.getDouble('Position')
+        self.l_spark_velocity = self.l_spark.getDouble('Velocity')
+        self.r_spark_velocity = self.r_spark.getDouble('Velocity')
+        self.l_spark_output = self.l_spark.getDouble('Applied Output')
+        self.r_spark_output = self.r_spark.getDouble('Applied Output')
 
-        else:  # use the generic wpilib motors and encoders
-            self.l_motor = simlib.PWMSim(1)
-            self.r_motor = simlib.PWMSim(3)
-            self.l_encoder = simlib.EncoderSim.createForChannel(0)
-            self.r_encoder = simlib.EncoderSim.createForChannel(2)
+        # else:  # use the generic wpilib motors and encoders
+        self.l_motor = simlib.PWMSim(1)
+        self.r_motor = simlib.PWMSim(3)
+        self.l_encoder = simlib.EncoderSim.createForChannel(0)
+        self.r_encoder = simlib.EncoderSim.createForChannel(2)
 
-            # update units from drive constants
-            self.l_encoder.setDistancePerPulse(drive_constants.k_encoder_distance_per_pulse_m)
-            self.r_encoder.setDistancePerPulse(drive_constants.k_encoder_distance_per_pulse_m)
+        # update units from drive constants
+        self.l_encoder.setDistancePerPulse(drive_constants.k_encoder_distance_per_pulse_m)
+        self.r_encoder.setDistancePerPulse(drive_constants.k_encoder_distance_per_pulse_m)
 
         # hood IO
         self.hood_encoder = simlib.EncoderSim.createForChannel(4)
@@ -80,6 +80,7 @@ class PhysicsEngine:
 
 
         # --------  INITIALIZE FIELD SETTINGS  ---------------
+
 
         # keep us on the field - set x,y limits for driving
         field_size = 'home'
@@ -153,12 +154,22 @@ class PhysicsEngine:
         """
 
         # Simulate the drivetrain and update encoders
+
         if self.sparkmax:
-            #self.l_spark_output.set(0.333) # need the -1 to 1 motor value, and I have to fake it
-            #self.r_spark_output.set(0.999)
-            l_motor = self.l_spark_output.get()
-            r_motor = self.r_spark_output.get()
+            # since we can't see the sparkmax's output the same way the PWMSim sees the PWM motors, have to get it ourselves
+            # with sparkmax, if you use the .set fn, it updates AppliedOutput, Position and Velocity in the SimDevice
+            # initial solution: make a function in the drivetrain that returns the left and right motors and call here
+            # but the sim can't see the robot code, only the rio's values.
+            # next solution: make PWM followers to the sparkmaxes in the drivetrain, and update them if simulation
+            # worst solution - pass back and forth to networktables
+
+            l_motor = self.l_motor.getSpeed()
+            r_motor = self.r_motor.getSpeed()
+            self.l_spark_output.set(l_motor) # need the -1 to 1 motor value, and I have to fake it
+            self.r_spark_output.set(r_motor)
+
         else:
+            # a PWM drivetrain sets the PWMs and the PWMSim can read them - much simpler for the user
             l_motor = self.l_motor.getSpeed()  # these are PWM speeds of -1 to 1
             r_motor = self.r_motor.getSpeed()   #  going forward, left should be positive and right is negative
 
@@ -199,15 +210,16 @@ class PhysicsEngine:
         # damn it, the SparkMax and the standard encoders have different calls
 
         if self.sparkmax:
-            self.l_spark_position.set(self.l_spark_position.get() + (self.drivetrain.l_position - self.l_distance_old) * 0.3105)
-            self.r_spark_position.set(self.r_spark_position.get() + (self.drivetrain.r_position - self.r_distance_old) * 0.3105)
-            self.l_spark_velocity.set(0.31 * (self.drivetrain.l_position - self.l_distance_old) / tm_diff)
-            self.r_spark_velocity.set(0.31 * (self.drivetrain.r_position - self.r_distance_old) / tm_diff)
-        else:
-            self.l_encoder.setDistance(self.l_encoder.getDistance() + (self.drivetrain.l_position-self.l_distance_old) * 0.3105)
-            self.r_encoder.setDistance(self.r_encoder.getDistance() - (self.drivetrain.r_position-self.r_distance_old) * 0.3105)  # negative going forward
-            self.l_encoder.setRate(0.31*(self.drivetrain.l_position -self.l_distance_old)/tm_diff)
-            self.r_encoder.setRate(-0.31*(self.drivetrain.r_position -self.r_distance_old)/tm_diff)  # needs to be negitive going fwd
+            pass
+        self.l_spark_position.set(self.l_spark_position.get() + (self.drivetrain.l_position - self.l_distance_old) * 0.3105)
+        self.r_spark_position.set(self.r_spark_position.get() - (self.drivetrain.r_position - self.r_distance_old) * 0.3105)
+        self.l_spark_velocity.set(0.31 * (self.drivetrain.l_position - self.l_distance_old) / tm_diff)
+        self.r_spark_velocity.set(-0.31 * (self.drivetrain.r_position - self.r_distance_old) / tm_diff)
+        #else:
+        self.l_encoder.setDistance(self.l_encoder.getDistance() + (self.drivetrain.l_position-self.l_distance_old) * 0.3105)
+        self.r_encoder.setDistance(self.r_encoder.getDistance() - (self.drivetrain.r_position-self.r_distance_old) * 0.3105)  # negative going forward
+        self.l_encoder.setRate(0.31*(self.drivetrain.l_position -self.l_distance_old)/tm_diff)
+        self.r_encoder.setRate(-0.31*(self.drivetrain.r_position -self.r_distance_old)/tm_diff)  # needs to be negitive going fwd
 
         self.l_distance_old = self.drivetrain.l_position
         self.r_distance_old = self.drivetrain.r_position

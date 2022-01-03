@@ -24,7 +24,7 @@ k_robot_wheelbase = 18 * 0.5 * 0.0254
 # frc-characterization got 1.2, 1.82, 1.19, track 0.399 w/ R^2=1 when multiplying by 12V
 # frc-characterization got 1.39, 1.79, 1.16, track 0.41 w/ R^2=1 when just using tank drive as specified in the tool
 
-# bunch of historical values
+# bunch of historical values from characterization
 sim_values_8 = [1.39, 1.79, 1.16, 0.41]  # ks, kv, ka, track  for 8" wheels and 9.52 gear ratio
 sim_values_6 = [1.42, 0.811, 2.54, 0.40]  # ks, kv, ka, track  for 6" wheels and 9.52 gear ratio
 sim_values_4 = [1.39, 1.56, 0.355, 0.40]  # ks, kv, ka, track  for 4" wheels and 9.52 gear ratio
@@ -40,9 +40,9 @@ ks_volts, kv_volt_seconds_per_meter = 0, 0
 ka_volt_seconds_squared_per_meter, k_track_width_meters = 0, 0
 
 # Now we only have one set of constants - the robot needs to match the sim.  But the tank model does not quite deliver, so fudge things to match
-ks_volts = 0.6* robot_characterization['KS']  # frc-characterization consistently measures a larger ks than tankmodel uses, so correct here with factor of 0.67
-kv_volt_seconds_per_meter = 1.15* robot_characterization['KV']  # also a slight correction so it characterizes the same as the drivien robot
-ka_volt_seconds_squared_per_meter = 1.15* robot_characterization['KA']  #
+#ks_volts = 0.6* robot_characterization['KS']  # frc-characterization consistently measures a larger ks than tankmodel uses, so correct here with factor of 0.67
+#kv_volt_seconds_per_meter = 1.15* robot_characterization['KV']  # also a slight correction so it characterizes the same as the driven robot
+#ka_volt_seconds_squared_per_meter = 1.15* robot_characterization['KA']  #
 ks_volts = robot_characterization['KS']  # frc-characterization consistently measures a larger ks than tankmodel uses, so correct here with factor of 0.67
 kv_volt_seconds_per_meter = robot_characterization['KV']  # also a slight correction so it characterizes the same as the drivien robot
 ka_volt_seconds_squared_per_meter = robot_characterization['KA']  #
@@ -87,7 +87,7 @@ k_max_centripetal_acceleration_meters_per_second_squared = 2.75  # force slower 
 
 # Reasonable baseline values for a RAMSETE follower in units of meters and seconds
 ramsete_B = 2  # default 2.  like a proportional, higher is more aggressive
-ramsete_Zeta = 0.9  #  default 0.7.  like a damping term, needs to be between 0 and 1
+ramsete_Zeta = 0.9  #  default 0.7.  like a damping term, and needs to be between 0 and 1
 
 
 # --------------  DRIVETRAIN OBJECTS FOR TRAJECTORY TRACKING  -------------
