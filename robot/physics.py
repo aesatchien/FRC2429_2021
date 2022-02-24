@@ -82,10 +82,10 @@ class PhysicsEngine:
         # --------  INITIALIZE FIELD SETTINGS  ---------------
 
         # keep us on the field - set x,y limits for driving
-        field_size = 'home'
+        field_size = 'competition'
         if field_size == 'competition':
             self.x_limit, self.y_limit = 15.97+0.5, 8.21+0.5  # meters for a 52.4x26.9' field PLUS 0.5 meter border
-            self.x, self.y = 2, 8.21/2
+            self.x, self.y = 4, 8.21/2
         else: # at home autonomous challenge for 2021
             self.x_limit, self.y_limit = 9.114, 4.572  # meters for a 30x15' DO NOT INCLUDE BORDER.  To that with the imgui.ini.
                     # Set our position on the field
