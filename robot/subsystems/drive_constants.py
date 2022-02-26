@@ -15,7 +15,7 @@ from wpimath.trajectory.constraint import DifferentialDriveVoltageConstraint, Ce
 k_wheel_diameter_in = 4  # wheel diameter in inches
 k_wheel_diameter_m = 4 * 0.0254  # wheel diameter in meters
 k_robot_length = 30 * 0.0254
-k_robot_width = 24* 0.0254
+k_robot_width = 24 * 0.0254
 k_robot_wheelbase = 18 * 0.5 * 0.0254
 
 # get these from robot characterization tools - using simulated values for now
@@ -196,6 +196,7 @@ def get_pathweaver_trajectory(course):
         pathweaver_trajectory = None
     return pathweaver_trajectory
 
+@DeprecationWarning
 def get_pathweaver_files():
     path_files = glob.glob('../robot/pathweaver/vel*/*/*pw*', recursive=True)
     file_names = [Path(file).name[:-12] + '_' + Path(file).parent.parent.name for file in path_files]

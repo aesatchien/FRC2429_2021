@@ -118,8 +118,10 @@ class DriveTrain(Subsystem):
 
     def get_rate(self, encoder): # spark maxes and regular encoders use different calls... annoying
         return encoder.getVelocity()
+
     def get_position(self, encoder):
         return encoder.getPosition()
+
     def set_position(self, encoder, position):
         encoder.setPosition(position)
 
