@@ -16,6 +16,7 @@ import networktables
 from subsystems.drivetrain_sim import DriveTrainSim  # simulation only, no SparkMax devices
 from subsystems.drivetrain import DriveTrain  # uses SparkMax, trying to get to work with simulation
 from subsystems.shooter import Shooter
+from subsystems.vision import Vision
 from oi import OI
 
 class Robot(CommandBasedRobot):
@@ -40,6 +41,7 @@ class Robot(CommandBasedRobot):
             self.drivetrain = DriveTrainSim(self)
 
         self.shooter = Shooter(self)
+        self.vision = Vision()
 
         # oi MUST be created after all other subsystems since it uses them
         self.oi = OI(self)

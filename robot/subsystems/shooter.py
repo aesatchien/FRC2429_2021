@@ -82,7 +82,6 @@ class Shooter(Subsystem):
     def periodic(self) -> None:
         """Perform necessary periodic updates"""
         self.counter += 1
-
         if self.counter % 5 == 0:
             # pass
             # ten per second updates
