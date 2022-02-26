@@ -18,6 +18,7 @@ from commands.shooter_toggle_flywheel import ShooterToggleFlywheel
 from commands.shooter_hood import ShooterHood
 from commands.shooter_fire import ShooterFire
 from commands.shooter_feed import ShooterFeed
+from commands.drive_to_ball import DriveToBall
 
 import subsystems.drive_constants as drive_constants
 
@@ -50,15 +51,19 @@ class OI(object):
         #self.buttonX.whenPressed( AutonomousRotate(self.robot, setpoint=-60, timeout=4, source='dashboard', absolute=True) )
         #self.buttonY.whenPressed( ShooterHood(self.robot, button=self.buttonY, power=-0.07) )
         #self.buttonA.whenPressed( ShooterHood(self.robot, button=self.buttonA, power=0.07) )
-        self.buttonY.whenPressed(ShooterToggleFlywheel(self.robot, omega=-4150))
+        # self.buttonY.whenPressed(ShooterToggleFlywheel(self.robot, omega=-4150))
         self.buttonA.whenPressed(ShooterToggleFlywheel(self.robot, omega=-3250))
-        self.buttonX.whenPressed(ShooterToggleFlywheel(self.robot, omega=-4800))
+        # self.buttonX.whenPressed(ShooterToggleFlywheel(self.robot, omega=-4800))
         # self.buttonY.whenPressed( AutonomousDrivePID(self.robot, setpoint=2, timeout=4, source='dashboard') )
         # self.buttonLB.whenPressed(ShooterFire(self.robot, button=self.buttonLB))
 
         self.buttonRB.whenPressed(ShooterFeed(self.robot, button=self.buttonRB, direction="forward"))
         self.axisButtonRT.whenPressed(ShooterFeed(self.robot, button=self.axisButtonRT, direction="forward"))
         self.buttonLB.whenPressed(ShooterFeed(self.robot, button=self.buttonLB, direction="backward"))
+
+        # testing vision commands
+        self.buttonY.whileHeld(DriveToBall(self.robot))
+        # self.buttonX.whenPressed()
 
         # g h j k on the keyboard
         # self.buttonLB.whenPressed( AutonomousSlalom(self.robot)  )
