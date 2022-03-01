@@ -23,7 +23,7 @@ class AutonomousRotate(Command):
         self.robot = robot
 
         self.tolerance = 1
-        self.kp = 0.3;  self.kd = 0.1; self.kf = 0.1
+        self.kp = 0.2;  self.kd = 0.1; self.kf = 0.1
         self.start_angle = 0
 
         self.power = 0; self.max_power = 0.5  # clamp maximum power for turning so we don't over turn

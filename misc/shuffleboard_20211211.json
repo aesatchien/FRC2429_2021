@@ -321,6 +321,39 @@
               "_source0": "network_table:///SmartDashboard/El PID",
               "_title": "SmartDashboard/El PID"
             }
+          },
+          "9,2": {
+            "size": [
+              2,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/drive_encoders LR",
+              "_title": "drive_encoders LR"
+            }
+          },
+          "12,1": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/drive_heading",
+              "_title": "drive_heading"
+            }
+          },
+          "9,3": {
+            "size": [
+              2,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/drive_heading",
+              "_title": "SmartDashboard/drive_heading"
+            }
           }
         }
       }
@@ -569,8 +602,8 @@
     }
   ],
   "windowGeometry": {
-    "x": 45.0,
-    "y": 100.0,
+    "x": 150.0,
+    "y": 12.0,
     "width": 1777.0,
     "height": 773.0
   }

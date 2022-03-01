@@ -124,6 +124,7 @@ class OI(object):
         #SmartDashboard.putData("Auto Ramsete", self.autonomous_test_ramsete_command)
         #SmartDashboard.putData("Auto PID", self.autonomous_pid_command)
         #SmartDashboard.putData("Auto Drive", self.drive_fwd_command )
+        SmartDashboard.putData('Rotate command', self.rotate_command)
 
         # set up the dashboard chooser for the autonomous options
         self.obstacle_chooser = SendableChooser()
